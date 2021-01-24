@@ -7,9 +7,16 @@ error = "Codice fiscale non valido"
 
 def detect_face(img):
     detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     dets = detector(img, 1)  # Detect the faces in the image
+    crop=img
     for i, d in enumerate(dets):
+        landmark = predictor(img, d)
+        dist_eye = landmark.part(45).x- landmark.part(36).x
+        print(dist_eye)
+        crop = img[d.top():d.bottom(), d.left():d.right()]
         cv2.rectangle(img, (d.left(), d.top()), (d.right(), d.bottom()), (0, 255, 0), 3)
+    cv2.imshow('Face', crop)
 
 
 
