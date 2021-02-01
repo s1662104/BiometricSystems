@@ -4,18 +4,21 @@ import cv2
 
 message = "Inserire codice fiscale: "
 error = "Codice fiscale non valido"
+dim_image = 64
 
-def detect_face(img):
+def detect_face(img, vis):
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     dets = detector(img, 1)  # Detect the faces in the image
-    crop=img
     for i, d in enumerate(dets):
         landmark = predictor(img, d)
-        dist_eye = landmark.part(45).x- landmark.part(36).x
-        print(dist_eye)
-        crop = img[d.top():d.bottom(), d.left():d.right()]
-        cv2.rectangle(img, (d.left(), d.top()), (d.right(), d.bottom()), (0, 255, 0), 3)
+        top = landmark.part(19).y
+        left = landmark.part(0).x
+        right = landmark.part(16).x
+        bottom = landmark.part(8).y
+        crop = img[top:bottom, left:right]
+        cv2.rectangle(vis, (left, top), (right, bottom), (0, 255, 0), 3)
+        crop = cv2.resize(crop, (dim_image, dim_image))
     cv2.imshow('Face', crop)
 
 
@@ -30,13 +33,15 @@ if __name__ == '__main__':
             # Capture frame-by-frame
             ret, frame = cap.read()
 
+            vis = frame.copy()
+
             # Our operations on the frame come here
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            detect_face(gray)
+            detect_face(gray, vis)
 
             # Display the resulting frame
-            cv2.imshow('frame', gray)
+            cv2.imshow('frame', vis)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
