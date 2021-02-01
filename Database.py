@@ -11,29 +11,29 @@ class Database():
         # probe of user that are not in the gallery in percentage
         self.pn = 20
 
-        # self.data=np.load("Olivetti_faces/olivetti_faces.npy")
-        # self.target=np.load("Olivetti_faces/olivetti_faces_target.npy")
+        self.data=np.load("Olivetti_faces/olivetti_faces.npy")
+        self.target=np.load("Olivetti_faces/olivetti_faces_target.npy")
 
-        self.data = []
-        self.target = []
-        tar = tarfile.open("LFW\lfw-funneled.tgz", "r:gz")
-        counter = 0
-        for tarinfo in tar:
-
-            tar.extract(tarinfo.name)
-            if tarinfo.name[-4:] == ".jpg":
-                image = cv2.imread(tarinfo.name, cv2.IMREAD_COLOR)
-                image = cv2.resize(image, None, fx=0.4, fy=0.4, interpolation=cv2.INTER_AREA)
-                self.data.append(np.array(image))
-                counter += 1
-
-                name = tarinfo.name.split("/")[1]
-                self.target.append(name)
-            if tarinfo.isdir():
-                pass
-            else:
-                os.remove(tarinfo.name)
-        tar.close()
+        # self.data = []
+        # self.target = []
+        # tar = tarfile.open("LFW\lfw-funneled.tgz", "r:gz")
+        # counter = 0
+        # for tarinfo in tar:
+        #
+        #     tar.extract(tarinfo.name)
+        #     if tarinfo.name[-4:] == ".jpg":
+        #         image = cv2.imread(tarinfo.name, cv2.IMREAD_COLOR)
+        #         image = cv2.resize(image, None, fx=0.4, fy=0.4, interpolation=cv2.INTER_AREA)
+        #         self.data.append(np.array(image))
+        #         counter += 1
+        #
+        #         name = tarinfo.name.split("/")[1]
+        #         self.target.append(name)
+        #     if tarinfo.isdir():
+        #         pass
+        #     else:
+        #         os.remove(tarinfo.name)
+        # tar.close()
 
     def split_data(self):
         unique, counts = np.unique(db.target, return_counts=True)
@@ -44,10 +44,7 @@ class Database():
         print(skipped_user)
         count=0
         template=0
-        gallery_data = []
-        gallery_target = []
-        probe_data = []
-        probe_target = []
+        gallery_data, gallery_target, probe_data,probe_target = [], [], [], []
         for i,val in enumerate(self.target):
             occ = occurrences[val]
             #print("it:",i,"count:",count,"skipped:",skipped_user,"cond:",count<skipped_user,"template:", template,"occ:",occ,"user:",val,)
@@ -66,12 +63,10 @@ class Database():
             else:
                 template = template+1
                 gallery=False
-                print(template,occ)
                 if (template == occ):
                     template = 0
                     if (count==skipped_user):
                         count=0
-                #if (occ == 1): break
             if (gallery):
                 gallery_data.append(self.data[i])
                 gallery_target.append(self.target[i])
