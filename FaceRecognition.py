@@ -6,7 +6,7 @@ message = "Inserire codice fiscale: "
 error = "Codice fiscale non valido"
 dim_image = 64
 
-def detect_face(img, vis):
+def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     dets = detector(img, 1)  # Detect the faces in the image
