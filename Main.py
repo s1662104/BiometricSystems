@@ -10,7 +10,6 @@ def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     dets = detector(img, 1)  # Detect the faces in the image
-    print(dets)
     for i, d in enumerate(dets):
         landmark = predictor(img, d)
         top = landmark.part(19).y
