@@ -17,7 +17,7 @@ class Database():
 
         self.data = []
         self.target = []
-        tar = tarfile.open("LFW\lfw-funneled.tgz", "r:gz")
+        tar = tarfile.open("LFW/lfw-funneled.tgz", "r:gz")
         counter = 0
         for tarinfo in tar:
 
@@ -90,7 +90,6 @@ class Database():
         if self.db_index == 1:
             norm_image = cv2.cvtColor(norm_image, cv2.COLOR_BGR2GRAY)
         return norm_image
-
 
     def get_target(self,i):
         return self.target[i]
