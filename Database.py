@@ -83,6 +83,7 @@ class Database():
     def get_user(self,i):
         return self.data[i]
 
+    #converte array del db con pixel in [0,1] in array con pixel in [0,255]
     def get_normalized_user(self,i):
         norm_image = cv2.normalize(self.get_user(i), None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         norm_image = norm_image.astype(np.uint8)
