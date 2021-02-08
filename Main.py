@@ -10,6 +10,7 @@ def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     dets = detector(img, 1)  # Detect the faces in the image
+    print(dets)
     for i, d in enumerate(dets):
         landmark = predictor(img, d)
         top = landmark.part(19).y
@@ -19,7 +20,8 @@ def detect_face(img, vis, crop=None):
         crop = img[top:bottom, left:right]
         cv2.rectangle(vis, (left, top), (right, bottom), (0, 255, 0), 3)
         crop = cv2.resize(crop, (dim_image, dim_image))
-    cv2.imshow('Face', crop)
+    if (len(dets)>0):
+        cv2.imshow('Face', crop)
 
 
 
