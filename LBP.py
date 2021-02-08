@@ -1,6 +1,7 @@
 import Database
 import cv2
 import numpy as np
+import math
 
 class LBP:
 
@@ -13,6 +14,8 @@ class LBP:
             self.img = []
             for i in range(10):
                 self.img.append(np.arange(10 * i, 10 * (i + 1)))
+            self.img = np.array(self.img).astype(np.uint8)
+
 
     # def define_window(self):
     #     neighbor = self.radius*8
@@ -41,22 +44,30 @@ class LBP:
         x[1:-1, 1:-1] = 0
         print(x)
 
-    def find_neighborhood(self):
-        x = np.arange(0,self.neighborhood)
-        x = self.radius * np.cos(2 * np.pi * x / self.neighborhood)
+    def find_pixels(self, cx, cy):
+        #dividere un angolo di 360 in self.neighborhood parti
+        angles_array = 2*np.pi/self.neighborhood
+        #ottenere tutti gli angoli
+        alpha = np.arange(0, 2 * np.pi, angles_array)
+        #calcolare coppia di seno e coseno per ogni angolo
+        s_points = np.array([-np.sin(alpha), np.cos(alpha)]).transpose()
+        s_points *= self.radius
+        print(s_points)
+        print(self.img[cx][cy])
 
-        y = np.arange(0, self.neighborhood)
-        y = -self.radius * np.sin(2 * np.pi * x / self.neighborhood)
-        print(x,y)
+        # for i in range(s_points.shape[0]):
+        #     print(i,cx,cy)
+
 
 
 
 if __name__ == '__main__':
-    #db = Database.Database()
-    #data = db.get_normalized_template(1)
+    # db = Database.Database()
+    # data = db.get_normalized_template(1)
 
     lbp = LBP(1,8, None)
-    lbp.find_neighborhood()
+    print(lbp.img)
+    lbp.find_pixels(4,4)
 
     # while(True):
     #     cv2.imshow('frame', data)

@@ -11,31 +11,31 @@ class Database():
         # probe of user that are not in the gallery in percentage
         self.pn = 20
 
-        # self.data=np.load("Olivetti_faces/olivetti_faces.npy")
-        # self.target=np.load("Olivetti_faces/olivetti_faces_target.npy")
-        # self.db_index = 0
+        self.data=np.load("Olivetti_faces/olivetti_faces.npy")
+        self.target=np.load("Olivetti_faces/olivetti_faces_target.npy")
+        self.db_index = 0
 
-        self.data = []
-        self.target = []
-        tar = tarfile.open("LFW\lfw-funneled.tgz", "r:gz")
-        counter = 0
-        for tarinfo in tar:
-
-            tar.extract(tarinfo.name)
-            if tarinfo.name[-4:] == ".jpg":
-                image = cv2.imread(tarinfo.name, cv2.IMREAD_COLOR)
-                image = cv2.resize(image, None, fx=0.4, fy=0.4, interpolation=cv2.INTER_AREA)
-                self.data.append(np.array(image))
-                counter += 1
-
-                name = tarinfo.name.split("/")[1]
-                self.target.append(name)
-            if tarinfo.isdir():
-                pass
-            else:
-                os.remove(tarinfo.name)
-        tar.close()
-        self.db_index = 1
+        # self.data = []
+        # self.target = []
+        # tar = tarfile.open("LFW\lfw-funneled.tgz", "r:gz")
+        # counter = 0
+        # for tarinfo in tar:
+        #
+        #     tar.extract(tarinfo.name)
+        #     if tarinfo.name[-4:] == ".jpg":
+        #         image = cv2.imread(tarinfo.name, cv2.IMREAD_COLOR)
+        #         image = cv2.resize(image, None, fx=0.4, fy=0.4, interpolation=cv2.INTER_AREA)
+        #         self.data.append(np.array(image))
+        #         counter += 1
+        #
+        #         name = tarinfo.name.split("/")[1]
+        #         self.target.append(name)
+        #     if tarinfo.isdir():
+        #         pass
+        #     else:
+        #         os.remove(tarinfo.name)
+        # tar.close()
+        # self.db_index = 1
 
     def split_data(self):
         unique, counts = np.unique(db.target, return_counts=True)
