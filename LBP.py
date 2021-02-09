@@ -1,6 +1,7 @@
 import Database
 import cv2
 import numpy as np
+from scipy import interpolate
 import math
 
 class LBP:
@@ -16,27 +17,6 @@ class LBP:
                 self.img.append(np.arange(10 * i, 10 * (i + 1)))
             self.img = np.array(self.img).astype(np.uint8)
 
-
-    # def define_window(self):
-    #     neighbor = self.radius*8
-    #     count = int(neighbor/self.neighborhood)-1
-    #     min = -self.radius
-    #     max = self.radius+1
-    #     str = ""
-    #     c = count
-    #     print(count, c)
-    #     for x in range(min, max):
-    #         for y in range(min, max):
-    #             if abs(x)==self.radius or abs(y)==self.radius:
-    #                 if c==0:
-    #                     str = str+"1"
-    #                 else: str = str+"0"
-    #                 c = c-1
-    #             else: str = str+"0"
-    #             if c<0:
-    #                 c = count
-    #         str = str+"\n"
-    #     print(str)
 
     def define_window(self):
         dim = self.radius*2+1
@@ -54,12 +34,22 @@ class LBP:
         s_points *= self.radius
         print(s_points)
         print(self.img[cx][cy])
-
-        # for i in range(s_points.shape[0]):
-        #     print(i,cx,cy)
-
-
-
+        # per ogni punto
+        pixels = []
+        for x,y in s_points:
+            #analizziamo la parte frazionaria, considerando solo i primi quattro valori.
+            # Se questi sono 0, allora si riferiscono ai punti nei gradi
+            #0,90,180,270, che sono gli unici a trovarsi al centro del pixel.
+            # In questo caso, non hanno bisogno di interpolazione
+            x = np.round(x,4)
+            y = np.round(y,4)
+            x_fract = x - np.round(x)
+            y_fract = y - np.round(y)
+            if (x_fract==0 and y_fract==0):
+                coorx = int(x)
+                coory = int(y)
+                pixels.append(self.img[cx+coorx][cy+coory])
+        print(pixels)
 
 if __name__ == '__main__':
     # db = Database.Database()
@@ -67,6 +57,8 @@ if __name__ == '__main__':
 
     lbp = LBP(1,8, None)
     print(lbp.img)
+    print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
+
     lbp.find_pixels(4,4)
 
     # while(True):
