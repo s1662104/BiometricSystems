@@ -24,7 +24,7 @@ class LBP:
         x[1:-1, 1:-1] = 0
         print(x)
 
-    def find_pixels(self, cx, cy):
+    def find_neighbors(self, cx, cy):
         #dividere un angolo di 360 in self.neighborhood parti
         angles_array = 2*np.pi/self.neighborhood
         #ottenere tutti gli angoli
@@ -49,6 +49,16 @@ class LBP:
                 coorx = int(x)
                 coory = int(y)
                 pixels.append(self.img[cx+coorx][cy+coory])
+            else:
+                x_min = np.ceil(x).astype(int)
+                y_min = np.ceil(y).astype(int)
+                x_max = np.floor(x).astype(int)
+                y_max = np.floor(y).astype(int)
+                print("-----------")
+                print(x,y)
+                print(x_min,y_min)
+                print(x_max,y_max)
+                print(self.img[cx+x_min,cx+y_min],self.img[cx+x_max,cx+y_max],self.img[cx+x_min,cx+y_max],self.img[cx+x_max,cx+y_min])
         print(pixels)
 
 if __name__ == '__main__':
@@ -59,7 +69,7 @@ if __name__ == '__main__':
     print(lbp.img)
     print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
 
-    lbp.find_pixels(4,4)
+    lbp.find_neighbors(4,4)
 
     # while(True):
     #     cv2.imshow('frame', data)
