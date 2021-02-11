@@ -1,8 +1,4 @@
-import Database
-import cv2
 import numpy as np
-from scipy import interpolate
-import math
 
 class LBP:
 
@@ -50,16 +46,35 @@ class LBP:
                 coory = int(y)
                 pixels.append(self.img[cx+coorx][cy+coory])
             else:
-                x_min = np.ceil(x).astype(int)
-                y_min = np.ceil(y).astype(int)
-                x_max = np.floor(x).astype(int)
-                y_max = np.floor(y).astype(int)
-                print("-----------")
-                print(x,y)
-                print(x_min,y_min)
-                print(x_max,y_max)
-                print(self.img[cx+x_min,cx+y_min],self.img[cx+x_max,cx+y_max],self.img[cx+x_min,cx+y_max],self.img[cx+x_max,cx+y_min])
+                x_c = np.ceil(x).astype(int)
+                y_c = np.ceil(y).astype(int)
+                x_f = np.floor(x).astype(int)
+                y_f = np.floor(y).astype(int)
+                if x_c == 0:
+                    x1 = x_c
+                    x2 = x_f
+                else:
+                    x1 = x_f
+                    x2 = x_c
+                if y_c == 0:
+                    y1 = y_c
+                    y2 = y_f
+                else:
+                    y1 = y_f
+                    y2 = y_c
+                print(x_c,y_c,x_f,y_f)
+                value = self.bilinear_interpolation(x1,y1,x2,y2,cx,cy,x,y)
+                pixels.append(value)
         print(pixels)
+
+    def bilinear_interpolation(self,x1,y1,x2,y2,cx,cy,x,y):
+        Q11 = self.img[cx + x1][cy + y1]
+        Q21 = self.img[cx + x1][cy + y2]
+        Q12 = self.img[cx + x2][cy + y1]
+        Q22 = self.img[cx + x2][cy + y2]
+        dem = (x2 - x1) * (y2 - y1)
+        return (Q11*(x2-x)*(y2-y)/dem)+(Q21*(x-x1)*(y2-y)/dem)+\
+                (Q12 * (x2 - x) * (y - y1) / dem)+(Q22 * (x - x1) * (y - y1) / dem)
 
 if __name__ == '__main__':
     # db = Database.Database()
@@ -68,8 +83,25 @@ if __name__ == '__main__':
     lbp = LBP(1,8, None)
     print(lbp.img)
     print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
+    lbp.find_neighbors(4,4)
 
     lbp.find_neighbors(4,4)
+    lbp.img[4][4] = 33
+    lbp.img[3][3] = 25
+    lbp.img[3][4] = 41
+    lbp.img[3][5] = 24
+    lbp.img[4][3] = 29
+    lbp.img[4][5] = 80
+    lbp.img[5][3] = 38
+    lbp.img[5][4] = 56
+    lbp.img[5][5] = 65
+    #
+
+    print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
+    print(lbp.bilinear_interpolation(0,0,1,-1,4,4,-0.7071,0.7071))
+
+
+
 
     # while(True):
     #     cv2.imshow('frame', data)
