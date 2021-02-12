@@ -1,6 +1,6 @@
 import numpy as np
 
-class LBP:
+class Local_Binary_Pattern:
 
     def __init__(self, radius, neighborhood, img):
         self.radius = radius
@@ -13,12 +13,12 @@ class LBP:
                 self.img.append(np.arange(10 * i, 10 * (i + 1)))
             self.img = np.array(self.img).astype(np.uint8)
 
-
-    def define_window(self):
-        dim = self.radius*2+1
-        x = np.ones((dim, dim))
-        x[1:-1, 1:-1] = 0
-        print(x)
+    #ALT: VEDERE BENE L'ORDINE DELLE CELLE ESAMINATE
+    def compute_lbp(self):
+        pixels = lbp.find_neighbors(4, 4)
+        print(pixels)
+        pattern = np.where(pixels > lbp.img[4][4],1,0)
+        print(pattern)
 
     def find_neighbors(self, cx, cy):
         #dividere un angolo di 360 in self.neighborhood parti
@@ -28,7 +28,6 @@ class LBP:
         #calcolare coppia di seno e coseno per ogni angolo
         s_points = np.array([-np.sin(alpha), np.cos(alpha)]).transpose()
         s_points *= self.radius
-        print(s_points)
         print(self.img[cx][cy])
         # per ogni punto
         pixels = []
@@ -62,10 +61,9 @@ class LBP:
                 else:
                     y1 = y_f
                     y2 = y_c
-                print(x_c,y_c,x_f,y_f)
                 value = self.bilinear_interpolation(x1,y1,x2,y2,cx,cy,x,y)
-                pixels.append(value)
-        print(pixels)
+                pixels.append(np.round(value).astype(int))
+        return pixels
 
     def bilinear_interpolation(self,x1,y1,x2,y2,cx,cy,x,y):
         Q11 = self.img[cx + x1][cy + y1]
@@ -76,32 +74,16 @@ class LBP:
         return (Q11*(x2-x)*(y2-y)/dem)+(Q21*(x-x1)*(y2-y)/dem)+\
                 (Q12 * (x2 - x) * (y - y1) / dem)+(Q22 * (x - x1) * (y - y1) / dem)
 
+    #def find_patter(self,pixels):
+
 if __name__ == '__main__':
     # db = Database.Database()
     # data = db.get_normalized_template(1)
 
-    lbp = LBP(1,8, None)
+    lbp = Local_Binary_Pattern(1,8, None)
     print(lbp.img)
     print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
-    lbp.find_neighbors(4,4)
-
-    lbp.find_neighbors(4,4)
-    lbp.img[4][4] = 33
-    lbp.img[3][3] = 25
-    lbp.img[3][4] = 41
-    lbp.img[3][5] = 24
-    lbp.img[4][3] = 29
-    lbp.img[4][5] = 80
-    lbp.img[5][3] = 38
-    lbp.img[5][4] = 56
-    lbp.img[5][5] = 65
-    #
-
-    print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
-    print(lbp.bilinear_interpolation(0,0,1,-1,4,4,-0.7071,0.7071))
-
-
-
+    lbp.compute_lbp()
 
     # while(True):
     #     cv2.imshow('frame', data)
