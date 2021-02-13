@@ -25,6 +25,7 @@ class Local_Binary_Pattern:
         angles_array = 2*np.pi/self.neighborhood
         #ottenere tutti gli angoli
         alpha = np.arange(0, 2 * np.pi, angles_array)
+        #ordiniamo i gradi in modo tale da partire dall'angolo in alto a sx e procedere verso dx
         alpha = lbp.sort_points(alpha)
         print(np.degrees(alpha))
         #calcolare coppia di seno e coseno per ogni angolo
@@ -94,7 +95,7 @@ class Local_Binary_Pattern:
 if __name__ == '__main__':
     # db = Database.Database()
     # data = db.get_normalized_template(1)
-    lbp = Local_Binary_Pattern(1,8, None)
+    lbp = Local_Binary_Pattern(2,16, None)
     print(lbp.img)
     print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
     lbp.compute_lbp()
