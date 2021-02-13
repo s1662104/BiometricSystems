@@ -25,6 +25,8 @@ class Local_Binary_Pattern:
         angles_array = 2*np.pi/self.neighborhood
         #ottenere tutti gli angoli
         alpha = np.arange(0, 2 * np.pi, angles_array)
+        alpha = lbp.sort_points(alpha)
+        print(np.degrees(alpha))
         #calcolare coppia di seno e coseno per ogni angolo
         s_points = np.array([-np.sin(alpha), np.cos(alpha)]).transpose()
         s_points *= self.radius
@@ -40,6 +42,7 @@ class Local_Binary_Pattern:
             y = np.round(y,4)
             x_fract = x - np.round(x)
             y_fract = y - np.round(y)
+            print(x,y)
             if (x_fract==0 and y_fract==0):
                 coorx = int(x)
                 coory = int(y)
@@ -74,12 +77,23 @@ class Local_Binary_Pattern:
         return (Q11*(x2-x)*(y2-y)/dem)+(Q21*(x-x1)*(y2-y)/dem)+\
                 (Q12 * (x2 - x) * (y - y1) / dem)+(Q22 * (x - x1) * (y - y1) / dem)
 
-    #def find_patter(self,pixels):
+    def sort_points(self,alpha):
+        if self.neighborhood>4:
+            left_point=np.where(np.degrees(alpha)==135.)[0][0];
+        else:
+            left_point=np.where(np.degrees(alpha)==90.)[0][0];
+        new_alpha = []
+        count = left_point
+        while len(new_alpha)!=self.neighborhood:
+            new_alpha.append(alpha[count])
+            if np.degrees(alpha[count])==0.:
+                count = self.neighborhood
+            count -=1
+        return new_alpha
 
 if __name__ == '__main__':
     # db = Database.Database()
     # data = db.get_normalized_template(1)
-
     lbp = Local_Binary_Pattern(1,8, None)
     print(lbp.img)
     print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
