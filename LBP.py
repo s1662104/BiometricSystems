@@ -13,12 +13,22 @@ class Local_Binary_Pattern:
                 self.img.append(np.arange(10 * i, 10 * (i + 1)))
             self.img = np.array(self.img).astype(np.uint8)
 
-    #ALT: VEDERE BENE L'ORDINE DELLE CELLE ESAMINATE
     def compute_lbp(self):
+        new_img = [[0 for y in range(self.img.shape[0]-2)] for x in range(self.img.shape[1]-2)]
         pixels = lbp.find_neighbors(4, 4)
-        print(pixels)
+        print("PIXELS",pixels)
         pattern = np.where(pixels > lbp.img[4][4],1,0)
-        print(pattern)
+        print("PATTERN:",pattern)
+        value=0
+        count=0
+        for i in pattern:
+            value += i * 2**count
+            count+=1
+        new_img[4][4]=value
+        print(value)
+        print("NEW IMG", new_img)
+
+
 
     def find_neighbors(self, cx, cy):
         #dividere un angolo di 360 in self.neighborhood parti
@@ -43,7 +53,7 @@ class Local_Binary_Pattern:
             y = np.round(y,4)
             x_fract = x - np.round(x)
             y_fract = y - np.round(y)
-            print(x,y)
+            #print(x,y)
             if (x_fract==0 and y_fract==0):
                 coorx = int(x)
                 coory = int(y)
@@ -95,7 +105,7 @@ class Local_Binary_Pattern:
 if __name__ == '__main__':
     # db = Database.Database()
     # data = db.get_normalized_template(1)
-    lbp = Local_Binary_Pattern(2,16, None)
+    lbp = Local_Binary_Pattern(1,8, None)
     print(lbp.img)
     print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
     lbp.compute_lbp()
