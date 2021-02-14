@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 class Local_Binary_Pattern:
 
@@ -8,27 +9,35 @@ class Local_Binary_Pattern:
         if self.radius <= 0 or self.neighborhood < 4 or self.neighborhood>self.radius*8:
             raise Exception("Input error")
         if (img==None):
-            self.img = []
-            for i in range(10):
-                self.img.append(np.arange(10 * i, 10 * (i + 1)))
-            self.img = np.array(self.img).astype(np.uint8)
+            # self.img = []
+            # for i in range(10):
+            #     self.img.append(np.arange(10 * i, 10 * (i + 1)))
+            # self.img = np.array(self.img).astype(np.uint8)
+            self.img = np.array([[10, 2, 32, 18, 81], [4, 73, 21, 10, 42], [54, 21, 17, 62, 49], [1, 72, 8, 92, 62], [7, 77, 28, 10, 88], ], np.int32)
 
     def compute_lbp(self):
-        new_img = [[0 for y in range(self.img.shape[0]-2)] for x in range(self.img.shape[1]-2)]
-        pixels = lbp.find_neighbors(4, 4)
-        print("PIXELS",pixels)
-        pattern = np.where(pixels > lbp.img[4][4],1,0)
-        print("PATTERN:",pattern)
-        value=0
-        count=0
-        for i in pattern:
-            value += i * 2**count
-            count+=1
-        new_img[4][4]=value
-        print(value)
-        print("NEW IMG", new_img)
-
-
+        new_img = [[0 for y in range(self.img.shape[0] - 2)] for x in range(self.img.shape[1] - 2)]
+        for i in range(self.radius,self.img.shape[0]-self.radius):
+            for j in range(1,self.img.shape[1]-self.radius):
+                #print("----------------")
+                #print("i;j:", i, j)
+                #print("value:", self.img[i][j])
+                #print("neighborhood:")
+                #print(lbp.img[i - lbp.radius: i + lbp.radius + 1, j - lbp.radius: j + lbp.radius + 1])
+                pixels = lbp.find_neighbors(i, j)
+                #print("PIXELS",pixels)
+                pattern = np.where(pixels > lbp.img[i][j], 1, 0)
+                #print("PATTERN:",pattern)
+                value = 0
+                count = 0
+                for k in pattern:
+                    value += k * 2 ** count
+                    count += 1
+                new_img[i - 1][j - 1] = value % 256
+                #print("new value:", value)
+                #print("----------------")
+        #print("NEW IMG", new_img)
+        return new_img
 
     def find_neighbors(self, cx, cy):
         #dividere un angolo di 360 in self.neighborhood parti
@@ -37,7 +46,7 @@ class Local_Binary_Pattern:
         alpha = np.arange(0, 2 * np.pi, angles_array)
         #ordiniamo i gradi in modo tale da partire dall'angolo in alto a sx e procedere verso dx
         alpha = lbp.sort_points(alpha)
-        print(np.degrees(alpha))
+        #print(np.degrees(alpha))
         #calcolare coppia di seno e coseno per ogni angolo
         s_points = np.array([-np.sin(alpha), np.cos(alpha)]).transpose()
         s_points *= self.radius
@@ -107,11 +116,11 @@ if __name__ == '__main__':
     # data = db.get_normalized_template(1)
     lbp = Local_Binary_Pattern(1,8, None)
     print(lbp.img)
-    print(lbp.img[4 - lbp.radius: 4 + lbp.radius + 1, 4 - lbp.radius: 4 + lbp.radius + 1])
-    lbp.compute_lbp()
+    new_img = lbp.compute_lbp()
 
-    # while(True):
-    #     cv2.imshow('frame', data)
-    #     if cv2.waitKey(1) & 0xFF == ord('q'):
-    #         break
+    while(True):
+        cv2.imshow('frame', lbp.img.astype(np.uint8))
+        cv2.imshow('new frame', np.float32(new_img))
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
