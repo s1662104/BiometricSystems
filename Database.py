@@ -49,7 +49,6 @@ class Database():
         type(targets)
         self.target = targets
 
-
     def split_data(self):
         unique, counts = np.unique(db.target, return_counts=True)
         occurrences = dict(zip(unique, counts))
@@ -93,12 +92,12 @@ class Database():
     def num_user(self):
         return len(np.unique(self.target))
 
-    def get_user(self,i):
+    def get_template(self,i):
         return self.data[i]
 
     #converte array del db con pixel in [0,1] in array con pixel in [0,255]
     def get_normalized_template(self,i):
-        norm_image = cv2.normalize(self.get_user(i), None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+        norm_image = cv2.normalize(self.get_template(i), None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         norm_image = norm_image.astype(np.uint8)
         if self.db_index == 1:
             norm_image = cv2.cvtColor(norm_image, cv2.COLOR_BGR2GRAY)
@@ -111,6 +110,15 @@ if __name__ == '__main__':
     db = Database()
     print("Numero utenti: ",len(np.unique(db.target)))
     print(len(db.target))
+
+    # print(db.get_template(1))
+    #
+    # data = db.get_normalized_template(1)
+    # print(data)
+    # while(True):
+    #     cv2.imshow('frame', data)
+    #     if cv2.waitKey(1) & 0xFF == ord('q'):
+    #         break
 
     gallery_data,gallery_target,probe_data,probe_target = db.split_data()
     print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))

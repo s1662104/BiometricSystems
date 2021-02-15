@@ -19,9 +19,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9610e805-8215-48a2-801f-497cbeeee0bc" name="Default Changelist" comment="Capire codice">
+    <list default="true" id="9610e805-8215-48a2-801f-497cbeeee0bc" name="Default Changelist" comment="fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LBP.py" beforeDir="false" afterPath="$PROJECT_DIR$/LBP.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -159,16 +158,13 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.LBP" />
-        <item itemvalue="Python.Database" />
         <item itemvalue="Python.Main (1)" />
         <item itemvalue="Python.Main" />
+        <item itemvalue="Python.Database" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
-  <component name="SvnConfiguration">
-    <configuration />
-  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="9610e805-8215-48a2-801f-497cbeeee0bc" name="Default Changelist" comment="" />
@@ -282,7 +278,56 @@
       <option name="project" value="LOCAL" />
       <updated>1612778553188</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="bilinear interpolation">
+      <created>1613075364471</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1613075364471</updated>
+    </task>
+    <task id="LOCAL-00017" summary="definizione pattern">
+      <created>1613161751060</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1613161751060</updated>
+    </task>
+    <task id="LOCAL-00018" summary="ordinazione gradi dall'angolo in alto a sx">
+      <created>1613238075078</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1613238075078</updated>
+    </task>
+    <task id="LOCAL-00019" summary="ordinazione gradi dall'angolo in alto a sx">
+      <created>1613239034861</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1613239034861</updated>
+    </task>
+    <task id="LOCAL-00020" summary="calcolato il valore LBP e aggiunto il valore al posto del pixel centrale">
+      <created>1613240286172</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1613240286172</updated>
+    </task>
+    <task id="LOCAL-00021" summary="lbp sull'intera immagine e valori normalizzati nel range [0,255]">
+      <created>1613310099720</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1613310099720</updated>
+    </task>
+    <task id="LOCAL-00022" summary="fix">
+      <created>1613311303625</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1613311303625</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -309,37 +354,39 @@
     <MESSAGE value="deleted print" />
     <MESSAGE value="convert numpy array to cv2-readable array" />
     <MESSAGE value="change name function" />
-    <option name="LAST_COMMIT_MESSAGE" value="change name function" />
+    <MESSAGE value="bilinear interpolation" />
+    <MESSAGE value="definizione pattern" />
+    <MESSAGE value="ordinazione gradi dall'angolo in alto a sx" />
+    <MESSAGE value="calcolato il valore LBP e aggiunto il valore al posto del pixel centrale" />
+    <MESSAGE value="lbp sull'intera immagine e valori normalizzati nel range [0,255]" />
+    <MESSAGE value="fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="740" y="261" key="FileChooserDialogImpl" timestamp="1611052355067">
+    <state x="740" y="261" key="FileChooserDialogImpl" timestamp="1612972568038">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="261" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1611052355067" />
+    <state x="740" y="261" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1612972568038" />
     <state x="818" y="418" key="Github.ShareDialog" timestamp="1611052239681">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="418" key="Github.ShareDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1611052239681" />
-    <state width="1419" height="114" key="GridCell.Tab.0.bottom" timestamp="1613084679080">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1899" height="305" key="GridCell.Tab.0.bottom" timestamp="1613311591578">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1419" height="114" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613084679080" />
-    <state width="1899" height="280" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612801853693" />
-    <state width="1419" height="114" key="GridCell.Tab.0.center" timestamp="1613084679080">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1899" height="305" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1613311591578" />
+    <state width="1899" height="305" key="GridCell.Tab.0.center" timestamp="1613311591578">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1419" height="114" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1613084679080" />
-    <state width="1899" height="280" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612801853692" />
-    <state width="1419" height="114" key="GridCell.Tab.0.left" timestamp="1613084679079">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1899" height="305" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1613311591578" />
+    <state width="1899" height="305" key="GridCell.Tab.0.left" timestamp="1613311591578">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1419" height="114" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1613084679079" />
-    <state width="1899" height="280" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612801853692" />
-    <state width="1419" height="114" key="GridCell.Tab.0.right" timestamp="1613084679080">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1899" height="305" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1613311591578" />
+    <state width="1899" height="305" key="GridCell.Tab.0.right" timestamp="1613311591578">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1419" height="114" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1613084679080" />
-    <state width="1899" height="280" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612801853693" />
+    <state width="1899" height="305" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1613311591578" />
     <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1612776688567">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -360,18 +407,14 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1611053187199" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1612778559502">
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1613311309915">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1612778559502" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1613311309915" />
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1612174336111">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1612174336111" />
-    <state x="421" y="176" width="598" height="548" key="find.popup" timestamp="1612892523897">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="421" y="176" width="598" height="548" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1612892523897" />
     <state x="741" y="421" key="git4idea.remote.GitConfigureRemotesDialog" timestamp="1611052368644">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
