@@ -116,13 +116,13 @@ class Local_Binary_Pattern:
 
 if __name__ == '__main__':
     db = Database.Database()
-    data = db.get_normalized_template(12)
+    data = db.get_normalized_template(1)
     lbp = Local_Binary_Pattern(1, 8, data)
     print(lbp.img)
     new_img = lbp.compute_lbp()
 
     while True:
         cv2.imshow('frame', lbp.img.astype(np.uint8))
-        cv2.imshow('new frame', np.float32(new_img))
+        cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
