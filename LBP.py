@@ -1,3 +1,4 @@
+import dlib
 import Database
 import cv2
 import numpy as np
@@ -50,16 +51,35 @@ class LBP:
         print(x,y)
 
 
-
 if __name__ == '__main__':
-    #db = Database.Database()
-    #data = db.get_normalized_template(1)
+    db_index = input("Quale database si vuole utilizzare? \n 0 - Olivetti \n 1 - LFW\n")
+    if db_index == "0":
+        db = Database.Database(0)
+        data = db.get_normalized_template(0)
 
-    lbp = LBP(1,8, None)
-    lbp.find_neighborhood()
+        while (True):
+            cv2.imshow('frame', data)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    elif db_index == "1":
+        db = Database.Database(1)
+        data = db.get_normalized_template(0)
 
-    # while(True):
-    #     cv2.imshow('frame', data)
-    #     if cv2.waitKey(1) & 0xFF == ord('q'):
-    #         break
+        detector = dlib.get_frontal_face_detector()
+        predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+        dets = detector(data, 1)
+        for i, d in enumerate(dets):
+           crop = data[d.top() : d.bottom(), d.left() : d.right()]
+           crop = cv2.resize(crop, (64, 64))
+
+        while (True):
+            cv2.imshow('frame', crop)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+    else:
+        print("Valora non valido!")
+
+    #lbp = LBP(1,8, None)
+    #lbp.find_neighborhood()
 
