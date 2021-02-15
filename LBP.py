@@ -123,28 +123,26 @@ if __name__ == '__main__':
         lbp = Local_Binary_Pattern(1, 8, data)
         print(lbp.img)
         new_img = lbp.compute_lbp()
-        while (True):
-            cv2.imshow('frame', data)
+        while True:
+            cv2.imshow('frame', lbp.img.astype(np.uint8))
+            cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
     elif db_index == "1":
         db = Database.Database(1)
         data = db.get_normalized_template(0)
-
         detector = dlib.get_frontal_face_detector()
         predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
         dets = detector(data, 1)
         for i, d in enumerate(dets):
            crop = data[d.top() : d.bottom(), d.left() : d.right()]
            crop = cv2.resize(crop, (64, 64))
-
-    while True:
-        cv2.imshow('frame', lbp.img.astype(np.uint8))
-        cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-        while (True):
-            cv2.imshow('frame', crop)
+        lbp = Local_Binary_Pattern(1, 8, crop)
+        print(lbp.img)
+        new_img = lbp.compute_lbp()
+        while True:
+            cv2.imshow('frame', lbp.img.astype(np.uint8))
+            cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
     else:
