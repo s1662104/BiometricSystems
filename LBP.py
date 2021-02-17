@@ -22,9 +22,9 @@ class Local_Binary_Pattern:
         #     [1, 72, 8, 92, 62], [7, 77, 28, 10, 88], ], np.int32)
 
     def compute_lbp(self):
-        new_img = [[0 for y in range(self.img.shape[0] - 2)] for x in range(self.img.shape[1] - 2)]
+        new_img = [[0 for y in range(self.img.shape[0] - 2*self.radius)] for x in range(self.img.shape[1] - 2*self.radius)]
         for i in range(self.radius, self.img.shape[0]-self.radius):
-            for j in range(1, self.img.shape[1]-self.radius):
+            for j in range(self.radius, self.img.shape[1]-self.radius):
                 # print("----------------")
                 # print("i;j:", i, j)
                 # print("value:", self.img[i][j])
@@ -39,7 +39,8 @@ class Local_Binary_Pattern:
                 for k in pattern:
                     value += k * 2 ** count
                     count += 1
-                new_img[i - 1][j - 1] = value % 256
+                #PROVARE CON DIVERSI RAGGI. FORSE CI VUOLE i-self.radius
+                new_img[i - self.radius][j - self.radius] = value % 256
                 # print("new value:", value)
                 # print("----------------")
         # print("NEW IMG", new_img)
@@ -160,3 +161,14 @@ if __name__ == '__main__':
     else:
         print("Valora non valido!")
 
+    db = Database.Database(0)
+    data = db.get_normalized_template(1)
+    lbp = Local_Binary_Pattern(1, 8, data)
+    print(lbp.img)
+    new_img = lbp.compute_lbp()
+
+    while True:
+        cv2.imshow('frame', lbp.img.astype(np.uint8))
+        cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
