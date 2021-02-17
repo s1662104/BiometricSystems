@@ -2,6 +2,8 @@ import dlib
 import numpy as np
 import cv2
 import Database
+from scipy.spatial import distance as dist
+import matplotlib.pyplot as plt
 
 class Local_Binary_Pattern:
 
@@ -123,11 +125,21 @@ if __name__ == '__main__':
         lbp = Local_Binary_Pattern(1, 8, data)
         print(lbp.img)
         new_img = lbp.compute_lbp()
-        while True:
-            cv2.imshow('frame', lbp.img.astype(np.uint8))
-            cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+        new_img = np.array(new_img).astype(np.uint8)
+        hist = cv2.calcHist([new_img],[0],None,[256],[0,256])
+        hist = cv2.normalize(hist, hist).flatten()
+        plt.figure()
+        plt.title("Grayscale Histogram")
+        plt.xlabel("Bins")
+        plt.ylabel("# of Pixels")
+        plt.plot(hist)
+        plt.xlim([0, 256])
+        plt.show()
+        # while True:
+        #     cv2.imshow('frame', lbp.img.astype(np.uint8))
+        #     cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
+        #     if cv2.waitKey(1) & 0xFF == ord('q'):
+        #         break
     elif db_index == "1":
         db = Database.Database(1)
         data = db.get_normalized_template(0)
