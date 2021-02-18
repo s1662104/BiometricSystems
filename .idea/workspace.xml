@@ -19,10 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9610e805-8215-48a2-801f-497cbeeee0bc" name="Default Changelist" comment="aggiunta db, creati set data e target">
+    <list default="true" id="9610e805-8215-48a2-801f-497cbeeee0bc" name="Default Changelist" comment="fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FaceRecognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/FaceRecognition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LBP.py" beforeDir="false" afterPath="$PROJECT_DIR$/LBP.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +49,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.FaceRecognition">
+  <component name="RunManager" selected="Python.LBP">
     <configuration name="Database" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -72,7 +71,49 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="FaceRecognition" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="LBP" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BiometricSystems" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LBP.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BiometricSystems" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -84,7 +125,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/FaceRecognition.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\ile_\PycharmProjects\BiometricSystems\Main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -116,12 +157,17 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.FaceRecognition" />
+        <item itemvalue="Python.LBP" />
+        <item itemvalue="Python.Main (1)" />
+        <item itemvalue="Python.Main" />
         <item itemvalue="Python.Database" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="9610e805-8215-48a2-801f-497cbeeee0bc" name="Default Changelist" comment="" />
@@ -165,7 +211,126 @@
       <option name="project" value="LOCAL" />
       <updated>1612025945302</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="crop face">
+      <created>1612176314245</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1612176314245</updated>
+    </task>
+    <task id="LOCAL-00007" summary="probe and gallery set setup">
+      <created>1612214537566</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1612214537567</updated>
+    </task>
+    <task id="LOCAL-00008" summary="probe and gallery set setup">
+      <created>1612214739469</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1612214739469</updated>
+    </task>
+    <task id="LOCAL-00009" summary="bug fix">
+      <created>1612435527485</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1612435527485</updated>
+    </task>
+    <task id="LOCAL-00010" summary="change name class">
+      <created>1612439517595</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1612439517595</updated>
+    </task>
+    <task id="LOCAL-00011" summary="prevent error caused by no face detected">
+      <created>1612776897461</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1612776897461</updated>
+    </task>
+    <task id="LOCAL-00012" summary="deleted print">
+      <created>1612776982294</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1612776982294</updated>
+    </task>
+    <task id="LOCAL-00013" summary="convert numpy array to cv2-readable array">
+      <created>1612777690227</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1612777690227</updated>
+    </task>
+    <task id="LOCAL-00014" summary="convert numpy array to cv2-readable array">
+      <created>1612777699806</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1612777699806</updated>
+    </task>
+    <task id="LOCAL-00015" summary="change name function">
+      <created>1612778553188</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1612778553188</updated>
+    </task>
+    <task id="LOCAL-00016" summary="bilinear interpolation">
+      <created>1613075364471</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1613075364471</updated>
+    </task>
+    <task id="LOCAL-00017" summary="definizione pattern">
+      <created>1613161751060</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1613161751060</updated>
+    </task>
+    <task id="LOCAL-00018" summary="ordinazione gradi dall'angolo in alto a sx">
+      <created>1613238075078</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1613238075078</updated>
+    </task>
+    <task id="LOCAL-00019" summary="ordinazione gradi dall'angolo in alto a sx">
+      <created>1613239034861</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1613239034861</updated>
+    </task>
+    <task id="LOCAL-00020" summary="calcolato il valore LBP e aggiunto il valore al posto del pixel centrale">
+      <created>1613240286172</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1613240286172</updated>
+    </task>
+    <task id="LOCAL-00021" summary="lbp sull'intera immagine e valori normalizzati nel range [0,255]">
+      <created>1613310099720</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1613310099720</updated>
+    </task>
+    <task id="LOCAL-00022" summary="fix">
+      <created>1613311303625</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1613311303625</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -183,43 +348,76 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="set-up" />
     <MESSAGE value="codice fiscale + face detection" />
-    <MESSAGE value="crop face" />
     <MESSAGE value="aggiunta db, creati set data e target" />
-    <option name="LAST_COMMIT_MESSAGE" value="aggiunta db, creati set data e target" />
+    <MESSAGE value="crop face" />
+    <MESSAGE value="probe and gallery set setup" />
+    <MESSAGE value="bug fix" />
+    <MESSAGE value="change name class" />
+    <MESSAGE value="prevent error caused by no face detected" />
+    <MESSAGE value="deleted print" />
+    <MESSAGE value="convert numpy array to cv2-readable array" />
+    <MESSAGE value="change name function" />
+    <MESSAGE value="bilinear interpolation" />
+    <MESSAGE value="definizione pattern" />
+    <MESSAGE value="ordinazione gradi dall'angolo in alto a sx" />
+    <MESSAGE value="calcolato il valore LBP e aggiunto il valore al posto del pixel centrale" />
+    <MESSAGE value="lbp sull'intera immagine e valori normalizzati nel range [0,255]" />
+    <MESSAGE value="fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="740" y="261" key="FileChooserDialogImpl" timestamp="1611052355067">
+    <state x="740" y="261" key="FileChooserDialogImpl" timestamp="1612972568038">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="261" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1611052355067" />
+    <state x="740" y="261" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1612972568038" />
     <state x="818" y="418" key="Github.ShareDialog" timestamp="1611052239681">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="418" key="Github.ShareDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1611052239681" />
-    <state width="1899" height="282" key="GridCell.Tab.0.bottom" timestamp="1612175942331">
+    <state width="1419" height="241" key="GridCell.Tab.0.bottom" timestamp="1613409378165">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1419" height="241" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613409378165" />
+    <state width="1899" height="305" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1613311591578" />
+    <state width="1419" height="241" key="GridCell.Tab.0.center" timestamp="1613409378164">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1419" height="241" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1613409378164" />
+    <state width="1899" height="305" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1613311591578" />
+    <state width="1419" height="241" key="GridCell.Tab.0.left" timestamp="1613409378163">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1419" height="241" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1613409378163" />
+    <state width="1899" height="305" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1613311591578" />
+    <state width="1419" height="241" key="GridCell.Tab.0.right" timestamp="1613409378165">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1419" height="241" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1613409378165" />
+    <state width="1899" height="305" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1613311591578" />
+    <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1612776688567">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612175942331" />
-    <state width="1899" height="282" key="GridCell.Tab.0.center" timestamp="1612175942330">
+    <state width="1899" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
+    <state width="1899" height="348" key="GridCell.Tab.1.center" timestamp="1612776688567">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612175942330" />
-    <state width="1899" height="282" key="GridCell.Tab.0.left" timestamp="1612175942330">
+    <state width="1899" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
+    <state width="1899" height="348" key="GridCell.Tab.1.left" timestamp="1612776688567">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612175942330" />
-    <state width="1899" height="282" key="GridCell.Tab.0.right" timestamp="1612175942330">
+    <state width="1899" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
+    <state width="1899" height="348" key="GridCell.Tab.1.right" timestamp="1612776688567">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612175942330" />
+    <state width="1899" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
     <state x="461" y="165" key="SettingsEditor" timestamp="1611053187199">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1611053187199" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1612174989303">
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1613311309915">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1612174989303" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1613311309915" />
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1612174336111">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
