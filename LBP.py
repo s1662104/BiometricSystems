@@ -36,7 +36,6 @@ class Local_Binary_Pattern:
                 for k in pattern:
                     value += k * 2 ** count
                     count += 1
-                #PROVARE CON DIVERSI RAGGI. FORSE CI VUOLE i-self.radius
                 new_img[i - self.radius][j - self.radius] = value % 256
                 # print("new value:", value)
                 # print("----------------")
