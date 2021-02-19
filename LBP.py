@@ -231,9 +231,8 @@ if __name__ == '__main__':
         for i in range(0, data.shape[0]):
             for j in range(0, data.shape[1]):
                 img_lbp[i, j] = lbp.lbp_calculated_pixel(data, i, j)
-        hist = lbp.createHistogram(img_lbp)
+        #hist = lbp.createHistogram(img_lbp)
         #new_img = lbp.compute_lbp()
-        #print(lbp.img)
         #hist = lbp.createHistogram(new_img)
         # new_img = np.array(new_img).astype(np.uint8)
         # hist = cv2.calcHist([new_img],[0],None,[256],[0,256])
@@ -242,9 +241,9 @@ if __name__ == '__main__':
         plt.title("Grayscale Histogram")
         plt.xlabel("Bins")
         plt.ylabel("# of Pixels")
-        plt.plot(hist)
+        #plt.plot(hist)
         # plt.xlim([0, 256])
-        plt.show()
+        #plt.show()
 
     elif db_index == "1":
         db = Database.Database(1)
