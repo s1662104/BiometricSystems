@@ -26,10 +26,10 @@ class Local_Binary_Pattern:
                 # print("i;j:", i, j)
                 # print("value:", self.img[i][j])
                 # print("neighborhood:")
-                # print(lbp.img[i - lbp.radius: i + lbp.radius + 1, j - lbp.radius: j + lbp.radius + 1])
-                pixels = lbp.find_neighbors(i, j)
+                # print(self.img[i - self.radius: i + self.radius + 1, j - self.radius: j + self.radius + 1])
+                pixels = self.find_neighbors(i, j)
                 # print("PIXELS",pixels)
-                pattern = np.where(pixels > lbp.img[i][j], 1, 0)
+                pattern = np.where(pixels > self.img[i][j], 1, 0)
                 # print("PATTERN:",pattern)
                 value = 0
                 count = 0
@@ -49,7 +49,7 @@ class Local_Binary_Pattern:
         # ottenere tutti gli angoli
         alpha = np.arange(0, 2 * np.pi, angles_array)
         # ordiniamo i gradi in modo tale da partire dall'angolo in alto a sx e procedere verso dx
-        alpha = lbp.sort_points(alpha)
+        alpha = self.sort_points(alpha)
         # print(np.degrees(alpha))
         # calcolare coppia di seno e coseno per ogni angolo
         s_points = np.array([-np.sin(alpha), np.cos(alpha)]).transpose()
@@ -127,3 +127,5 @@ if __name__ == '__main__':
         cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+
