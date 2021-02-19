@@ -7,34 +7,47 @@ import os
 
 class Database():
 
-    def __init__(self):
+    def __init__(self, db_index):
+
         # probe of user that are not in the gallery in percentage
-        self.pn = 20
+        self.pn = 20    #numero utenti dopo il quale inserisce un utente solo nel probe set
+        self.db_index = db_index
+        self.data = []
+        self.target = []
 
-        self.data=np.load("Olivetti_faces/olivetti_faces.npy")
-        self.target=np.load("Olivetti_faces/olivetti_faces_target.npy")
-        self.db_index = 0
+        if self.db_index == 0:
+            self.secondDB()
+        elif self.db_index == 1:
+            tar = tarfile.open("LFW/lfw-funneled.tgz", "r:gz")
+            counter = 0
+            for tarinfo in tar:
+                tar.extract(tarinfo.name)
+                if tarinfo.name[-4:] == ".jpg":
+                    image = cv2.imread(tarinfo.name, cv2.IMREAD_COLOR)
+                    image = cv2.resize(image, None, fx=0.4, fy=0.4, interpolation=cv2.INTER_AREA)
+                    self.data.append(np.array(image))
+                    counter += 1
 
-        # self.data = []
-        # self.target = []
-        # tar = tarfile.open("LFW\lfw-funneled.tgz", "r:gz")
-        # counter = 0
-        # for tarinfo in tar:
-        #     tar.extract(tarinfo.name)
-        #     if tarinfo.name[-4:] == ".jpg":
-        #         image = cv2.imread(tarinfo.name, cv2.IMREAD_COLOR)
-        #         image = cv2.resize(image, None, fx=0.4, fy=0.4, interpolation=cv2.INTER_AREA)
-        #         self.data.append(np.array(image))
-        #         counter += 1
-        #
-        #         name = tarinfo.name.split("/")[1]
-        #         self.target.append(name)
-        #     if tarinfo.isdir():
-        #         pass
-        #     else:
-        #         os.remove(tarinfo.name)
-        # tar.close()
-        # self.db_index = 1
+                    name = tarinfo.name.split("/")[1]
+                    self.target.append(name)
+                if tarinfo.isdir():
+                    pass
+                else:
+                    os.remove(tarinfo.name)
+            tar.close()
+        else:
+            print("VALORE NON VALIDO!")
+
+    def secondDB(self):
+        imgs = np.load("Olivetti_faces/olivetti_faces.npy")
+        imgs.shape
+        type(imgs)
+        self.data = imgs
+
+        targets = np.load("Olivetti_faces/olivetti_faces_target.npy")
+        targets.shape
+        type(targets)
+        self.target = targets
 
     def split_data(self):
         unique, counts = np.unique(db.target, return_counts=True)
@@ -89,7 +102,6 @@ class Database():
         if self.db_index == 1:
             norm_image = cv2.cvtColor(norm_image, cv2.COLOR_BGR2GRAY)
         return norm_image
-
 
     def get_target(self,i):
         return self.target[i]
