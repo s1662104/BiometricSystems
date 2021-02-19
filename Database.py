@@ -27,7 +27,6 @@ class Database():
                     image = cv2.resize(image, None, fx=0.4, fy=0.4, interpolation=cv2.INTER_AREA)
                     self.data.append(np.array(image))
                     counter += 1
-
                     name = tarinfo.name.split("/")[1]
                     self.target.append(name)
                 if tarinfo.isdir():

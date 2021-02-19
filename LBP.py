@@ -118,29 +118,134 @@ class Local_Binary_Pattern:
             count -= 1
         return new_alpha
 
+    def get_pixel(self, img, center, x, y):
+
+        new_value = 0
+
+        try:
+            # If local neighbourhood pixel value is greater than or equal to center pixel values then set it to 1
+            if img[x][y] >= center:
+                new_value = 1
+
+        except:
+            # Exception is required when neighbourhood value of a center pixel value is null i.e. values present at boundaries.
+            pass
+
+        return new_value
+
+    def lbp_calculated_pixel(self, img, x, y):
+
+        center = img[x][y]
+
+        val_ar = []
+
+        # top_left
+        val_ar.append(self.get_pixel(img, center, x - 1, y - 1))
+
+        # top
+        val_ar.append(self.get_pixel(img, center, x - 1, y))
+
+        # top_right
+        val_ar.append(self.get_pixel(img, center, x - 1, y + 1))
+
+        # right
+        val_ar.append(self.get_pixel(img, center, x, y + 1))
+
+        # bottom_right
+        val_ar.append(self.get_pixel(img, center, x + 1, y + 1))
+
+        # bottom
+        val_ar.append(self.get_pixel(img, center, x + 1, y))
+
+        # bottom_left
+        val_ar.append(self.get_pixel(img, center, x + 1, y - 1))
+
+        # left
+        val_ar.append(self.get_pixel(img, center, x, y - 1))
+
+        # Now, we need to convert binary values to decimal
+        power_val = [1, 2, 4, 8, 16, 32, 64, 128]
+        val = 0
+        for i in range(len(val_ar)):
+            val += val_ar[i] * power_val[i]
+
+        return val
+
+    def createHistogram(self, new_img):
+        histogram = []
+
+        #Check the pixels  matrix
+        if len(new_img) == 0:
+            raise Exception("Input error")
+
+        #Get the matrix dimensions
+        h = len(new_img)
+        w = len(new_img[0])
+        print("Altezza:",h)
+        print("Larghezza:",w)
+
+        #The LBPHFaceRecognizer uses Extended Local Binary Patterns
+        #(it's probably configurable with other operators at a later
+        #point), and has the following default values for radius = 1 and neighbors = 8
+        grid_x = 8
+        grid_y = 8
+
+        #Get the size (width and height) of each region
+        gridWidth = int(w / grid_x)
+        gridHeight = int(h / grid_y)
+        print("gridWidth:", gridWidth)
+        print("gridHeight:",gridHeight)
+
+        #Calculates the histogram of each grid
+        for gx in range(0, grid_x):
+            for gy in range(0, grid_y):
+
+                #Create a slice with empty 256 positions
+                regionHistogram = [0]*256
+
+                #Define the start and end positions for the following loop
+                startPosX = gx * gridWidth
+                startPosY = gy * gridHeight
+                endPosX = (gx+1) * gridWidth
+                endPosY = (gy+1) * gridHeight
+
+                #Creates the histogram for the current region
+                for x in range(startPosX, endPosX):
+                    for y in range(startPosY, endPosY):
+                        if new_img[x][y] < len(regionHistogram):
+                            regionHistogram[new_img[x][y]] += 1
+
+                #Concatenate two slices
+                #print("Region Histogram:", regionHistogram)
+                #histogram.append(regionHistogram)
+        #print("Histogram:", histogram)
+        return histogram
+
 if __name__ == '__main__':
     db_index = input("Quale database si vuole utilizzare? \n 0 - Olivetti \n 1 - LFW\n")
     if db_index == "0":
         db = Database.Database(0)
         data = db.get_normalized_template(0)
         lbp = Local_Binary_Pattern(1, 8, data)
-        print(lbp.img)
-        new_img = lbp.compute_lbp()
-        new_img = np.array(new_img).astype(np.uint8)
-        hist = cv2.calcHist([new_img],[0],None,[256],[0,256])
-        hist = cv2.normalize(hist, hist).flatten()
+        img_lbp = np.zeros((data.shape[0], data.shape[1]), np.uint8)
+        for i in range(0, data.shape[0]):
+            for j in range(0, data.shape[1]):
+                img_lbp[i, j] = lbp.lbp_calculated_pixel(data, i, j)
+        hist = lbp.createHistogram(img_lbp)
+        #new_img = lbp.compute_lbp()
+        #print(lbp.img)
+        #hist = lbp.createHistogram(new_img)
+        # new_img = np.array(new_img).astype(np.uint8)
+        # hist = cv2.calcHist([new_img],[0],None,[256],[0,256])
+        # hist = cv2.normalize(hist, hist).flatten()
         plt.figure()
         plt.title("Grayscale Histogram")
         plt.xlabel("Bins")
         plt.ylabel("# of Pixels")
         plt.plot(hist)
-        plt.xlim([0, 256])
+        # plt.xlim([0, 256])
         plt.show()
-        # while True:
-        #     cv2.imshow('frame', lbp.img.astype(np.uint8))
-        #     cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-        #     if cv2.waitKey(1) & 0xFF == ord('q'):
-        #         break
+
     elif db_index == "1":
         db = Database.Database(1)
         data = db.get_normalized_template(0)
@@ -161,14 +266,14 @@ if __name__ == '__main__':
     else:
         print("Valora non valido!")
 
-    db = Database.Database(0)
-    data = db.get_normalized_template(1)
-    lbp = Local_Binary_Pattern(1, 8, data)
-    print(lbp.img)
-    new_img = lbp.compute_lbp()
-
-    while True:
-        cv2.imshow('frame', lbp.img.astype(np.uint8))
-        cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    # db = Database.Database(0)
+    # data = db.get_normalized_template(1)
+    # lbp = Local_Binary_Pattern(1, 8, data)
+    # print(lbp.img)
+    # new_img = lbp.compute_lbp()
+    #
+    # while True:
+    #     cv2.imshow('frame', lbp.img.astype(np.uint8))
+    #     cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
+    #     if cv2.waitKey(1) & 0xFF == ord('q'):
+    #         break
