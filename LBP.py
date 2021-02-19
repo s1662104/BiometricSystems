@@ -22,24 +22,23 @@ class Local_Binary_Pattern:
         #     [1, 72, 8, 92, 62], [7, 77, 28, 10, 88], ], np.int32)
 
     def compute_lbp(self):
-        new_img = [[0 for y in range(self.img.shape[0] - 2*self.radius)] for x in range(self.img.shape[1] - 2*self.radius)]
-        for i in range(self.radius, self.img.shape[0]-self.radius):
-            for j in range(self.radius, self.img.shape[1]-self.radius):
+        new_img = [[0 for y in range(self.img.shape[0])] for x in range(self.img.shape[1])]
+        for i in range(0, self.img.shape[0]):
+            for j in range(0, self.img.shape[1]):
                 # print("----------------")
                 # print("i;j:", i, j)
                 # print("value:", self.img[i][j])
                 # print("neighborhood:")
-                # print(lbp.img[i - lbp.radius: i + lbp.radius + 1, j - lbp.radius: j + lbp.radius + 1])
-                pixels = lbp.find_neighbors(i, j)
+                # print(self.img[i - self.radius: i + self.radius + 1, j - self.radius: j + self.radius + 1])
+                pixels = self.find_neighbors(i, j)
                 # print("PIXELS",pixels)
-                pattern = np.where(pixels > lbp.img[i][j], 1, 0)
+                pattern = np.where(pixels > self.img[i][j], 1, 0)
                 # print("PATTERN:",pattern)
                 value = 0
                 count = 0
                 for k in pattern:
                     value += k * 2 ** count
                     count += 1
-                #PROVARE CON DIVERSI RAGGI. FORSE CI VUOLE i-self.radius
                 new_img[i - self.radius][j - self.radius] = value % 256
                 # print("new value:", value)
                 # print("----------------")
@@ -52,7 +51,7 @@ class Local_Binary_Pattern:
         # ottenere tutti gli angoli
         alpha = np.arange(0, 2 * np.pi, angles_array)
         # ordiniamo i gradi in modo tale da partire dall'angolo in alto a sx e procedere verso dx
-        alpha = lbp.sort_points(alpha)
+        alpha = self.sort_points(alpha)
         # print(np.degrees(alpha))
         # calcolare coppia di seno e coseno per ogni angolo
         s_points = np.array([-np.sin(alpha), np.cos(alpha)]).transpose()
@@ -73,7 +72,10 @@ class Local_Binary_Pattern:
             if x_fract == 0 and y_fract == 0:
                 coorx = int(x)
                 coory = int(y)
-                pixels.append(self.img[cx+coorx][cy+coory])
+                if self.check_border(cx+coorx,cy+coory):
+                    pixels.append(0)
+                else:
+                    pixels.append(self.img[cx+coorx][cy+coory])
             else:
                 x_c = np.ceil(x).astype(int)
                 y_c = np.ceil(y).astype(int)
@@ -91,8 +93,11 @@ class Local_Binary_Pattern:
                 else:
                     y1 = y_f
                     y2 = y_c
-                value = self.bilinear_interpolation(x1, y1, x2, y2, cx, cy, x, y)
-                pixels.append(np.round(value).astype(int))
+                if self.check_border(cx+x1,cy+y1) or self.check_border(cx+x2,cy+y2):
+                    pixels.append(0)
+                else:
+                    value = self.bilinear_interpolation(x1, y1, x2, y2, cx, cy, x, y)
+                    pixels.append(np.round(value).astype(int))
         return pixels
 
     def bilinear_interpolation(self, x1, y1, x2, y2, cx, cy, x, y):
@@ -117,6 +122,9 @@ class Local_Binary_Pattern:
                 count = self.neighborhood
             count -= 1
         return new_alpha
+
+    def check_border(self,x,y):
+        return x < 0 or x >= self.img.shape[0] or y < 0 or y >= self.img.shape[1]
 
     def get_pixel(self, img, center, x, y):
 
