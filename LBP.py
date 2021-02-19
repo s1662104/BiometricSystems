@@ -19,9 +19,9 @@ class Local_Binary_Pattern:
         #     [1, 72, 8, 92, 62], [7, 77, 28, 10, 88], ], np.int32)
 
     def compute_lbp(self):
-        new_img = [[0 for y in range(self.img.shape[0] - 2*self.radius)] for x in range(self.img.shape[1] - 2*self.radius)]
-        for i in range(self.radius, self.img.shape[0]-self.radius):
-            for j in range(self.radius, self.img.shape[1]-self.radius):
+        new_img = [[0 for y in range(self.img.shape[0])] for x in range(self.img.shape[1])]
+        for i in range(0, self.img.shape[0]):
+            for j in range(0, self.img.shape[1]):
                 # print("----------------")
                 # print("i;j:", i, j)
                 # print("value:", self.img[i][j])
@@ -70,7 +70,10 @@ class Local_Binary_Pattern:
             if x_fract == 0 and y_fract == 0:
                 coorx = int(x)
                 coory = int(y)
-                pixels.append(self.img[cx+coorx][cy+coory])
+                if self.check_border(cx+coorx,cy+coory):
+                    pixels.append(0)
+                else:
+                    pixels.append(self.img[cx+coorx][cy+coory])
             else:
                 x_c = np.ceil(x).astype(int)
                 y_c = np.ceil(y).astype(int)
@@ -88,8 +91,11 @@ class Local_Binary_Pattern:
                 else:
                     y1 = y_f
                     y2 = y_c
-                value = self.bilinear_interpolation(x1, y1, x2, y2, cx, cy, x, y)
-                pixels.append(np.round(value).astype(int))
+                if self.check_border(cx+x1,cy+y1) or self.check_border(cx+x2,cy+y2):
+                    pixels.append(0)
+                else:
+                    value = self.bilinear_interpolation(x1, y1, x2, y2, cx, cy, x, y)
+                    pixels.append(np.round(value).astype(int))
         return pixels
 
     def bilinear_interpolation(self, x1, y1, x2, y2, cx, cy, x, y):
@@ -114,6 +120,9 @@ class Local_Binary_Pattern:
                 count = self.neighborhood
             count -= 1
         return new_alpha
+
+    def check_border(self,x,y):
+        return x < 0 or x >= self.img.shape[0] or y < 0 or y >= self.img.shape[1]
 
 if __name__ == '__main__':
     db = Database.Database(0)
