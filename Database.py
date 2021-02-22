@@ -91,28 +91,42 @@ class Database():
     #     return gallery_data, gallery_target, probe_data, probe_target
 
     # 0.7 = 30% degli utenti e' nel test ma non nel train
-    def split_data(self,percTest=30):
+    def split_data(self,percTest=30, percPN=15):
         train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data,probe_target = [], [], [], [], [], [], [], []
         num_user = self.num_user()
         test_no_train = round(num_user * percTest / 100)
-        print(num_user, test_no_train)
-        count = 0
+        probe_no_gallery = round(num_user * percPN / 100)
+        print("Numero utenti in test ma non in train:", test_no_train, "Numero utenti in probe set ma non in gallery", probe_no_gallery)
+        countTest = 0
+        countPN = 0
         template = 0
         unique, counts = np.unique(self.target, return_counts=True)
         occurrences = dict(zip(unique, counts))
         for i, val in enumerate(self.target):
             occ = occurrences[val]
             div = round(occ/2)
-            if template<div and count<num_user - test_no_train:
+            if (template<div or occ==1) and countTest<num_user - test_no_train:
                 train_data.append(self.data[i])
                 train_target.append(self.target[i])
             else:
                 test_data.append(self.data[i])
                 test_target.append(self.target[i])
+                # se tale condizione e' vera, significa che in test ci vanno tutti i template dell'i-esimo utente
+                if countTest>=num_user - test_no_train:
+                    divT = div
+                else:
+                    divT = round(div/2)
+                if ((countTest < num_user - test_no_train and template-div < divT) or
+                        (countTest >= num_user - test_no_train and template < div)) or occ==1:
+                    gallery_data.append(self.data[i])
+                    gallery_target.append(self.target[i])
+                else:
+                    probe_data.append(self.data[i])
+                    probe_target.append(self.target[i])
             template += 1
             if template == occ:
                 template = 0
-                count += 1
+                countTest += 1
 
         return train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target
 
@@ -136,7 +150,7 @@ class Database():
 if __name__ == '__main__':
     db = Database(0)
     print("Numero utenti: ",len(np.unique(db.target)))
-    print(len(db.target))
+    print("Template:", len(db.target))
 
     # print(db.get_template(1))
     #
@@ -147,10 +161,9 @@ if __name__ == '__main__':
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
     #         break
 
-    # gallery_data,gallery_target,probe_data,probe_target = db.split_data()
-    # print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))
-    # print("probe:", len(probe_data), len(probe_target), len(np.unique(probe_target)))
-
-    train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data,probe_target  = db.split_data()
+    train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data, probe_target = \
+        db.split_data()
     print("train:", len(train_data), len(train_target), len(np.unique(train_target)))
     print("test:", len(test_data), len(test_target), len(np.unique(test_target)))
+    print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))
+    print("probe:", len(probe_data), len(probe_target), len(np.unique(probe_target)))

@@ -19,10 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="fix">
+    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="suddivisione train e test set">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LBP.py" beforeDir="false" afterPath="$PROJECT_DIR$/LBP.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -180,14 +179,14 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.Database" />
-        <item itemvalue="Python.LBP" />
         <item itemvalue="Python.Main (1)" />
         <item itemvalue="Python.Recognition" />
         <item itemvalue="Python.CaptureFace" />
+        <item itemvalue="Python.LBP" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -360,7 +359,14 @@
       <option name="project" value="LOCAL" />
       <updated>1613757659568</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="suddivisione train e test set">
+      <created>1614010484640</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1614010484640</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -393,7 +399,8 @@
     <MESSAGE value="calcolato il valore LBP e aggiunto il valore al posto del pixel centrale" />
     <MESSAGE value="lbp sull'intera immagine e valori normalizzati nel range [0,255]" />
     <MESSAGE value="fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix" />
+    <MESSAGE value="suddivisione train e test set" />
+    <option name="LAST_COMMIT_MESSAGE" value="suddivisione train e test set" />
   </component>
   <component name="WindowStateProjectService">
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1613826445923">
@@ -408,26 +415,26 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="418" key="Github.ShareDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1611052239681" />
-    <state width="1419" height="170" key="GridCell.Tab.0.bottom" timestamp="1614018744362">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1899" height="213" key="GridCell.Tab.0.bottom" timestamp="1614019929815">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1419" height="170" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1614018744362" />
-    <state width="1899" height="213" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1613921925507" />
-    <state width="1419" height="170" key="GridCell.Tab.0.center" timestamp="1614018744361">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1419" height="234" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613763012681" />
+    <state width="1899" height="213" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1614019929815" />
+    <state width="1899" height="213" key="GridCell.Tab.0.center" timestamp="1614019929815">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1419" height="170" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1614018744361" />
-    <state width="1899" height="213" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1613921925507" />
-    <state width="1419" height="170" key="GridCell.Tab.0.left" timestamp="1614018744360">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1419" height="234" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1613763012679" />
+    <state width="1899" height="213" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1614019929815" />
+    <state width="1899" height="213" key="GridCell.Tab.0.left" timestamp="1614019929815">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1419" height="170" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1614018744360" />
-    <state width="1899" height="213" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1613921925507" />
-    <state width="1419" height="170" key="GridCell.Tab.0.right" timestamp="1614018744361">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1419" height="234" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1613763012679" />
+    <state width="1899" height="213" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1614019929815" />
+    <state width="1899" height="213" key="GridCell.Tab.0.right" timestamp="1614019929815">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1419" height="170" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1614018744361" />
-    <state width="1899" height="213" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1613921925507" />
+    <state width="1419" height="234" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1613763012680" />
+    <state width="1899" height="213" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1614019929815" />
     <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1612776688567">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -444,15 +451,14 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1899" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
-    <state x="346" y="143" key="SettingsEditor" timestamp="1614015169035">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="346" y="143" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1614015169035" />
-    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1613758752091" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1613757729745">
+    <state x="461" y="165" key="SettingsEditor" timestamp="1613758752091">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1613757729745" />
+    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1613758752091" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1614010502313">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1614010502313" />
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1612174336111">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
