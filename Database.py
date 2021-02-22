@@ -98,7 +98,7 @@ class Database():
         print(num_user, test_no_train)
         count = 0
         template = 0
-        unique, counts = np.unique(db.target, return_counts=True)
+        unique, counts = np.unique(self.target, return_counts=True)
         occurrences = dict(zip(unique, counts))
         for i, val in enumerate(self.target):
             occ = occurrences[val]
@@ -114,7 +114,7 @@ class Database():
                 template = 0
                 count += 1
 
-        return train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data,probe_target
+        return train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target
 
     def num_user(self):
         return len(np.unique(self.target))

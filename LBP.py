@@ -2,7 +2,7 @@ import dlib
 import numpy as np
 import cv2
 import Database
-from scipy.spatial import distance as dist
+from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 
 class Local_Binary_Pattern:
@@ -176,19 +176,30 @@ if __name__ == '__main__':
     db_index = input("Quale database si vuole utilizzare? \n 0 - Olivetti \n 1 - LFW\n")
     if db_index == "0":
         db = Database.Database(0)
-        data = db.get_normalized_template(1)
-        lbp = Local_Binary_Pattern(1, 8, data)
-        new_img = lbp.compute_lbp()
-        hist = lbp.createHistogram(new_img)
-        #new_img = np.array(new_img).astype(np.uint8)
-        #hist = cv2.calcHist([new_img],[0],None,[256],[0,256])
-        #hist = cv2.normalize(hist, hist).flatten()
-        plt.figure()
-        plt.title("Grayscale Histogram")
-        plt.xlabel("Bins")
-        plt.ylabel("# of Pixels")
-        plt.plot(hist)
-        plt.show()
+
+        #Initializing Support Vector Machine and fitting the training data
+        train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
+
+        print("train_data\n",train_data)
+        print("train_target\n",train_target)
+        classifier = SVC(kernel='rbf', random_state=1)
+        #classifier.fit(train_data, train_target)        #In this case, the X_train is train_data, while the  Y_train is train_target
+
+        #Predicting the classes for test set
+        #pred_target = classifier.predict(test_data)
+
+
+        # data = db.get_normalized_template(1)
+        # lbp = Local_Binary_Pattern(1, 8, data)
+        # new_img = lbp.compute_lbp()
+        # hist = lbp.createHistogram(new_img)
+
+        # plt.figure()
+        # plt.title("Grayscale Histogram")
+        # plt.xlabel("Bins")
+        # plt.ylabel("# of Pixels")
+        # plt.plot(hist)
+        # plt.show()
 
     elif db_index == "1":
         db = Database.Database(1)
@@ -200,12 +211,12 @@ if __name__ == '__main__':
            crop = data[d.top() : d.bottom(), d.left() : d.right()]
            crop = cv2.resize(crop, (64, 64))
         lbp = Local_Binary_Pattern(1, 8, crop)
-        print(lbp.img)
         new_img = lbp.compute_lbp()
-        while True:
-            cv2.imshow('frame', lbp.img.astype(np.uint8))
-            cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+        hist = lbp.createHistogram(new_img)
+        # while True:
+        #     cv2.imshow('frame', lbp.img.astype(np.uint8))
+        #     cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
+        #     if cv2.waitKey(1) & 0xFF == ord('q'):
+        #         break
     else:
         print("Valora non valido!")
