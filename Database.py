@@ -4,6 +4,10 @@ import numpy as np
 import tarfile
 import cv2
 import os
+import csv
+
+from sklearn.svm import SVC
+
 
 class Database():
 
@@ -106,10 +110,10 @@ class Database():
             occ = occurrences[val]
             div = round(occ/2)
             if (template<div or occ==1) and countTest<num_user - test_no_train:
-                train_data.append(self.data[i])
+                train_data.append(self.get_normalized_template(i))
                 train_target.append(self.target[i])
             else:
-                test_data.append(self.data[i])
+                test_data.append(self.get_normalized_template(i))
                 test_target.append(self.target[i])
                 # se tale condizione e' vera, significa che in test ci vanno tutti i template dell'i-esimo utente
                 if countTest>=num_user - test_no_train:
@@ -118,10 +122,10 @@ class Database():
                     divT = round(div/2)
                 if ((countTest < num_user - test_no_train and template-div < divT) or
                         (countTest >= num_user - test_no_train and template < div)) or occ==1:
-                    gallery_data.append(self.data[i])
+                    gallery_data.append(self.get_normalized_template(i))
                     gallery_target.append(self.target[i])
                 else:
-                    probe_data.append(self.data[i])
+                    probe_data.append(self.get_normalized_template(i))
                     probe_target.append(self.target[i])
             template += 1
             if template == occ:
@@ -147,10 +151,54 @@ class Database():
     def get_target(self,i):
         return self.target[i]
 
+    def createCSV(self):
+        train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = self.split_data()
+
+        data_list = [[]]*(len(train_data)+1)
+        data_list[0] = ['Image', 'Target']
+        for i in range(1,len(data_list)):
+            data_list[i] = [train_data[i-1].tolist(), train_target[i-1]]
+        with open('train.csv', 'w', newline='') as file:
+            writer = csv.writer(file, delimiter=',')
+            writer.writerows(data_list)
+
+        data_list = [[]] * (len(test_data) + 1)
+        data_list[0] = ['Image', 'Target']
+        for i in range(1,len(data_list)):
+            data_list[i] = [test_data[i-1].tolist(), test_target[i-1]]
+        with open('test.csv', 'w', newline='') as file:
+            writer = csv.writer(file, delimiter=',')
+            writer.writerows(data_list)
+
+        data_list = [[]] * (len(gallery_data) + 1)
+        data_list[0] = ['Image', 'Target']
+        for i in range(1, len(data_list)):
+            data_list[i] = [gallery_data[i - 1].tolist(), gallery_target[i - 1]]
+        with open('gallery.csv', 'w', newline='') as file:
+            writer = csv.writer(file, delimiter=',')
+            writer.writerows(data_list)
+
+        data_list = [[]] * (len(probe_data) + 1)
+        data_list[0] = ['Image', 'Target']
+        for i in range(1, len(data_list)):
+            data_list[i] = [probe_data[i - 1].tolist(), probe_target[i - 1]]
+        with open('probe.csv', 'w', newline='') as file:
+            writer = csv.writer(file, delimiter=',')
+            writer.writerows(data_list)
+
+        return
+
 if __name__ == '__main__':
     db = Database(0)
     print("Numero utenti: ",len(np.unique(db.target)))
     print("Template:", len(db.target))
+    classifier = SVC(kernel='rbf', random_state=1)
+    db.createCSV()
+    train = pd.read_csv('train.csv')
+    X_train = train['Image']
+    Y_train = train['Target']
+    #print(X_train)
+    #classifier.fit(X_train, Y_train)
 
     # print(db.get_template(1))
     #
@@ -161,9 +209,9 @@ if __name__ == '__main__':
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
     #         break
 
-    train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data, probe_target = \
-        db.split_data()
-    print("train:", len(train_data), len(train_target), len(np.unique(train_target)))
-    print("test:", len(test_data), len(test_target), len(np.unique(test_target)))
-    print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))
-    print("probe:", len(probe_data), len(probe_target), len(np.unique(probe_target)))
+    # train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data, probe_target = \
+    #     db.split_data()
+    # print("train:", len(train_data), len(train_target), len(np.unique(train_target)))
+    # print("test:", len(test_data), len(test_target), len(np.unique(test_target)))
+    # print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))
+    # print("probe:", len(probe_data), len(probe_target), len(np.unique(probe_target)))

@@ -19,9 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="suddivisione train e test set">
+    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="Lavoro su svm">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LBP.py" beforeDir="false" afterPath="$PROJECT_DIR$/LBP.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -179,14 +180,14 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.Database" />
+        <item itemvalue="Python.LBP" />
         <item itemvalue="Python.Main (1)" />
         <item itemvalue="Python.Recognition" />
         <item itemvalue="Python.CaptureFace" />
-        <item itemvalue="Python.LBP" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -403,6 +404,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="suddivisione train e test set" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="463" y="259" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1614093779831">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="463" y="259" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900@0.0.1440.900" timestamp="1614093779831" />
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1613826445923">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -415,25 +420,25 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="418" key="Github.ShareDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1611052239681" />
-    <state width="1899" height="213" key="GridCell.Tab.0.bottom" timestamp="1614019929815">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1419" height="151" key="GridCell.Tab.0.bottom" timestamp="1614107072082">
+      <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="234" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1613763012681" />
+    <state width="1419" height="151" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1614107072082" />
     <state width="1899" height="213" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1614019929815" />
-    <state width="1899" height="213" key="GridCell.Tab.0.center" timestamp="1614019929815">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1419" height="151" key="GridCell.Tab.0.center" timestamp="1614107072080">
+      <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="234" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1613763012679" />
+    <state width="1419" height="151" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1614107072080" />
     <state width="1899" height="213" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1614019929815" />
-    <state width="1899" height="213" key="GridCell.Tab.0.left" timestamp="1614019929815">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1419" height="151" key="GridCell.Tab.0.left" timestamp="1614107072080">
+      <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="234" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1613763012679" />
+    <state width="1419" height="151" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1614107072080" />
     <state width="1899" height="213" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1614019929815" />
-    <state width="1899" height="213" key="GridCell.Tab.0.right" timestamp="1614019929815">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state width="1419" height="151" key="GridCell.Tab.0.right" timestamp="1614107072081">
+      <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="234" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1613763012680" />
+    <state width="1419" height="151" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1614107072081" />
     <state width="1899" height="213" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1614019929815" />
     <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1612776688567">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -463,6 +468,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1612174336111" />
+    <state x="421" y="176" width="598" height="548" key="find.popup" timestamp="1614094567929">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="421" y="176" width="598" height="548" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1614094567929" />
     <state x="741" y="421" key="git4idea.remote.GitConfigureRemotesDialog" timestamp="1611052368644">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -475,5 +484,9 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="735" y="419" key="git4idea.ui.GitStashDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1612174348168" />
+    <state x="385" y="196" width="670" height="676" key="search.everywhere.popup" timestamp="1614095199736">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="385" y="196" width="670" height="676" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1614095199736" />
   </component>
 </project>

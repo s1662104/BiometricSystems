@@ -180,8 +180,8 @@ if __name__ == '__main__':
         #Initializing Support Vector Machine and fitting the training data
         train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
 
-        print("train_data\n",train_data)
-        print("train_target\n",train_target)
+        print("train_data\n",train_data[0])
+        print("train_target\n",train_target[0])
         classifier = SVC(kernel='rbf', random_state=1)
         #classifier.fit(train_data, train_target)        #In this case, the X_train is train_data, while the  Y_train is train_target
 
