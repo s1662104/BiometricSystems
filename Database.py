@@ -195,9 +195,9 @@ if __name__ == '__main__':
     classifier = SVC(kernel='rbf', random_state=1)
     db.createCSV()
     train = pd.read_csv('train.csv')
-    X_train = train['Image']
-    Y_train = train['Target']
-    #print(X_train)
+    X_train = train['Image'].array.to_numpy().tolist()
+    Y_train = train['Target'].array.to_numpy().tolist()
+    print(X_train)
     #classifier.fit(X_train, Y_train)
 
     # print(db.get_template(1))
