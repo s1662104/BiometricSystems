@@ -7,6 +7,7 @@ import os
 import csv
 
 from sklearn.svm import SVC
+import LBP
 
 class Database():
 
@@ -150,21 +151,27 @@ if __name__ == '__main__':
     print("Numero utenti: ",len(np.unique(db.target)))
     print("Template:", len(db.target))
     classifier = SVC(kernel='rbf', random_state=1)
-    #db.createCSV()
     train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
     print(train_data[0])
-    np.save("X_train.npy",train_data)
-    np.save("Y_train.npy",train_target)
 
+    #COME SALVARE E RICARICARE IL SET
+    #np.save("X_train.npy",train_data)
+    #np.save("Y_train.npy",train_target)
 
-    X_train = np.load("X_train.npy")
-    Y_train = np.load("Y_train.npy")
+    #X_train = np.load("X_train.npy")
+    #Y_train = np.load("Y_train.npy")
 
-    train = pd.read_csv('train.csv')
-    #X_train = train['Image']
-    #Y_train = train['Target']
+    X_train_list = [0] * len(train_data)
+
+    for i in range(0, len(train_data)):
+        lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
+        new_image = lbp.compute_lbp()
+        X_train_list[i] = lbp.createHistogram(new_image)
+
+    X_train = X_train_list
+
     print(X_train[0])
-    classifier.fit(X_train, Y_train)
+    classifier.fit(X_train, train_target)
 
     # train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data, probe_target = \
     #     db.split_data()
