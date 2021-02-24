@@ -8,7 +8,6 @@ import csv
 
 from sklearn.svm import SVC
 
-
 class Database():
 
     def __init__(self, db_index):
@@ -51,48 +50,6 @@ class Database():
         targets.shape
         type(targets)
         self.target = targets
-
-    # def split_data(self):
-    #     unique, counts = np.unique(db.target, return_counts=True)
-    #     occurrences = dict(zip(unique, counts))
-    #     num_user = self.num_user()
-    #     # numero di utenti dopo i quali si inserisce l'utente nel PG
-    #     skipped_user = round(num_user* self.pn/100)
-    #     print(skipped_user)
-    #     count=0
-    #     template=0
-    #     gallery_data, gallery_target, probe_data,probe_target, train_data, train_target, test_data,test_target = [], [], [], [], [], [], [], []
-    #     for i,val in enumerate(self.target):
-    #         occ = occurrences[val]
-    #         # print("it:",i,"count:",count,"skipped:",skipped_user,"cond:",count<skipped_user,"template:", template,"occ:",occ,"user:",val,)
-    #         if count<skipped_user:
-    #             if occ == 1:
-    #                 gallery=True
-    #             else:
-    #                 # numero gallery template
-    #                 ngt = round(occ/2)
-    #                 if template<ngt:
-    #                     gallery=True
-    #                 else:
-    #                     gallery = False
-    #             template = template+1
-    #             if template == occ:
-    #                 template = 0
-    #                 count = count+1
-    #         else:
-    #             template = template+1
-    #             gallery = False
-    #             if template == occ:
-    #                 template = 0
-    #                 if count == skipped_user:
-    #                     count = 0
-    #         if gallery:
-    #             gallery_data.append(self.data[i])
-    #             gallery_target.append(self.target[i])
-    #         else:
-    #             probe_data.append(self.data[i])
-    #             probe_target.append(self.target[i])
-    #     return gallery_data, gallery_target, probe_data, probe_target
 
     # 0.7 = 30% degli utenti e' nel test ma non nel train
     def split_data(self,percTest=30, percPN=15):
@@ -193,7 +150,16 @@ if __name__ == '__main__':
     print("Numero utenti: ",len(np.unique(db.target)))
     print("Template:", len(db.target))
     classifier = SVC(kernel='rbf', random_state=1)
-    db.createCSV()
+    #db.createCSV()
+    train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
+    print(train_data[0])
+    np.save("X_train.npy",train_data)
+    np.save("Y_train.npy",train_target)
+
+
+    X_train = np.load("X_train.npy")
+    Y_train = np.load("Y_train.npy")
+
     train = pd.read_csv('train.csv')
     X_train = train['Image'].array.to_numpy().tolist()
     Y_train = train['Target'].array.to_numpy().tolist()
@@ -208,6 +174,10 @@ if __name__ == '__main__':
     #     cv2.imshow('frame', data)
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
     #         break
+    #X_train = train['Image']
+    #Y_train = train['Target']
+    print(X_train[0])
+    classifier.fit(X_train, Y_train)
 
     # train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data, probe_target = \
     #     db.split_data()
