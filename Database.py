@@ -8,6 +8,8 @@ import csv
 
 from sklearn.svm import SVC
 
+import LBP
+
 class Database():
 
     def __init__(self, db_index):
@@ -150,21 +152,24 @@ if __name__ == '__main__':
     print("Numero utenti: ",len(np.unique(db.target)))
     print("Template:", len(db.target))
     classifier = SVC(kernel='rbf', random_state=1)
-    #db.createCSV()
     train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
-    print(train_data[0])
-    np.save("X_train.npy",train_data)
-    np.save("Y_train.npy",train_target)
 
+    #np.save("X_train.npy",train_data)
+    #np.save("Y_train.npy",train_target)
 
-    X_train = np.load("X_train.npy")
-    Y_train = np.load("Y_train.npy")
+    #X_train = np.load("X_train.npy")
+    #Y_train = np.load("Y_train.npy")
+    X_train = [0]*len(train_data)
 
-    train = pd.read_csv('train.csv')
-    X_train = train['Image'].array.to_numpy().tolist()
-    Y_train = train['Target'].array.to_numpy().tolist()
-    print(X_train)
-    #classifier.fit(X_train, Y_train)
+    for i in range(0, len(train_data)):
+        lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
+        new_img = lbp.compute_lbp()
+        X_train[i] = lbp.createHistogram(new_img)
+
+    classifier.fit(X_train, train_target)
+
+    #X_train = train['Image'].array.to_numpy().tolist()
+    #Y_train = train['Target'].array.to_numpy().tolist()
 
     # print(db.get_template(1))
     #
@@ -174,10 +179,6 @@ if __name__ == '__main__':
     #     cv2.imshow('frame', data)
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
     #         break
-    #X_train = train['Image']
-    #Y_train = train['Target']
-    print(X_train[0])
-    classifier.fit(X_train, Y_train)
 
     # train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data, probe_target = \
     #     db.split_data()

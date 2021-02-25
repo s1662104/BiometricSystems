@@ -136,8 +136,8 @@ class Local_Binary_Pattern:
         #Get the matrix dimensions
         h = len(new_img)
         w = len(new_img[0])
-        print("Altezza:",h)
-        print("Larghezza:",w)
+        #print("Altezza:",h)
+        #print("Larghezza:",w)
 
         #The LBPHFaceRecognizer uses Extended Local Binary Patterns
         #(it's probably configurable with other operators at a later
