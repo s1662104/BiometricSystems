@@ -7,7 +7,6 @@ import os
 import csv
 
 from sklearn.svm import SVC
-
 import LBP
 
 class Database():
@@ -153,14 +152,16 @@ if __name__ == '__main__':
     print("Template:", len(db.target))
     classifier = SVC(kernel='rbf', random_state=1)
     train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
+    print(train_data[0])
 
+    #COME SALVARE E RICARICARE IL SET
     #np.save("X_train.npy",train_data)
     #np.save("Y_train.npy",train_target)
 
     #X_train = np.load("X_train.npy")
     #Y_train = np.load("Y_train.npy")
-    X_train = [0]*len(train_data)
 
+    X_train = [0] * len(train_data)
     for i in range(0, len(train_data)):
         lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
         new_img = lbp.compute_lbp()
