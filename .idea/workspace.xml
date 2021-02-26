@@ -49,7 +49,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.Database">
+  <component name="RunManager" selected="Python.Main (1)">
     <configuration name="CaptureFace" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="BiometricSystems" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -178,9 +178,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.Main (1)" />
         <item itemvalue="Python.Database" />
         <item itemvalue="Python.LBP" />
-        <item itemvalue="Python.Main (1)" />
         <item itemvalue="Python.Recognition" />
         <item itemvalue="Python.CaptureFace" />
       </list>

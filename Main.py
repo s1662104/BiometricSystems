@@ -2,14 +2,95 @@ import dlib
 import cv2
 import Recognition
 import Enrollment
+import tkinter as tk
 
-azioni = "Cosa vuoi fare? \n0. Registrazione \n1. Riconoscimento"
+messageBenvenuto = "Benvenuto! \nCosa vuoi fare? \n0. Registrazione \n1. Riconoscimento"
 messageA = "Inserire scelta: "
 messageCF = "Inserire codice fiscale: "
 messageError = "Codice fiscale non valido"
 messageN = "Inserire nome: "
+choice1 = "Registrazione"
+choice2 = "Riconoscimento"
+messageWelcome = "Benvenuto\n Che operazione desideri svolgere?"
 
 dim_image = 64
+
+
+class Page(tk.Tk):
+
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
+        container = tk.Frame(self)
+
+        container.pack(side="top", fill="both", expand=True)
+
+        self.frames = {}
+
+        for F in (StartPage, EnrollmentPage, RecognitionPage):
+            frame = F(container, self)
+
+            self.frames[F] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame(StartPage)
+
+    def show_frame(self, cont):
+        frame = self.frames[cont]
+        frame.tkraise()
+
+class StartPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self,parent)
+        label = tk.Label(self, text=messageWelcome)
+        label.pack(pady=10,padx=50)
+        button1 = tk.Button(self, text=choice1, width=15, height=2, bg='#1E79FA',
+                            command=lambda: controller.show_frame(EnrollmentPage))
+        button2 = tk.Button(self, text=choice2, width=15, height=2, bg='#1E79FA',
+                            command=lambda: controller.show_frame(RecognitionPage))
+        button1.pack()
+        button2.pack(pady=10)
+
+class EnrollmentPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text=choice1)
+        label.pack(pady=10,padx=10)
+
+        entryCF = tk.Entry(self)
+        entryCF.insert(1, messageCF)
+        entryCF.pack(pady=2)
+        entryName = tk.Entry(self)
+        entryName.insert(1, messageN)
+        entryName.pack(pady=2)
+        button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+                            command=lambda: videoCapture(self, entryCF.get()))
+        button2.pack()
+
+        button1 = tk.Button(self, text="Back", width=15, height=2, bg='#1E79FA',
+                            command=lambda: controller.show_frame(StartPage))
+        button1.pack(pady=150)
+
+class RecognitionPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text=choice2)
+        label.pack(pady=10,padx=10)
+
+        entry1 = tk.Entry(self)
+        entry1.insert(1, messageCF)
+        entry1.pack(padx=0, pady=0)
+        button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+                            command=videoCapture)
+        button2.pack()
+
+        button1 = tk.Button(self, text="Back", width=15, height=2, bg='#1E79FA',
+                            command=lambda: controller.show_frame(StartPage))
+        button1.pack(pady=150)
+
+def videoCapture(Frame,cf):
+    if len(cf) != 16 or cf == messageCF:
+        print(messageError)
 
 def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
@@ -28,11 +109,10 @@ def detect_face(img, vis, crop=None):
         cv2.imshow('Face', crop)
     return crop
 
-
-if __name__ == '__main__':
-    print(azioni)
+def main():
+    print(messageBenvenuto)
     action = input(messageA)
-    if int(action)==0:
+    if int(action) == 0:
         error = Enrollment.collect_info()
     else:
         error = Recognition.collect_data()
@@ -51,7 +131,7 @@ if __name__ == '__main__':
             crop = detect_face(gray, vis)
 
             if crop is not None:
-                #azioni!
+                # azioni!
                 if action == 0:
                     Recognition.recognize()
                 else:
@@ -65,3 +145,11 @@ if __name__ == '__main__':
         # When everything done, release the capture
         cap.release()
         cv2.destroyAllWindows()
+
+def main2():
+    app = Page()
+    app.geometry('300x300')
+    app.mainloop()
+
+if __name__ == '__main__':
+    main2()
