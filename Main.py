@@ -7,7 +7,7 @@ import tkinter as tk
 messageBenvenuto = "Benvenuto! \nCosa vuoi fare? \n0. Registrazione \n1. Riconoscimento"
 messageA = "Inserire scelta: "
 messageCF = "Inserire codice fiscale: "
-messageError = "Codice fiscale non valido"
+messageError = "Input non valido"
 messageN = "Inserire nome: "
 choice1 = "Registrazione"
 choice2 = "Riconoscimento"
@@ -64,12 +64,15 @@ class EnrollmentPage(tk.Frame):
         entryName.insert(1, messageN)
         entryName.pack(pady=2)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: videoCapture(self, entryCF.get()))
+                            command=lambda: checkInputCFName(entryCF.get(), entryName.get(), labelError))
         button2.pack()
+
+        labelError = tk.Label(self, text=messageError,fg="#f0f0f0")
+        labelError.pack(pady=10, padx=10)
 
         button1 = tk.Button(self, text="Back", width=15, height=2, bg='#1E79FA',
                             command=lambda: controller.show_frame(StartPage))
-        button1.pack(pady=150)
+        button1.pack(pady=100)
 
 class RecognitionPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -77,20 +80,36 @@ class RecognitionPage(tk.Frame):
         label = tk.Label(self, text=choice2)
         label.pack(pady=10,padx=10)
 
-        entry1 = tk.Entry(self)
-        entry1.insert(1, messageCF)
-        entry1.pack(padx=0, pady=0)
+        entryCF = tk.Entry(self)
+        entryCF.insert(1, messageCF)
+        entryCF.pack(padx=0, pady=0)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=videoCapture)
+                            command=lambda: checkInputCF(entryCF.get(), labelError))
         button2.pack()
+
+        labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
+        labelError.pack(pady=10, padx=10)
 
         button1 = tk.Button(self, text="Back", width=15, height=2, bg='#1E79FA',
                             command=lambda: controller.show_frame(StartPage))
-        button1.pack(pady=150)
+        button1.pack(pady=125)
 
-def videoCapture(Frame,cf):
+def checkInputCF(cf, labelError):
     if len(cf) != 16 or cf == messageCF:
-        print(messageError)
+        labelError.configure(fg="red")
+    else:
+        labelError.configure(fg="#f0f0f0")
+    videoCapture()
+
+def checkInputCFName(cf, name, labelError):
+    if len(cf) != 16 or cf == messageCF or name == messageN:
+        labelError.configure(fg="red")
+    else:
+        labelError.configure(fg="#f0f0f0")
+    videoCapture()
+
+def videoCapture():
+    pass
 
 def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
