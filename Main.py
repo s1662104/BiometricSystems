@@ -64,14 +64,14 @@ class EnrollmentPage(tk.Frame):
         entryName.insert(1, messageN)
         entryName.pack(pady=2)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: checkInputCFName(entryCF.get(), entryName.get(), labelError))
+                            command=lambda: checkInput(entryCF.get(), labelError, entryName.get()))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError,fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
         button1 = tk.Button(self, text="Back", width=15, height=2, bg='#1E79FA',
-                            command=lambda: controller.show_frame(StartPage))
+                            command=lambda: back(controller, entryCF, labelError, entryName))
         button1.pack(pady=100)
 
 class RecognitionPage(tk.Frame):
@@ -84,29 +84,32 @@ class RecognitionPage(tk.Frame):
         entryCF.insert(1, messageCF)
         entryCF.pack(padx=0, pady=0)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: checkInputCF(entryCF.get(), labelError))
+                            command=lambda: checkInput(entryCF.get(), labelError))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
         button1 = tk.Button(self, text="Back", width=15, height=2, bg='#1E79FA',
-                            command=lambda: controller.show_frame(StartPage))
+                            command=lambda: back(controller, entryCF, labelError))
         button1.pack(pady=125)
 
-def checkInputCF(cf, labelError):
-    if len(cf) != 16 or cf == messageCF:
+def checkInput(cf, labelError, name=None):
+    if len(cf) != 16 or cf == messageCF or (name!=None and name == messageN):
         labelError.configure(fg="red")
+        return
     else:
         labelError.configure(fg="#f0f0f0")
     videoCapture()
 
-def checkInputCFName(cf, name, labelError):
-    if len(cf) != 16 or cf == messageCF or name == messageN:
-        labelError.configure(fg="red")
-    else:
-        labelError.configure(fg="#f0f0f0")
-    videoCapture()
+def back(controller, entryCF, labelError, entryName=None):
+    entryCF.delete(0,tk.END)
+    entryCF.insert(0,messageCF)
+    if entryName!= None:
+        entryName.delete(0, tk.END)
+        entryName.insert(0, messageN)
+    labelError.configure(fg="#f0f0f0")
+    controller.show_frame(StartPage)
 
 def videoCapture():
     pass
