@@ -133,6 +133,7 @@ def videoCapture():
     # When everything done, release the capture
     cap.release()
     cv2.destroyAllWindows()
+    return crop
 
 def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
@@ -152,46 +153,9 @@ def detect_face(img, vis, crop=None):
     return crop
 
 def main():
-    print(messageBenvenuto)
-    action = input(messageA)
-    if int(action) == 0:
-        error = Enrollment.collect_info()
-    else:
-        error = Recognition.collect_data()
-    if not error:
-        cap = cv2.VideoCapture(0)
-
-        while (True):
-            # Capture frame-by-frame
-            ret, frame = cap.read()
-
-            vis = frame.copy()
-
-            # Our operations on the frame come here
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-            crop = detect_face(gray, vis)
-
-            if crop is not None:
-                # azioni!
-                if action == 0:
-                    Recognition.recognize()
-                else:
-                    Enrollment.enroll()
-
-            # Display the resulting frame
-            cv2.imshow('frame', vis)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-        # When everything done, release the capture
-        cap.release()
-        cv2.destroyAllWindows()
-
-def main2():
     app = Page()
     app.geometry('300x300')
     app.mainloop()
 
 if __name__ == '__main__':
-    main2()
+    main()

@@ -53,21 +53,20 @@ class Database():
         self.target = targets
 
     # 0.7 = 30% degli utenti e' nel test ma non nel train
-    def split_data(self,percTest=30, percPN=15):
-        train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data,probe_target = [], [], [], [], [], [], [], []
+    def split_data(self,percTest=30):
+        train_data, train_target, test_data,test_target,gallery_data, gallery_target, pg_data, pg_target, pn_data,\
+            pn_target = [], [], [], [], [], [], [], [], [], []
         num_user = self.num_user()
         test_no_train = round(num_user * percTest / 100)
-        probe_no_gallery = round(num_user * percPN / 100)
-        print("Numero utenti in test ma non in train:", test_no_train, "Numero utenti in probe set ma non in gallery", probe_no_gallery)
+        print("Numero utenti in test ma non in train:", test_no_train)
         countTest = 0
-        countPN = 0
         template = 0
         unique, counts = np.unique(self.target, return_counts=True)
         occurrences = dict(zip(unique, counts))
         for i, val in enumerate(self.target):
             occ = occurrences[val]
             div = round(occ/2)
-            if (template<div or occ==1) and countTest<num_user - test_no_train:
+            if (template<div or occ==1) and countTest < num_user - test_no_train:
                 train_data.append(self.get_normalized_template(i))
                 train_target.append(self.target[i])
             else:
@@ -78,19 +77,21 @@ class Database():
                     divT = div
                 else:
                     divT = round(div/2)
-                if ((countTest < num_user - test_no_train and template-div < divT) or
-                        (countTest >= num_user - test_no_train and template < div)) or occ==1:
+                if (countTest < num_user - test_no_train and template-div < divT) or occ==1:
                     gallery_data.append(self.get_normalized_template(i))
                     gallery_target.append(self.target[i])
+                elif countTest < num_user - test_no_train:
+                    pg_data.append(self.get_normalized_template(i))
+                    pg_target.append(self.target[i])
                 else:
-                    probe_data.append(self.get_normalized_template(i))
-                    probe_target.append(self.target[i])
+                    pn_data.append(self.get_normalized_template(i))
+                    pn_target.append(self.target[i])
             template += 1
             if template == occ:
                 template = 0
                 countTest += 1
 
-        return train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target
+        return train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, pn_data, pn_target
 
     def num_user(self):
         return len(np.unique(self.target))
@@ -150,9 +151,8 @@ if __name__ == '__main__':
     db = Database(0)
     print("Numero utenti: ",len(np.unique(db.target)))
     print("Template:", len(db.target))
-    classifier = SVC(kernel='rbf', random_state=1)
-    train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
-    print(train_data[0])
+    # classifier = SVC(kernel='rbf', random_state=1)
+    # train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
 
     #COME SALVARE E RICARICARE IL SET
     #np.save("X_train.npy",train_data)
@@ -161,21 +161,22 @@ if __name__ == '__main__':
     #X_train = np.load("X_train.npy")
     #Y_train = np.load("Y_train.npy")
 
-    X_train_list = [0] * len(train_data)
+    # X_train_list = [0] * len(train_data)
+    #
+    # for i in range(0, len(train_data)):
+    #     lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
+    #     new_image = lbp.compute_lbp()
+    #     X_train_list[i] = lbp.createHistogram(new_image)
+    #
+    # X_train = X_train_list
+    #
+    # print(X_train[0])
+    # classifier.fit(X_train, train_target)
 
-    for i in range(0, len(train_data)):
-        lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
-        new_image = lbp.compute_lbp()
-        X_train_list[i] = lbp.createHistogram(new_image)
-
-    X_train = X_train_list
-
-    print(X_train[0])
-    classifier.fit(X_train, train_target)
-
-    # train_data, train_target, test_data,test_target,gallery_data, gallery_target, probe_data, probe_target = \
-    #     db.split_data()
-    # print("train:", len(train_data), len(train_target), len(np.unique(train_target)))
-    # print("test:", len(test_data), len(test_target), len(np.unique(test_target)))
-    # print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))
-    # print("probe:", len(probe_data), len(probe_target), len(np.unique(probe_target)))
+    train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, \
+        pn_data, pn_target = db.split_data()
+    print("train:", len(train_data), len(train_target), len(np.unique(train_target)))
+    print("test:", len(test_data), len(test_target), len(np.unique(test_target)))
+    print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))
+    print("probe PG:", len(pg_data), len(pg_target), len(np.unique(pg_target)))
+    print("probe PN:", len(pn_data), len(pn_target), len(np.unique(pn_target)))
