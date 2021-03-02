@@ -6,6 +6,7 @@ import cv2
 import os
 import csv
 
+from sklearn import metrics
 from sklearn.svm import SVC
 import LBP
 
@@ -154,23 +155,34 @@ if __name__ == '__main__':
     train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
     print(train_data[0])
 
-    #COME SALVARE E RICARICARE IL SET
-    #np.save("X_train.npy",train_data)
-    #np.save("Y_train.npy",train_target)
-
-    #X_train = np.load("X_train.npy")
-    #Y_train = np.load("Y_train.npy")
-
     X_train = [0] * len(train_data)
     for i in range(0, len(train_data)):
         lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
         new_img = lbp.compute_lbp()
         X_train[i] = lbp.createHistogram(new_img)
 
+    X_test = [0] * len(test_data)
+    for i in range(0, len(test_data)):
+        lbp = LBP.Local_Binary_Pattern(1, 8, test_data[i])
+        new_img = lbp.compute_lbp()
+        X_test[i] = lbp.createHistogram(new_img)
+
+    #COME SALVARE E RICARICARE IL SET
+    #np.save("X_train.npy",X_train)
+    #np.save("Y_train.npy",X_test)
+
+    #X_train = np.load("X_train.npy")
+    #Y_train = np.load("Y_train.npy")
+
+    #Train the model using the training sets
     classifier.fit(X_train, train_target)
 
-    #X_train = train['Image'].array.to_numpy().tolist()
-    #Y_train = train['Target'].array.to_numpy().tolist()
+    #Predict the response for test dataset
+    y_pred = classifier.predict(X_test)
+
+    #Model Accuracy: how often is the classifier correct?
+    print("Accuracy:", metrics.accuracy_score(test_target, y_pred))
+
 
     # print(db.get_template(1))
     #

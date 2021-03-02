@@ -22,7 +22,6 @@
     <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="CSV">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LBP.py" beforeDir="false" afterPath="$PROJECT_DIR$/LBP.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -367,7 +366,14 @@
       <option name="project" value="LOCAL" />
       <updated>1614010484640</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="CSV">
+      <created>1614245337959</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1614245337959</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -401,7 +407,8 @@
     <MESSAGE value="lbp sull'intera immagine e valori normalizzati nel range [0,255]" />
     <MESSAGE value="fix" />
     <MESSAGE value="suddivisione train e test set" />
-    <option name="LAST_COMMIT_MESSAGE" value="suddivisione train e test set" />
+    <MESSAGE value="CSV" />
+    <option name="LAST_COMMIT_MESSAGE" value="CSV" />
   </component>
   <component name="WindowStateProjectService">
     <state x="463" y="259" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1614093779831">
@@ -421,25 +428,25 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="418" key="Github.ShareDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1611052239681" />
-    <state width="1419" height="341" key="GridCell.Tab.0.bottom" timestamp="1614244817841">
+    <state width="1419" height="53" key="GridCell.Tab.0.bottom" timestamp="1614620425109">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="341" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1614244817841" />
+    <state width="1419" height="53" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1614620425109" />
     <state width="1899" height="213" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1614159807703" />
-    <state width="1419" height="341" key="GridCell.Tab.0.center" timestamp="1614244817840">
+    <state width="1419" height="53" key="GridCell.Tab.0.center" timestamp="1614620425108">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="341" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1614244817840" />
+    <state width="1419" height="53" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1614620425108" />
     <state width="1899" height="213" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1614159807702" />
-    <state width="1419" height="341" key="GridCell.Tab.0.left" timestamp="1614244817839">
+    <state width="1419" height="53" key="GridCell.Tab.0.left" timestamp="1614620425108">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="341" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1614244817839" />
+    <state width="1419" height="53" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1614620425108" />
     <state width="1899" height="213" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1614159807702" />
-    <state width="1419" height="341" key="GridCell.Tab.0.right" timestamp="1614244817841">
+    <state width="1419" height="53" key="GridCell.Tab.0.right" timestamp="1614620425109">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="341" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1614244817841" />
+    <state width="1419" height="53" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1614620425109" />
     <state width="1899" height="213" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1614159807703" />
     <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1612776688567">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -457,6 +464,14 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1899" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
+    <state x="144" y="79" key="MergeDialog" timestamp="1614245433679">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="144" y="79" key="MergeDialog/0.0.1440.900@0.0.1440.900" timestamp="1614245433679" />
+    <state x="360" y="218" key="MultipleFileMergeDialog" timestamp="1614245433697">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="360" y="218" key="MultipleFileMergeDialog/0.0.1440.900@0.0.1440.900" timestamp="1614245433697" />
     <state x="461" y="165" key="SettingsEditor" timestamp="1613758752091">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -473,6 +488,10 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="421" y="176" width="598" height="548" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1614183571939" />
+    <state x="393" y="245" key="git4idea.merge.GitPullDialog" timestamp="1614616176196">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="393" y="245" key="git4idea.merge.GitPullDialog/0.0.1440.900@0.0.1440.900" timestamp="1614616176196" />
     <state x="741" y="421" key="git4idea.remote.GitConfigureRemotesDialog" timestamp="1611052368644">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
