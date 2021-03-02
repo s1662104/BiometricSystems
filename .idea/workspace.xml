@@ -19,10 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="CSV">
+    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="Evaluation SVC">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -374,7 +373,14 @@
       <option name="project" value="LOCAL" />
       <updated>1614245337959</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Evaluation SVC">
+      <created>1614675515435</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1614675515435</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -409,7 +415,8 @@
     <MESSAGE value="fix" />
     <MESSAGE value="suddivisione train e test set" />
     <MESSAGE value="CSV" />
-    <option name="LAST_COMMIT_MESSAGE" value="CSV" />
+    <MESSAGE value="Evaluation SVC" />
+    <option name="LAST_COMMIT_MESSAGE" value="Evaluation SVC" />
   </component>
   <component name="WindowStateProjectService">
     <state x="463" y="259" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1614093779831">
@@ -485,10 +492,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1612174336111" />
-    <state x="421" y="176" width="598" height="548" key="find.popup" timestamp="1614183571939">
+    <state x="421" y="176" width="598" height="548" key="find.popup" timestamp="1614675537069">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="421" y="176" width="598" height="548" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1614183571939" />
+    <state x="421" y="176" width="598" height="548" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1614675537069" />
     <state x="393" y="245" key="git4idea.merge.GitPullDialog" timestamp="1614616176196">
       <screen x="0" y="0" width="1440" height="900" />
     </state>

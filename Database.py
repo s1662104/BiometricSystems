@@ -111,43 +111,6 @@ class Database():
     def get_target(self,i):
         return self.target[i]
 
-    def createCSV(self):
-        train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, pn_data, pn_target = self.split_data()
-
-        data_list = [[]]*(len(train_data)+1)
-        data_list[0] = ['Image', 'Target']
-        for i in range(1,len(data_list)):
-            data_list[i] = [train_data[i-1].tolist(), train_target[i-1]]
-        with open('train.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=',')
-            writer.writerows(data_list)
-
-        data_list = [[]] * (len(test_data) + 1)
-        data_list[0] = ['Image', 'Target']
-        for i in range(1,len(data_list)):
-            data_list[i] = [test_data[i-1].tolist(), test_target[i-1]]
-        with open('test.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=',')
-            writer.writerows(data_list)
-
-        data_list = [[]] * (len(gallery_data) + 1)
-        data_list[0] = ['Image', 'Target']
-        for i in range(1, len(data_list)):
-            data_list[i] = [gallery_data[i - 1].tolist(), gallery_target[i - 1]]
-        with open('gallery.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=',')
-            writer.writerows(data_list)
-
-        #data_list = [[]] * (len(probe_data) + 1)
-        #data_list[0] = ['Image', 'Target']
-        #for i in range(1, len(data_list)):
-        #    data_list[i] = [probe_data[i - 1].tolist(), probe_target[i - 1]]
-        #with open('probe.csv', 'w', newline='') as file:
-        #    writer = csv.writer(file, delimiter=',')
-        #    writer.writerows(data_list)
-
-        return
-
 if __name__ == '__main__':
     db = Database(0)
     print("Numero utenti: ",len(np.unique(db.target)))
