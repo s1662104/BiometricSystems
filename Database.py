@@ -8,6 +8,11 @@ import csv
 
 from sklearn import metrics
 from sklearn.svm import SVC
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from sklearn.decomposition import PCA as RandomizedPCA
+from sklearn.model_selection import train_test_split
 import LBP
 
 class Database():
@@ -73,7 +78,7 @@ class Database():
             else:
                 test_data.append(self.get_normalized_template(i))
                 test_target.append(self.target[i])
-                # se tale condizione e' vera, significa che in test ci vanno tutti i template dell'i-esimo utente
+                #se tale condizione e' vera, significa che in test ci vanno tutti i template dell'i-esimo utente
                 if countTest>=num_user - test_no_train:
                     divT = div
                 else:
@@ -115,20 +120,40 @@ if __name__ == '__main__':
     db = Database(0)
     print("Numero utenti: ",len(np.unique(db.target)))
     print("Template:", len(db.target))
+
+    X = [0]*len(db.data)
+    for i in range(0,len(db.data)):
+        lbp = LBP.Local_Binary_Pattern(1, 8, db.get_normalized_template(i))
+        new_img = lbp.compute_lbp()
+        X[i] = lbp.createHistogram(new_img)
+    X_train, X_test, y_train, y_test = train_test_split(X, db.target, test_size=0.25, random_state=42)
     classifier = SVC(kernel='rbf', random_state=1)
-    train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, pn_data, pn_target = db.split_data()
+    classifier.fit(X_train, y_train)        #Train the model using the training sets
+    y_pred = classifier.predict(X_test)       #Predict the response for test dataset
+    print("Accuracy:", metrics.accuracy_score(y_test, y_pred))        #Model Accuracy: how often is the classifier correct?
 
-    X_train = [0] * len(train_data)
-    for i in range(0, len(train_data)):
-        lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
-        new_img = lbp.compute_lbp()
-        X_train[i] = lbp.createHistogram(new_img)
-
-    X_test = [0] * len(test_data)
-    for i in range(0, len(test_data)):
-        lbp = LBP.Local_Binary_Pattern(1, 8, test_data[i])
-        new_img = lbp.compute_lbp()
-        X_test[i] = lbp.createHistogram(new_img)
+    # train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, pn_data, pn_target = db.split_data()
+    # X_train = [0] * len(train_data)
+    # for i in range(0, len(train_data)):
+    #     lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
+    #     new_img = lbp.compute_lbp()
+    #     X_train[i] = lbp.createHistogram(new_img)
+    #
+    # X_test = [0] * len(test_data)
+    # for i in range(0, len(test_data)):
+    #    lbp = LBP.Local_Binary_Pattern(1, 8, test_data[i])
+    #    new_img = lbp.compute_lbp()
+    #    X_test[i] = lbp.createHistogram(new_img)
+    #
+    # pca = RandomizedPCA(n_components=50, whiten=True).fit(X_train)
+    # X_train_pca = pca.transform(X_train)
+    # X_test_pca = pca.transform(X_test)
+    # classifier = SVC(kernel='rbf', random_state=1)
+    # classifier.fit(X_train_pca, train_target)
+    # Predict the response for test dataset
+    # y_pred = classifier.predict(X_test_pca)
+    # Model Accuracy: how often is the classifier correct?
+    #print("Accuracy:", metrics.accuracy_score(test_target, y_pred))
 
     #COME SALVARE E RICARICARE IL SET
     #np.save("X_train.npy",X_train)
@@ -137,27 +162,6 @@ if __name__ == '__main__':
     #X_train = np.load("X_train.npy")
     #Y_train = np.load("Y_train.npy")
 
-    #Train the model using the training sets
-    classifier.fit(X_train, train_target)
-
-    #Predict the response for test dataset
-    y_pred = classifier.predict(X_test)
-
-    #Model Accuracy: how often is the classifier correct?
-    print("Accuracy:", metrics.accuracy_score(test_target, y_pred))
-
-
-    # print(db.get_template(1))
-    #
-    # data = db.get_normalized_template(1)
-    # print(data)
-    # while(True):
-    #     cv2.imshow('frame', data)
-    #     if cv2.waitKey(1) & 0xFF == ord('q'):
-    #         break
-
-    # train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, \
-    #         pn_data, pn_target = db.split_data()
     # print("train:", len(train_data), len(train_target), len(np.unique(train_target)))
     # print("test:", len(test_data), len(test_target), len(np.unique(test_target)))
     # print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))
