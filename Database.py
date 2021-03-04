@@ -1,14 +1,25 @@
+import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
 import tarfile
 import cv2
 import os
 
+from sklearn import metrics
+from sklearn.svm import SVC
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from sklearn.decomposition import PCA as RandomizedPCA
+from sklearn.model_selection import train_test_split
+import LBP
 
 class Database():
 
     def __init__(self, db_index):
 
         # probe of user that are not in the gallery in percentage
+        self.pn = 20    #numero utenti dopo il quale inserisce un utente solo nel probe set
         self.db_index = db_index
         self.data = []
         self.target = []
@@ -140,6 +151,20 @@ if __name__ == '__main__':
     db = Database(0)
     print("Numero utenti: ",len(np.unique(db.target)))
     print("Template:", len(db.target))
+    classifier = SVC(kernel='rbf', random_state=1)
+    train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, pn_data, pn_target = db.split_data()
+
+    X_train = [0] * len(train_data)
+    for i in range(0, len(train_data)):
+        lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
+        new_img = lbp.compute_lbp()
+        X_train[i] = lbp.createHistogram(new_img)
+
+    X_test = [0] * len(test_data)
+    for i in range(0, len(test_data)):
+        lbp = LBP.Local_Binary_Pattern(1, 8, test_data[i])
+        new_img = lbp.compute_lbp()
+        X_test[i] = lbp.createHistogram(new_img)
 
     #COME SALVARE E RICARICARE IL SET
     #np.save("X_train.npy",X_train)
