@@ -1,27 +1,20 @@
-import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
 import tarfile
 import cv2
 import os
-import csv
 
-from sklearn import metrics
-from sklearn.svm import SVC
-import LBP
 
 class Database():
 
     def __init__(self, db_index):
 
         # probe of user that are not in the gallery in percentage
-        self.pn = 20    #numero utenti dopo il quale inserisce un utente solo nel probe set
         self.db_index = db_index
         self.data = []
         self.target = []
 
         if self.db_index == 0:
-            self.secondDB()
+            self.olivettiDB()
         elif self.db_index == 1:
             tar = tarfile.open("LFW/lfw-funneled.tgz", "r:gz")
             counter = 0
@@ -42,7 +35,7 @@ class Database():
         else:
             print("VALORE NON VALIDO!")
 
-    def secondDB(self):
+    def olivettiDB(self):
         imgs = np.load("Olivetti_faces/olivetti_faces.npy")
         imgs.shape
         type(imgs)
@@ -67,14 +60,14 @@ class Database():
         for i, val in enumerate(self.target):
             occ = occurrences[val]
             div = round(occ/2)
-            if (template<div or occ==1) and countTest < num_user - test_no_train:
+            if (template < div or occ == 1) and countTest < num_user - test_no_train:
                 train_data.append(self.get_normalized_template(i))
                 train_target.append(self.target[i])
             else:
                 test_data.append(self.get_normalized_template(i))
                 test_target.append(self.target[i])
                 # se tale condizione e' vera, significa che in test ci vanno tutti i template dell'i-esimo utente
-                if countTest>=num_user - test_no_train:
+                if countTest >= num_user - test_no_train:
                     divT = div
                 else:
                     divT = round(div/2)
@@ -94,6 +87,35 @@ class Database():
 
         return train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, pn_data, pn_target
 
+    # pn = percentuale di utenti che non sono nella gallery
+    # probe = percentuale di template che sono nel probe set e non nel gallery set per lo stesso utente
+    def split_gallery_probe(self, pn=30, probe=50):
+        num_user = self.num_user()
+        unique, counts = np.unique(self.target, return_counts=True)
+        occurrences = dict(zip(unique, counts))
+        pn_user = round(num_user * pn / 100)
+        count = 0
+        countUser = 0
+        gallery_target, gallery_data, pn_data, pn_target, pg_data, pg_target = [], [], [], [], [], []
+        for i, val in enumerate(self.target):
+            occ = occurrences[val]
+            n_probe_temp = round(occ * probe / 100)
+            if (count < occ - n_probe_temp or occ == 1) and countUser < num_user - pn_user:
+                gallery_data.append(self.get_normalized_template(i))
+                gallery_target.append(self.target[i])
+            else:
+                if countUser < num_user - pn_user:
+                    pg_data.append(self.get_normalized_template(i))
+                    pg_target.append(self.target[i])
+                else:
+                    pn_data.append(self.get_normalized_template(i))
+                    pn_target.append(self.target[i])
+            count += 1
+            if count == occ:
+                count = 0
+                countUser += 1
+        return gallery_data, gallery_target, pn_data, pn_target, pg_data, pg_target
+
     def num_user(self):
         return len(np.unique(self.target))
 
@@ -111,24 +133,13 @@ class Database():
     def get_target(self,i):
         return self.target[i]
 
+    def load_db(self):
+        pass
+
 if __name__ == '__main__':
     db = Database(0)
     print("Numero utenti: ",len(np.unique(db.target)))
     print("Template:", len(db.target))
-    classifier = SVC(kernel='rbf', random_state=1)
-    train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, pn_data, pn_target = db.split_data()
-
-    X_train = [0] * len(train_data)
-    for i in range(0, len(train_data)):
-        lbp = LBP.Local_Binary_Pattern(1, 8, train_data[i])
-        new_img = lbp.compute_lbp()
-        X_train[i] = lbp.createHistogram(new_img)
-
-    X_test = [0] * len(test_data)
-    for i in range(0, len(test_data)):
-        lbp = LBP.Local_Binary_Pattern(1, 8, test_data[i])
-        new_img = lbp.compute_lbp()
-        X_test[i] = lbp.createHistogram(new_img)
 
     #COME SALVARE E RICARICARE IL SET
     #np.save("X_train.npy",X_train)
@@ -137,30 +148,8 @@ if __name__ == '__main__':
     #X_train = np.load("X_train.npy")
     #Y_train = np.load("Y_train.npy")
 
-    #Train the model using the training sets
-    classifier.fit(X_train, train_target)
-
-    #Predict the response for test dataset
-    y_pred = classifier.predict(X_test)
-
-    #Model Accuracy: how often is the classifier correct?
-    print("Accuracy:", metrics.accuracy_score(test_target, y_pred))
-
-
-    # print(db.get_template(1))
-    #
-    # data = db.get_normalized_template(1)
-    # print(data)
-    # while(True):
-    #     cv2.imshow('frame', data)
-    #     if cv2.waitKey(1) & 0xFF == ord('q'):
-    #         break
-
-    # train_data, train_target, test_data, test_target, gallery_data, gallery_target, pg_data, pg_target, \
-    #         pn_data, pn_target = db.split_data()
-    # print("train:", len(train_data), len(train_target), len(np.unique(train_target)))
-    # print("test:", len(test_data), len(test_target), len(np.unique(test_target)))
-    # print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))
-    # print("probe PG:", len(pg_data), len(pg_target), len(np.unique(pg_target)))
-    # print("probe PN:", len(pn_data), len(pn_target), len(np.unique(pn_target)))
+    gallery_data, gallery_target, pn_data, pn_target, pg_data, pg_target = db.split_gallery_probe()
+    print("gallery:", len(gallery_data), len(gallery_target), len(np.unique(gallery_target)))
+    print("probe PG:", len(pg_data), len(pg_target), len(np.unique(pg_target)))
+    print("probe PN:", len(pn_data), len(pn_target), len(np.unique(pn_target)))
 
