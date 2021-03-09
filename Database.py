@@ -4,6 +4,7 @@ import cv2
 import os
 from enum import Enum
 import pandas as pd
+from random import randrange
 
 class Olivetti_Names(Enum):
     Xander_Bolton = 0
@@ -47,13 +48,23 @@ class Olivetti_Names(Enum):
     Konnor_Buck = 38
     Martyn_Mays = 39
 
-    def __str__(self):
-        return 'my custom str! {0}'.format(self.value)
+class Medicine(Enum):
+    Cardioaspirina = 0
+    DAFLON = 1
+    Cardiol = 2
+    CardioPlus = 3
+    Adalat = 4
+    Lasopranzolo = 5
+    Motilex = 6
+    Chetogerd = 7
+    Tachipirina = 8
 
 class Database():
 
     def __init__(self, db_index=None):
         self.db_index = db_index
+        # numero di famigliari massimo per ogni utente
+        self.family_number = 2
         if self.db_index is not None:
             data, target = self.load_db()
             self.gallery_data, self.gallery_target, self.pn_data, self.pn_target, self.pg_data, self.pg_target = \
@@ -85,16 +96,20 @@ class Database():
         for i, val in enumerate(target):
             occ = occurrences[val]
             n_probe_temp = round(occ * probe / 100)
+            if self.db_index == 0:
+                name = Olivetti_Names(int(target[i])).name.replace("_"," ")
+            else:
+                name = target[i]
             if (count < occ - n_probe_temp or occ == 1) and countUser < num_user - pn_user:
                 gallery_data.append(self.get_normalized_template(i, data))
-                gallery_target.append(target[i])
+                gallery_target.append(name)
             else:
                 if countUser < num_user - pn_user:
                     pg_data.append(self.get_normalized_template(i, data))
-                    pg_target.append(target[i])
+                    pg_target.append(name)
                 else:
                     pn_data.append(self.get_normalized_template(i, data))
-                    pn_target.append(target[i])
+                    pn_target.append(name)
             count += 1
             if count == occ:
                 count = 0
@@ -145,7 +160,60 @@ class Database():
             row = []
             row.append(user)
             dataset.append(row)
+            row.append(self.generateCF(user))
+            row.append(self.generateMedicineList())
+            #n_family = randrange(self.family_number+1)
+            #for j in range(n_family):
+
+
         print(dataset)
+
+    # generazione di un codice fiscale (fonte Wikipedia). Sono aggiunti caratteri casuali in casi particolari
+    def generateCF(self,name):
+        first_name = name.split(" ")[0]
+        last_name = name.split(" ")[1]
+        print(first_name, last_name)
+        cf = ""
+        total = 0
+        for c in enumerate(last_name):
+            if c[1].lower() not in {"a", "e", "i", "o", "u", "y"}:
+                cf += c[1].upper()
+                total += 1
+            if total == 3:
+                break
+        total = 0
+        for c in enumerate(first_name):
+            if c[1].lower() not in {"a", "e", "i", "o", "u", "y"}:
+                cf += c[1].upper()
+                total += 1
+            if total == 3:
+                break
+        for i in range(2):
+            cf += str(randrange(10))
+        month = ["A", "B", "C", "D", "E", "H", "L", "M", "P", "R", "S", "T"]
+        cf += month[randrange(12)]
+        day = str(randrange(31))
+        if len(day)==1:
+            day = "0"+day
+        cf += day
+        char = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "L", "M", "O", "P", "R", "S", "T", "U", "V", "Z"]
+        cf += char[randrange(len(char))]
+        for i in range(3):
+            cf += str(randrange(10))
+        cf += char[randrange(len(char))]
+        if len(cf) < 16:
+            diff = 16 - len(cf)
+            for i in range(diff):
+                cf += char[randrange(len(char))]
+        return cf
+
+    def generateMedicineList(self):
+        list = []
+        for i in range(randrange(len(Medicine))):
+            medicine = Medicine(randrange(len(Medicine))).name
+            if medicine not in list:
+                list.append(medicine)
+        return list
 
     def show_image(self, img):
         while(True):
