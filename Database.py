@@ -170,10 +170,11 @@ class Database():
                 family.append(users[family_member])
             row.append(family)
             dataset.append(row)
-        df = pd.DataFrame({'User': np.array(dataset)[::, 0],
-                           'Codice Fiscale': np.array(dataset)[::, 1],
-                           'Farmaci': np.array(dataset)[::, 2],
-                           'Delegati': np.array(dataset)[::, 3],
+        dataset = np.array(dataset)
+        df = pd.DataFrame({'User': dataset[::, 0],
+                           'Codice Fiscale': dataset[::, 1],
+                           'Farmaci': dataset[::, 2],
+                           'Delegati': dataset[::, 3],
                            })
         df.to_csv('dataset_farmaci.csv')
 
