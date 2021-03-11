@@ -51,8 +51,6 @@ class Olivetti_Names(Enum):
 class Medicine(Enum):
     Cardioaspirina = 0
     DAFLON = 1
-    Cardiol = 2
-    CardioPlus = 3
     Adalat = 4
     Lasopranzolo = 5
     Motilex = 6
@@ -70,6 +68,7 @@ class Database():
             data, target = self.load_db()
             self.gallery_data, self.gallery_target, self.pn_data, self.pn_target, self.pg_data, self.pg_target = \
                 self.split_gallery_probe(data, target )
+            self.csv_maker()
             np.save("npy_db/gallery_data.npy",self.gallery_data)
             np.save("npy_db/gallery_target.npy",self.gallery_target)
             np.save("npy_db/pn_data.npy", self.pn_data)
@@ -173,7 +172,7 @@ class Database():
         dataset = []
         # numero di utenti nella gallery
         n_user = self.num_user(self.gallery_target)
-        #utenti nella gallery
+        # utenti nella gallery
         users = np.unique(self.gallery_target)
         # per ogni  utente
         for user in users:
@@ -200,7 +199,24 @@ class Database():
                            'Delegati': dataset[::, 3],
                            })
         #salvo in csv
-        df.to_csv('dataset_farmaci.csv')
+        df.to_csv('dataset_user.csv')
+
+    def csv_medicine_maker(self):
+        dataset = []
+        dataset.append(["Cardioaspirina", "100 mg", 30, 1])
+        dataset.append(["DAFLON", "500 mg", 30, 2])
+        dataset.append(["Adalat", "60 mg", 14, 1])
+        dataset.append(["Lasopranzolo", "30 mg", 28, 1])
+        dataset.append(["Motilex", "0,5 mg", 30, 2])
+        dataset.append(["Prefolic", "15 mg", 30, 1])
+        dataset.append(["SIMESTAT", "5 mg", 20, 1])
+        dataset = np.array(dataset)
+        df = pd.DataFrame({'Nome': dataset[::, 0],
+                           'Dosaggio': dataset[::, 1],
+                           'Numero Pasticche': dataset[::, 2],
+                           'Dose x giorno': dataset[::, 3],
+                           })
+        df.to_csv('dataset_medicine.csv')
 
     # generazione di un codice fiscale (fonte Wikipedia). Sono aggiunti caratteri casuali in casi particolari
     def generateCF(self,name):
@@ -250,11 +266,16 @@ class Database():
 
     def generateMedicineList(self):
         list = []
+        medicines = pd.read_csv("dataset_medicine.csv")
+        len = medicines.shape[0]
         # fissa un numero randomico di farmaci
-        for i in range(randrange(len(Medicine))):
-            medicine = Medicine(randrange(len(Medicine))).name
+        for i in range(randrange(len)):
+            rnd = randrange(len)
+            m = medicines.loc[rnd]
+            medicine = m['Nome'] + " " + m['Dosaggio']
             if medicine not in list:
                 list.append(medicine)
+        print(list)
         return list
 
     def show_image(self, img):
@@ -265,9 +286,11 @@ class Database():
 
 if __name__ == '__main__':
     db = Database()
-    print("gallery:", len(db.gallery_data), len(db.gallery_target), len(np.unique(db.gallery_target)))
-    print("probe PG:", len(db.pg_data), len(db.pg_target), len(np.unique(db.pg_target)))
-    print("probe PN:", len(db.pn_data), len(db.pn_target), len(np.unique(db.pn_target)))
+    # print("gallery:", len(db.gallery_data), len(db.gallery_target), len(np.unique(db.gallery_target)))
+    # print("probe PG:", len(db.pg_data), len(db.pg_target), len(np.unique(db.pg_target)))
+    # print("probe PN:", len(db.pn_data), len(db.pn_target), len(np.unique(db.pn_target)))
 
+    #db.csv_medicine_maker()
     db.csv_maker()
+
 
