@@ -65,6 +65,7 @@ class Database():
         self.db_index = db_index
         # numero di famigliari massimo per ogni utente
         self.family_number = 2
+        # Se si specifica un indice, carica l'intero DB, lo splitta e salva i singoli database (gallery, probe)
         if self.db_index is not None:
             data, target = self.load_db()
             self.gallery_data, self.gallery_target, self.pn_data, self.pn_target, self.pg_data, self.pg_target = \
@@ -87,23 +88,35 @@ class Database():
     # probe = percentuale di template che sono nel probe set e non nel gallery set per lo stesso utente
     def split_gallery_probe(self, data,target, pn=30, probe=50):
         num_user = self.num_user(target)
+        # calcola il numero di template per utente
         unique, counts = np.unique(target, return_counts=True)
         occurrences = dict(zip(unique, counts))
+        # numero di utenti che non sono nella gallery
         pn_user = round(num_user * pn / 100)
+        # conteggio dei template
         count = 0
+        # conteggio
         countUser = 0
         gallery_target, gallery_data, pn_data, pn_target, pg_data, pg_target = [], [], [], [], [], []
+        # per ogni utente
         for i, val in enumerate(target):
+            # prendo il numero di template dell'utente
             occ = occurrences[val]
+            # numero di template per il probe set
             n_probe_temp = round(occ * probe / 100)
+            # seleziono il nome
             if self.db_index == 0:
                 name = Olivetti_Names(int(target[i])).name.replace("_"," ")
             else:
                 name = target[i]
+            # se il numero del template e' minore del numero massimo di template destinati alla gallery
+            # e il numero di utenti rientra negli utenti che sono nella gallery, allora inserisco il template nella
+            # gallery
             if (count < occ - n_probe_temp or occ == 1) and countUser < num_user - pn_user:
                 gallery_data.append(self.get_normalized_template(i, data))
                 gallery_target.append(name)
             else:
+                # se lo inserisco nel probe set, controllo se l'utente e' nella gallery o no
                 if countUser < num_user - pn_user:
                     pg_data.append(self.get_normalized_template(i, data))
                     pg_target.append(name)
@@ -111,11 +124,13 @@ class Database():
                     pn_data.append(self.get_normalized_template(i, data))
                     pn_target.append(name)
             count += 1
+            # se ho finito i template, passo all'utente successivo
             if count == occ:
                 count = 0
                 countUser += 1
         return gallery_data, gallery_target, pn_data, pn_target, pg_data, pg_target
 
+    # ritorna il numero di utenti nel dataset
     def num_user(self, target):
         return len(np.unique(target))
 
@@ -156,13 +171,20 @@ class Database():
 
     def csv_maker(self):
         dataset = []
+        # numero di utenti nella gallery
         n_user = self.num_user(self.gallery_target)
+        #utenti nella gallery
         users = np.unique(self.gallery_target)
+        # per ogni  utente
         for user in users:
             row = []
+            # aggiungo nome
             row.append(user)
+            # genero il codice fiscale
             row.append(self.generateCF(user))
+            # genero la lista casuale di farmaci
             row.append(self.generateMedicineList())
+            # definisco il numero di delegati
             n_family = randrange(self.family_number+1)
             family = []
             for j in range(n_family):
@@ -170,12 +192,14 @@ class Database():
                 family.append(users[family_member])
             row.append(family)
             dataset.append(row)
+        # trasformo in np array
         dataset = np.array(dataset)
         df = pd.DataFrame({'User': dataset[::, 0],
                            'Codice Fiscale': dataset[::, 1],
                            'Farmaci': dataset[::, 2],
                            'Delegati': dataset[::, 3],
                            })
+        #salvo in csv
         df.to_csv('dataset_farmaci.csv')
 
     # generazione di un codice fiscale (fonte Wikipedia). Sono aggiunti caratteri casuali in casi particolari
@@ -184,6 +208,7 @@ class Database():
         last_name = name.split(" ")[1]
         cf = ""
         total = 0
+        # prime tre consonanti
         for c in enumerate(last_name):
             if c[1].lower() not in {"a", "e", "i", "o", "u", "y"}:
                 cf += c[1].upper()
@@ -191,25 +216,32 @@ class Database():
             if total == 3:
                 break
         total = 0
+        # primi tre consonanti
         for c in enumerate(first_name):
             if c[1].lower() not in {"a", "e", "i", "o", "u", "y"}:
                 cf += c[1].upper()
                 total += 1
             if total == 3:
                 break
+        # anno di nascita
         for i in range(2):
             cf += str(randrange(10))
+        # mese di nascita
         month = ["A", "B", "C", "D", "E", "H", "L", "M", "P", "R", "S", "T"]
         cf += month[randrange(12)]
         day = str(randrange(31))
+        # giorno di nascita
         if len(day)==1:
             day = "0"+day
         cf += day
+        # stato di nascita
         char = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "L", "M", "O", "P", "R", "S", "T", "U", "V", "Z"]
         cf += char[randrange(len(char))]
+        # codice di sicurezza
         for i in range(3):
             cf += str(randrange(10))
         cf += char[randrange(len(char))]
+        # se manca una cifra, si aggiunge (ad esempio consonanti sono < 3)
         if len(cf) < 16:
             diff = 16 - len(cf)
             for i in range(diff):
@@ -218,6 +250,7 @@ class Database():
 
     def generateMedicineList(self):
         list = []
+        # fissa un numero randomico di farmaci
         for i in range(randrange(len(Medicine))):
             medicine = Medicine(randrange(len(Medicine))).name
             if medicine not in list:
