@@ -275,7 +275,6 @@ class Database():
             medicine = m['Nome'] + " " + m['Dosaggio']
             if medicine not in list:
                 list.append(medicine)
-        print(list)
         return list
 
     def show_image(self, img):
