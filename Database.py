@@ -156,23 +156,31 @@ class Database():
 
     def csv_maker(self):
         dataset = []
-        for user in np.unique(self.gallery_target):
+        n_user = self.num_user(self.gallery_target)
+        users = np.unique(self.gallery_target)
+        for user in users:
             row = []
             row.append(user)
-            dataset.append(row)
             row.append(self.generateCF(user))
             row.append(self.generateMedicineList())
-            #n_family = randrange(self.family_number+1)
-            #for j in range(n_family):
-
-
-        print(dataset)
+            n_family = randrange(self.family_number+1)
+            family = []
+            for j in range(n_family):
+                family_member = randrange(n_user)
+                family.append(users[family_member])
+            row.append(family)
+            dataset.append(row)
+        df = pd.DataFrame({'User': np.array(dataset)[::, 0],
+                           'Codice Fiscale': np.array(dataset)[::, 1],
+                           'Farmaci': np.array(dataset)[::, 2],
+                           'Delegati': np.array(dataset)[::, 3],
+                           })
+        df.to_csv('dataset_farmaci.csv')
 
     # generazione di un codice fiscale (fonte Wikipedia). Sono aggiunti caratteri casuali in casi particolari
     def generateCF(self,name):
         first_name = name.split(" ")[0]
         last_name = name.split(" ")[1]
-        print(first_name, last_name)
         cf = ""
         total = 0
         for c in enumerate(last_name):
