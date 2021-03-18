@@ -3,6 +3,7 @@ import cv2
 import Recognition
 import Enrollment
 import tkinter as tk
+from PIL import ImageTk
 
 messageBenvenuto = "Benvenuto! \nCosa vuoi fare? \n0. Registrazione \n1. Riconoscimento"
 messageA = "Inserire scelta: "
@@ -26,7 +27,7 @@ class Page(tk.Tk):
 
         self.frames = {}
 
-        for F in (StartPage, EnrollmentPage, RecognitionPage):
+        for F in (StartPage, EnrollmentPage, RecognitionPage, DataPage):
             frame = F(container, self)
 
             self.frames[F] = frame
@@ -39,6 +40,7 @@ class Page(tk.Tk):
         frame = self.frames[cont]
         frame.tkraise()
 
+
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
@@ -49,7 +51,7 @@ class StartPage(tk.Frame):
         button2 = tk.Button(self, text=choice2, width=15, height=2, bg='#1E79FA',
                             command=lambda: controller.show_frame(RecognitionPage))
         button1.pack()
-        button2.pack(pady=10)
+        button2.pack(pady=1)
 
 class EnrollmentPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -64,7 +66,7 @@ class EnrollmentPage(tk.Frame):
         entryName.insert(1, messageN)
         entryName.pack(pady=2)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: checkInput(entryCF.get(), labelError, entryName.get()))
+                            command=lambda: checkInput(self, controller, entryCF.get(), labelError, 0, entryName.get()))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError,fg="#f0f0f0")
@@ -84,7 +86,7 @@ class RecognitionPage(tk.Frame):
         entryCF.insert(1, messageCF)
         entryCF.pack(padx=0, pady=0)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: checkInput(entryCF.get(), labelError))
+                            command=lambda: checkInput(self, controller, entryCF.get(), labelError, 1))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
@@ -94,13 +96,28 @@ class RecognitionPage(tk.Frame):
                             command=lambda: back(controller, entryCF, labelError))
         button1.pack(pady=125)
 
-def checkInput(cf, labelError, name=None):
+class DataPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.label = tk.Label(self, text="NAME")
+        self.label.pack(pady=10,padx=10)
+
+    def set_name(self,name):
+        self.label.config(text=name)
+
+def checkInput(frame, controller, cf, labelError, op, name=None):
     if len(cf) != 16 or cf == messageCF or (name!=None and name == messageN):
         labelError.configure(fg="red")
         return
     else:
         labelError.configure(fg="#f0f0f0")
-    videoCapture()
+    crop = videoCapture()
+    print(controller.frames.values())
+    print(list(controller.frames.values()))
+    list(controller.frames.values())[3].set_name(name)
+    print(name)
+
+    controller.show_frame(DataPage)
 
 def back(controller, entryCF, labelError, entryName=None):
     entryCF.delete(0,tk.END)
@@ -111,24 +128,26 @@ def back(controller, entryCF, labelError, entryName=None):
     labelError.configure(fg="#f0f0f0")
     controller.show_frame(StartPage)
 
+
+
 def videoCapture():
     cap = cv2.VideoCapture(0)
 
-    while (True):
-        # Capture frame-by-frame
-        ret, frame = cap.read()
+    #while (True):
+    # Capture frame-by-frame
+    ret, frame = cap.read()
 
-        vis = frame.copy()
+    vis = frame.copy()
 
-        # Our operations on the frame come here
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # Our operations on the frame come here
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        crop = detect_face(gray, vis)
+    crop = detect_face(gray, vis)
 
-        # Display the resulting frame
-        cv2.imshow('frame', vis)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    # # Display the resulting frame
+    # cv2.imshow('frame', vis)
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     break
 
     # When everything done, release the capture
     cap.release()
