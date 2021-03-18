@@ -3,7 +3,8 @@ import cv2
 import Recognition
 import Enrollment
 import tkinter as tk
-from PIL import ImageTk
+from PIL import ImageTk, Image
+import numpy as np
 
 messageBenvenuto = "Benvenuto! \nCosa vuoi fare? \n0. Registrazione \n1. Riconoscimento"
 messageA = "Inserire scelta: "
@@ -13,6 +14,8 @@ messageN = "Inserire nome: "
 choice1 = "Registrazione"
 choice2 = "Riconoscimento"
 messageWelcome = "Benvenuto\n Che operazione desideri svolgere?"
+numberMedicines = "Quanti farmaci assumi?"
+numberDelegate = "Quante persone vuoi delegare il prelievo di farmaci?"
 
 dim_image = 64
 
@@ -66,7 +69,7 @@ class EnrollmentPage(tk.Frame):
         entryName.insert(1, messageN)
         entryName.pack(pady=2)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: checkInput(self, controller, entryCF.get(), labelError, 0, entryName.get()))
+                            command=lambda: checkInput(controller, entryCF.get(), labelError, 0, entryName.get()))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError,fg="#f0f0f0")
@@ -86,7 +89,7 @@ class RecognitionPage(tk.Frame):
         entryCF.insert(1, messageCF)
         entryCF.pack(padx=0, pady=0)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: checkInput(self, controller, entryCF.get(), labelError, 1))
+                            command=lambda: checkInput(controller, entryCF.get(), labelError, 1))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
@@ -99,24 +102,45 @@ class RecognitionPage(tk.Frame):
 class DataPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.label = tk.Label(self, text="NAME")
-        self.label.pack(pady=10,padx=10)
 
-    def set_name(self,name):
-        self.label.config(text=name)
+        self.op = 0
 
-def checkInput(frame, controller, cf, labelError, op, name=None):
+        array = np.ones((64, 64)) * 150
+        img = ImageTk.PhotoImage(image=Image.fromarray(array))
+        self.panel = tk.Label(self, image=img)
+        self.panel.image = img
+        self.panel.pack(pady=10,padx=10)
+
+        self.name = tk.Label(self, text=" ")
+        self.name.pack()
+
+        self.cf = tk.Label(self, text=" ")
+        self.cf.pack()
+
+        labelNMedicine = tk.Label(self, text=numberMedicines)
+        labelNMedicine.pack()
+        entryNMedicine = tk.Entry(self)
+        entryNMedicine.insert(1, "")
+        entryNMedicine.pack(padx=0, pady=0)
+        button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+                            command=lambda: addMedicines(self, entryNMedicine.get()))
+        button2.pack()
+
+    def update_data(self,cf, img, op, name=None):
+        self.name.config(text="NOME: "+name)
+        self.cf.config(text="CODICE FISCALE: "+cf)
+        self.panel.config(image=img)
+        self.panel.image = img
+        self.op = op
+
+def checkInput(controller, cf, labelError, op, name=None):
     if len(cf) != 16 or cf == messageCF or (name!=None and name == messageN):
         labelError.configure(fg="red")
         return
     else:
         labelError.configure(fg="#f0f0f0")
     crop = videoCapture()
-    print(controller.frames.values())
-    print(list(controller.frames.values()))
-    list(controller.frames.values())[3].set_name(name)
-    print(name)
-
+    list(controller.frames.values())[3].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), op, name)
     controller.show_frame(DataPage)
 
 def back(controller, entryCF, labelError, entryName=None):
@@ -128,7 +152,8 @@ def back(controller, entryCF, labelError, entryName=None):
     labelError.configure(fg="#f0f0f0")
     controller.show_frame(StartPage)
 
-
+def addMedicines(frame,nMedicine):
+    print(nMedicine)
 
 def videoCapture():
     cap = cv2.VideoCapture(0)
