@@ -279,12 +279,20 @@ class Database():
 
     def show_image(self, img):
         while(True):
+            print(img)
             cv2.imshow('frame', img)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
 if __name__ == '__main__':
     db = Database()
+    # img = db.get_normalized_template(0, db.gallery_data)
+    # db.show_image(img)
+    #
+    # lbp = LBP.Local_Binary_Pattern(1, 8, img)
+    # new_img = lbp.compute_lbp()
+    # db.show_image(np.array(new_img).astype(np.uint8))
+
     # print("gallery:", len(db.gallery_data), len(db.gallery_target), len(np.unique(db.gallery_target)))
     # print("probe PG:", len(db.pg_data), len(db.pg_target), len(np.unique(db.pg_target)))
     # print("probe PN:", len(db.pn_data), len(db.pn_target), len(np.unique(db.pn_target)))
