@@ -13,9 +13,10 @@ import LBP
 #import dask
 #import dask.array as da
 import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import plot_confusion_matrix, accuracy_score
+from sklearn.metrics import roc_curve, auc
 from mlxtend.plotting import plot_decision_regions
 #from dask_ml.model_selection import train_test_split
 
@@ -98,7 +99,7 @@ def splitting_train_test(filecsv):
 
     X,y = data.iloc[:, :-1], data.iloc[:, -1]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state = 1)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state = 1, shuffle=True)
 
     return X_train, X_test, y_train, y_test
 
@@ -119,27 +120,122 @@ def count_print_row(filecsv):
 
 def train_svm(X_train,y_train,X_test,y_test):
     model = SVC(kernel='rbf', random_state=0,gamma=1,C=1 )
-    svm = model.fit(X_train, y_train)
+    #new code
+    #pca = PCA(n_components = 2)
+    #X_train2 = pca.fit_transform(X_train)
+    #end code
+    svm = model.fit(X_train, y_train)  #Transform X_train to X_train2
+    y_train_score = svm.decision_function(X_train)
 
+    FPR, TPR, t = roc_curve(y_train, y_train_score)
+    roc_auc = auc(FPR, TPR)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    ax1.plot(FPR, TPR, label='SVM $\gamma = 1$ ROC curve (area = %0.2f)' % roc_auc, color='b')
+    ax1.set_title('Training Data')
+
+    y_test_score = svm.decision_function(X_test)
+
+    FPR2, TPR2, t2 = roc_curve(y_test, y_test_score)
+    roc_auc = auc(FPR2, TPR2)
+
+    ax2.plot(FPR2, TPR2, label='SVM $\gamma = 1$ ROC curve (area = %0.2f)' % roc_auc, color='b')
+    ax2.set_title('Test Data')
+
+    for ax in fig.axes:
+        ax.plot([0, 1], [0, 1], 'k--')
+        ax.set_xlim([-0.05, 1.0])
+        ax.set_ylim([0.0, 1.05])
+        ax.set_xlabel('False Positive Rate')
+        ax.set_ylabel('True Positive Rate')
+        ax.legend(loc="lower right")
+
+
+    plt.show()
+
+
+    ###EER Parte
+    # fpr, tpr, threshold = roc_curve(y_train, y_pred, pos_label=1)
+    fnr = 1 - TPR2
+    eer_threshold = t2[np.nanargmin(np.absolute((fnr - FPR2)))]
+
+    print("EER_THRESHOLD: ",eer_threshold)
+
+    EER = FPR2[np.nanargmin(np.absolute((fnr - FPR2)))]
+
+    print ("EER:", EER)
+
+    EER=fnr[np.nanargmin(np.absolute((fnr - FPR2)))]
+
+    print ("EER: ",EER)
+
+    ### FAR + FRR + HTER
+
+    # print("#### LICIT SCENARIO ####")
+    #FRR = FN / (TP + FN) = 1 - TPR
+    #FAR = FP / (FP + TN) = FPR
+    FRR = 1 - TPR
+    FAR = FPR
+    # print("FRR: ",FRR)
+    # print("FAR: ", FAR)
+
+    HTER = (FAR + FRR)/2
+
+    print("HTER: ", HTER)
+
+    #Spoof scenario: FRR e Spoof False Acceptance Rate
+
+    print("#### Spoof Scenario ####")
+
+    SFAR = FAR
+
+    print("FRR: ",FRR)
+    print("SFAR: ",FAR)
+
+
+
+    # y_probas = svm.predict_proba(X_test)
+    # fpr, tpr, thresholds = roc_curve(y_train, y_probas, pos_label=0)
+    # fnr = 1 - tpr
+    #_____
+
+    # Compute ROC curve and ROC area for each class
+    # fpr = dict()
+    # tpr = dict()
+    # roc_auc = dict()
+    # for i in range(n_classes):
+    #     fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
+    #     roc_auc[i] = auc(fpr[i], tpr[i])
+    #
+    # # Compute micro-average ROC curve and ROC area
+    # fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
+    # roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
 
     # Evaluate by means of a confusion matrix
-    matrix = plot_confusion_matrix(svm, X_test, y_test,
-                                   cmap=plt.cm.Blues,
-                                   normalize='true')
-    plt.title('Confusion matrix for RBF SVM')
-    #plt.show(matrix)
-    plt.show()
+    # matrix = plot_confusion_matrix(svm, X_test, y_test,
+    #                                cmap=plt.cm.Blues,
+    #                                normalize='true')
+    # plt.title('Confusion matrix for RBF SVM')
+    # #plt.show(matrix)
+    # plt.show()
 
     # Generate predictions
-    y_pred = svm.predict(X_test)
+    #y_pred = svm.predict(X_test)
 
     # Evaluate by means of accuracy
-    accuracy = accuracy_score(y_test, y_pred)
-    print(f'Model accuracy: {accuracy}')
+    #accuracy = accuracy_score(y_test, y_pred)
+    #print(f'Model accuracy: {accuracy}')
 
     # Plot decision boundary
-    plot_decision_regions(X_test, y_test, clf=svm, legend=2)
-    plt.show()
+    # feature_values = {i: 1 for i in range(2, 16384)}
+    # feature_width = {i: 1 for i in range(2, 16384)}
+    # #X_test = X_test.as_matrix()
+    # #plot_decision_regions(X_test.values, y_test.values, clf=svm, legend=2)
+    # plot_decision_regions(X_test.values, y_test.values, clf=svm,
+    #                       filler_feature_values= feature_values,
+    #                       filler_feature_ranges= feature_width,
+    #                       res=0.02, legend=2)
+    # plt.show()
 
 
 root_dir = 'Data'
@@ -196,9 +292,7 @@ if fill_csv_fake == True:
 
 #count_print_row('histogram.csv')
 X_train, X_test, y_train, y_test = splitting_train_test('histogram.csv')
-print ("ci siamo")
 train_svm(X_train,y_train,X_test,y_test)
-print("non credo")
 
 
 
