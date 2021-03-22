@@ -5,7 +5,7 @@ import numpy as np
 import shutil
 import cv2
 import pandas as pd
-
+import AntiSpoofingTrainingEvaluation
 
 
 import LBP
@@ -118,79 +118,7 @@ def count_print_row(filecsv):
 
 #FINE
 
-def train_svm(X_train,y_train,X_test,y_test):
-    model = SVC(kernel='rbf', random_state=0,gamma=1,C=1 )
-    #new code
-    #pca = PCA(n_components = 2)
-    #X_train2 = pca.fit_transform(X_train)
-    #end code
-    svm = model.fit(X_train, y_train)  #Transform X_train to X_train2
-    y_train_score = svm.decision_function(X_train)
 
-    FPR, TPR, t = roc_curve(y_train, y_train_score)
-    roc_auc = auc(FPR, TPR)
-
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-    ax1.plot(FPR, TPR, label='SVM $\gamma = 1$ ROC curve (area = %0.2f)' % roc_auc, color='b')
-    ax1.set_title('Training Data')
-
-    y_test_score = svm.decision_function(X_test)
-
-    FPR2, TPR2, t2 = roc_curve(y_test, y_test_score)
-    roc_auc = auc(FPR2, TPR2)
-
-    ax2.plot(FPR2, TPR2, label='SVM $\gamma = 1$ ROC curve (area = %0.2f)' % roc_auc, color='b')
-    ax2.set_title('Test Data')
-
-    for ax in fig.axes:
-        ax.plot([0, 1], [0, 1], 'k--')
-        ax.set_xlim([-0.05, 1.0])
-        ax.set_ylim([0.0, 1.05])
-        ax.set_xlabel('False Positive Rate')
-        ax.set_ylabel('True Positive Rate')
-        ax.legend(loc="lower right")
-
-
-    plt.show()
-
-
-    ###EER Parte
-    # fpr, tpr, threshold = roc_curve(y_train, y_pred, pos_label=1)
-    fnr = 1 - TPR2
-    eer_threshold = t2[np.nanargmin(np.absolute((fnr - FPR2)))]
-
-    print("EER_THRESHOLD: ",eer_threshold)
-
-    EER = FPR2[np.nanargmin(np.absolute((fnr - FPR2)))]
-
-    print ("EER:", EER)
-
-    EER=fnr[np.nanargmin(np.absolute((fnr - FPR2)))]
-
-    print ("EER: ",EER)
-
-    ### FAR + FRR + HTER
-
-    # print("#### LICIT SCENARIO ####")
-    #FRR = FN / (TP + FN) = 1 - TPR
-    #FAR = FP / (FP + TN) = FPR
-    FRR = 1 - TPR
-    FAR = FPR
-    # print("FRR: ",FRR)
-    # print("FAR: ", FAR)
-
-    HTER = (FAR + FRR)/2
-
-    print("HTER: ", HTER)
-
-    #Spoof scenario: FRR e Spoof False Acceptance Rate
-
-    print("#### Spoof Scenario ####")
-
-    SFAR = FAR
-
-    print("FRR: ",FRR)
-    print("SFAR: ",FAR)
 
 
 
@@ -292,7 +220,18 @@ if fill_csv_fake == True:
 
 #count_print_row('histogram.csv')
 X_train, X_test, y_train, y_test = splitting_train_test('histogram.csv')
-train_svm(X_train,y_train,X_test,y_test)
+svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test, y_test).train_svm()
+AntiSpoofingTrainingEvaluation.plot_roc_curve(y_test, y_test_score)
+FRR,SFAR=AntiSpoofingTrainingEvaluation.spoofing_scenario(y_test,y_test_score)
+print("Spoofing Scenario")
+print("FRR: ", FRR)
+print("SFAR: ", SFAR)
+FRR, FAR , HTER = AntiSpoofingTrainingEvaluation.licit_scenario(y_test,y_test_score)
+print("Licit Scenario:")
+print("FRR: ", FRR)
+print("FAR: ", FAR)
+print("HTER: ", HTER)
+
 
 
 
