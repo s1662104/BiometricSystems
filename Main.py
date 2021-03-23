@@ -37,7 +37,7 @@ class Page(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(StartPage)
+        self.show_frame(DataPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -117,6 +117,8 @@ class DataPage(tk.Frame):
         self.cf = tk.Label(self, text=" ")
         self.cf.pack()
 
+        self.medicineEntry = []
+
         labelNMedicine = tk.Label(self, text=numberMedicines)
         labelNMedicine.pack()
         entryNMedicine = tk.Entry(self)
@@ -153,7 +155,25 @@ def back(controller, entryCF, labelError, entryName=None):
     controller.show_frame(StartPage)
 
 def addMedicines(frame,nMedicine):
-    print(nMedicine)
+    if not nMedicine.isdigit():
+        frame.bell()
+    else:
+        n = int(nMedicine)
+        print(len(frame.medicineEntry))
+        actualN = len(frame.medicineEntry)
+        if n > actualN:
+            n = n - actualN
+            for m in range(n):
+                entryMedicine = tk.Entry(frame)
+                entryMedicine.insert(1, "")
+                entryMedicine.pack(padx=1, pady=1)
+                frame.medicineEntry.append(entryMedicine)
+        elif n < actualN:
+            n = actualN - n
+            for m in range(n):
+                entryMedicine = frame.medicineEntry[actualN-1]
+                entryMedicine.destroy()
+                frame.medicineEntry.pop()
 
 def videoCapture():
     cap = cv2.VideoCapture(0)
