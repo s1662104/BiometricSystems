@@ -126,7 +126,7 @@ class Local_Binary_Pattern:
     def check_border(self,x,y):
         return x < 0 or x >= self.img.shape[0] or y < 0 or y >= self.img.shape[1]
 
-    def createHistogram(self, new_img):
+    def createHistogram(self, new_img,grid_x = 8,grid_y = 8):
         histogram = []
 
         #Check the pixels  matrix
@@ -142,8 +142,8 @@ class Local_Binary_Pattern:
         #The LBPHFaceRecognizer uses Extended Local Binary Patterns
         #(it's probably configurable with other operators at a later
         #point), and has the following default values for radius = 1 and neighbors = 8
-        grid_x = 8
-        grid_y = 8
+        # grid_x = 8
+        # grid_y = 8
 
         #Get the size (width and height) of each region
         gridWidth = int(w / grid_x)
@@ -171,6 +171,17 @@ class Local_Binary_Pattern:
                 #Concatenate two slices
                 histogram = np.concatenate((histogram, regionHistogram), axis=None)
         return histogram
+
+
+class Spoof_Local_Binary_Pattern(Local_Binary_Pattern):
+
+    def createHistogram(self, new_img, grid_x=8, grid_y=8):
+        w = new_img.shape[0]
+        h = new_img.shape[1]
+        # dividiamo la nostra immagine in 4 x 4 blocchi
+        grid_x = int(w / 4)
+        grid_y = int(h / 4)
+        return super().createHistogram(new_img, grid_x, grid_y)
 
 if __name__ == '__main__':
     db_index = input("Quale database si vuole utilizzare? \n 0 - Olivetti \n 1 - LFW\n")
@@ -213,10 +224,10 @@ if __name__ == '__main__':
         lbp = Local_Binary_Pattern(1, 8, crop)
         new_img = lbp.compute_lbp()
         hist = lbp.createHistogram(new_img)
-        # while True:
-        #     cv2.imshow('frame', lbp.img.astype(np.uint8))
-        #     cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-        #     if cv2.waitKey(1) & 0xFF == ord('q'):
-        #         break
+        while True:
+            cv2.imshow('frame', lbp.img.astype(np.uint8))
+            cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
     else:
         print("Valora non valido!")
