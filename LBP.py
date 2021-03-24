@@ -176,11 +176,11 @@ class Local_Binary_Pattern:
 class Spoof_Local_Binary_Pattern(Local_Binary_Pattern):
 
     def createHistogram(self, new_img, grid_x=8, grid_y=8):
-        w = new_img.shape[0]
-        h = new_img.shape[1]
+        w = len(new_img)
+        h = len(new_img[0])
         # dividiamo la nostra immagine in 4 x 4 blocchi
-        grid_x = int(w / 4)
-        grid_y = int(h / 4)
+        grid_x = int(w / 16)
+        grid_y = int(h / 16)
         return super().createHistogram(new_img, grid_x, grid_y)
 
 if __name__ == '__main__':

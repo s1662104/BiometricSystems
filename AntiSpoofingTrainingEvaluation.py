@@ -17,7 +17,7 @@ class ModelSVM:
         self.y_test = y_test
 
     def train_svm(self):
-        model = SVC(kernel='rbf', random_state=0, gamma=1, C=1)
+        model = SVC(kernel='rbf', random_state=0, gamma='scale', C=1)
         # new code
         # pca = PCA(n_components = 2)
         # X_train2 = pca.fit_transform(X_train)
@@ -45,17 +45,14 @@ def plot_roc_curve(y_test, y_test_score):
         # ax1.plot(FPR, TPR, label='SVM $\gamma = 1$ ROC curve (area = %0.2f)' % roc_auc, color='b')
         # ax1.set_title('Test Data')
 
-        plt.figure()
-        lw = 2
-        plt.plot(FPR[1], TPR[1], color='darkorange',
-                 lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
-        plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
+        plt.title('Receiver Operating Characteristic')
+        plt.plot(FPR, TPR, 'b', label='AUC = %0.2f' % roc_auc)
+        plt.legend(loc='lower right')
+        plt.plot([0, 1], [0, 1], 'r--')
+        plt.xlim([0, 1])
+        plt.ylim([0, 1])
         plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic example')
-        plt.legend(loc="lower right")
+        plt.xlabel('False Positive Rate')
         plt.show()
 
         #Non plotta a roc curve...

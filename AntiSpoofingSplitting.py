@@ -58,8 +58,8 @@ def convert_image_to_hist(image):
     #cv2.destroyAllWindows()
     norm_image = get_normalized(image)
 
-    myLBP = LBP.Local_Binary_Pattern(1, 8, norm_image)
-
+    #myLBP = LBP.Local_Binary_Pattern(1, 8, norm_image)
+    myLBP = LBP.Spoof_Local_Binary_Pattern(1,8,norm_image)
     new_img = myLBP.compute_lbp()
     # print(np.array(new_img).astype(np.uint8))
     # while (True):
@@ -221,6 +221,14 @@ if fill_csv_fake == True:
 #count_print_row('histogram.csv')
 X_train, X_test, y_train, y_test = splitting_train_test('histogram.csv')
 svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test, y_test).train_svm()
+print ("Y_test_pred")
+print (y_test_score)
+print ("Y_test")
+print (y_test)
+print ("X_train")
+print (X_train)
+print ("X_train_score")
+
 AntiSpoofingTrainingEvaluation.plot_roc_curve(y_test, y_test_score)
 FRR,SFAR=AntiSpoofingTrainingEvaluation.spoofing_scenario(y_test,y_test_score)
 print("Spoofing Scenario")
