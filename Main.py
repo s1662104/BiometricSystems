@@ -36,7 +36,7 @@ class Page(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(DataEnrollmentPage)
+        self.show_frame(StartPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -152,6 +152,7 @@ class DataEnrollmentPage(tk.Frame):
         self.panel.config(image=img)
         self.panel.image = img
         self.op = op
+        print("I'M HERE 2")
 
     def addMedicines(self, nMedicine):
         if not nMedicine.isdigit():
@@ -199,7 +200,8 @@ class DataRecognitionPage(tk.Frame):
         self.cf.pack()
 
     def update_data(self, cf, img, op, name=None):
-        self.name.config(text="NOME: " + name)
+        if name is not None:
+            self.name.config(text="NOME: " + name)
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
@@ -222,7 +224,7 @@ def checkInput(controller, cf, labelError, op, name=None):
     if op == 0:
         controller.show_frame(DataEnrollmentPage)
     else:
-        controller.show_frame(DataEnrollmentPage)
+        controller.show_frame(DataRecognitionPage)
 
 
 def back(controller, entryCF, labelError, entryName=None):
@@ -244,7 +246,9 @@ def videoCapture():
 
     # Our operations on the frame come here
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    crop = detect_face(gray, vis)
+    crop = None
+    while crop is None:
+        crop = detect_face(gray, vis)
 
     # # Display the resulting frame
     # cv2.imshow('frame', vis)
