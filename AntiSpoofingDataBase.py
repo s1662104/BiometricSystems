@@ -5,95 +5,133 @@ import tarfile
 import cv2
 import os
 import csv
-
+import shutil
 from sklearn import metrics
 from sklearn.svm import SVC
 import LBP
 import Main
 
 
-def createDataSet(input, val, subdir):
-    cap = cv2.VideoCapture(input)
-    pathReal = 'Data/Real/'
-    pathFake = 'Data/Fake/'
-    counter = 0
-    crop = None
-    vis = None
+def createDataSet(input, val, name, replayAttack, eyeBlink):
 
-    while ( True ):
+    if replayAttack == True:
+        cap = cv2.VideoCapture(input)
+        pathReal = 'Data/ReplayAttack/Real/'
+        pathFake = 'Data/ReplayAttack/Fake/'
+        counter = 0
+        crop = None
+        vis = None
 
-        ret, frame = cap.read()
+        while ( True ):
 
-        vis = frame.copy()
+            ret, frame = cap.read()
 
-        if vis is None:
-         break
+            vis = frame.copy()
 
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        crop = Main.detect_face(gray,vis)
+            if vis is None:
+                break
 
-        if crop is not None:
-            counter += 1
-            if val == 'Real':
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            crop = Main.detect_face(gray,vis)
+
+            if crop is not None:
+                counter += 1
+                if val == 'Real':
+                    if not os.path.exists(pathReal):
+                        os.makedirs(pathReal)
+                    try:
+                        cv2.imwrite(pathReal+ name +"_{}.jpg".format(counter), crop)
+                    except Exception as e:
+                        print(str(e))
+                elif val == 'Fake':
+                    if not os.path.exists(pathFake):
+                        os.makedirs(pathFake)
+                    try:
+                        cv2.imwrite(pathFake+name+"_{}.jpg".format(counter), crop)
+                    except Exception as e:
+                        print(str(e))
+            break
+        cap.release()
+        cv2.destroyAllWindows()
+    if eyeBlink == True:
+        pathReal = 'Data/EyeBlink/Real/'
+        pathFake = 'Data/EyeBlink/Fake/'
+        if val == 'Real':
                 if not os.path.exists(pathReal):
                     os.makedirs(pathReal)
-                cv2.imwrite(pathReal+"crop{}.jpg".format(counter), crop)
-            elif val == 'Fake':
+                try:
+                    shutil.copy(input,pathReal)
+                except Exception as e:
+                        print(str(e))
+        elif val == 'Fake':
                 if not os.path.exists(pathFake):
                     os.makedirs(pathFake)
-                cv2.imwrite(pathFake+"crop{}.jpg".format(subdir,counter), crop)
+                try:
+                    shutil.copy(input, pathFake)
+                except Exception as e:
+                    print(str(e))
         #filename = 'img_' + str(counter) +'.jpg'
         #with open(os.path.join(path, filename), 'wb') as temp_file:
 
             #temp_file.write(crop)
 
 
-    cap.release()
-    cv2.destroyAllWindows()
+
+
+#def createDataSetEyeBlink(input, val, subdir):
+
+
+
 
 class Database():
 
-    def __init__(self):
-
+    def __init__(self, index):
+        #index = 0 Database ROSE
+        #index = 1 Database Eyeblink8
         # probe of user that are not in the gallery in percentage
         #self.pn = 20    #numero utenti dopo il quale inserisce un utente solo nel probe set
         #self.db_index = db_index
         self.data = []
         self.target = []
-        root = 'ROSE - Youtube Face'
-        input = None
+        if index == 0:
 
-        #if self.db_index == 0:
-        #    self.secondDB()
-        #elif self.db_index == 1:
-            #tar = tarfile.open("LFW/lfw-funneled.tgz", "r:gz")
-        counter = 0
-        for path, subdirs, files in os.walk(root):
-            for name in files:
-                if not name.startswith(('Mc','Mf','Mu','Ml')):
-                    if name.startswith('G'):
-                        input = os.path.join(path, name)
-                        print(path)
-                        createDataSet(input,'Real', path)
-                    else:
-                        input = os.path.join(path, name)
-                        createDataSet(input,'Fake', path)
+            root = 'ROSE - Youtube Face'
+            input = None
 
-        #         tar.extract(tarinfo.name)
-        #         if tarinfo.name[-4:] == ".jpg":
-        #             image = cv2.imread(tarinfo.name, cv2.IMREAD_COLOR)
-        #             image = cv2.resize(image, None, fx=0.4, fy=0.4, interpolation=cv2.INTER_AREA)
-        #             self.data.append(np.array(image))
-        #             counter += 1
-        #             name = tarinfo.name.split("/")[1]
-        #             self.target.append(name)
-        #         if tarinfo.isdir():
-        #             pass
-        #         else:
-        #             os.remove(tarinfo.name)
-        #     tar.close()
-        # else:
-        #     print("VALORE NON VALIDO!")
+
+            counter = 0
+            for path, subdirs, files in os.walk(root):
+                for name in files:
+                    if not name.startswith(('Mc','Mf','Mu','Ml')):
+                        if name.startswith('G'):
+                            input = os.path.join(path, name)
+                            print(input)
+                            createDataSet(input, 'Real', name, True, False)
+                        else:
+                            input = os.path.join(path, name)
+                            print(input)
+                            createDataSet(input, 'Fake', name, True, False)
+        elif index == 1:
+            input = None
+            root = 'ROSE - Youtube Face'
+            for path, subdirs, files in os.walk(root):
+                for name in files:
+                    if not name.startswith(('Mc','Mu','Ml')):
+                        if name.startswith('G'):
+                            input = os.path.join(path,name)
+                            print(input)
+                            createDataSet(input, 'Real', name, False , True)
+                        elif name.startswith(('Mf','Ps','Pq')) :
+                            input = os.path.join(path,name)
+                            print(input)
+                            createDataSet(input, 'Fake', name, False, True)
+
+
+
+
+
+
+
 
 
 
@@ -101,7 +139,8 @@ class Database():
 
 if __name__ == '__main__':
 
-    Database()
+    #Database(0)
+    Database(1)
 
 
     #db = Database(0)
