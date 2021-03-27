@@ -121,10 +121,12 @@ class DataEnrollmentPage(tk.Frame):
 
         labelDelegate = tk.Label(self, text=numberDelegate)
         labelDelegate.pack()
+        self.delegateEntry = []
         for n in range(number_maximum_delegate):
             entryDelegate = tk.Entry(self)
             entryDelegate.insert(1, "")
             entryDelegate.pack(padx=0, pady=0)
+            self.delegateEntry.append(entryDelegate)
 
         self.medicineEntry = []
         labelNMedicine = tk.Label(self, text=numberMedicines)
@@ -141,7 +143,7 @@ class DataEnrollmentPage(tk.Frame):
         button2.pack(side="right", pady=240)
 
         button3 = tk.Button(self, text="Back", width=8, height=1, bg='#1E79FA',
-                            command=lambda: self.back())
+                            command=lambda: self.back(controller))
         button3.pack(side="left", pady=240, padx=2)
 
     def update_data(self, cf, img, op, name=None):
@@ -171,8 +173,8 @@ class DataEnrollmentPage(tk.Frame):
                     entryMedicine.destroy()
                     self.medicineEntry.pop()
 
-    def back(self):
-        pass
+    def back(self, controller):
+        controller.show_frame(EnrollmentPage)
 
     def confirm(self):
         pass

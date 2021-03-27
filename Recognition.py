@@ -1,17 +1,15 @@
-import cv2
+import numpy as np
 
-messageCF = "Inserire codice fiscale: "
-messageError = "Codice fiscale non valido"
-cf = ""
-
-def collect_data():
-    global cf
-    cf = input(messageCF)
-    error = False
-    if len(cf) != 16:
-        print(messageError)
-        error = True
-    return error
 
 def recognize():
-    print("Recognize")
+    # DA MODIFICARE
+    gallery_data = np.load("npy_db/gallery_data.npy")
+    return gallery_data[:, 0]
+
+
+def main():
+    pass
+
+
+if __name__ == '__main__':
+    main()
