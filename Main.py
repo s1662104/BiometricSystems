@@ -211,9 +211,15 @@ def detect_face(img, vis, crop=None):
         bottom = landmark.part(8).y
         crop = img[top:bottom, left:right]
         cv2.rectangle(vis, (left, top), (right, bottom), (0, 255, 0), 3)
-        crop = cv2.resize(crop, (dim_image, dim_image))
+        try:
+            crop = cv2.resize(crop, (dim_image, dim_image))
+        except Exception as e:
+            print(str(e))
     if len(dets) > 0:
-        cv2.imshow('Face', crop)
+        try:
+            cv2.imshow('Face', crop)
+        except Exception as e:
+            print(str(e))
     return crop
 
 def main():
