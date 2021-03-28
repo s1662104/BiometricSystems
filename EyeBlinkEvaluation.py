@@ -81,4 +81,5 @@ class EyeBlinkEvaluation:
 
 
 if __name__ == '__main__':
-    EyeBlinkEvaluation().createDataSetEyeBlink()
+    #EyeBlinkEvaluation().createDataSetEyeBlink()
+    Antispoofing.EyeBlink(None).eyeBlinkStart()

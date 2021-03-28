@@ -2,6 +2,7 @@ import cv2
 import imutils
 from imutils.video import FileVideoStream
 from imutils.video import VideoStream
+from scipy.spatial import distance as dist
 from imutils.video import FPS
 import time
 import Main
@@ -79,12 +80,16 @@ class EyeBlink():
             fvs.stop()
 
         elif inputType is None:
-            cap = cv2.VideoCapture(2)
+            cap = cv2.VideoCapture(0)
             # Write the label with this font
             history = ''
             font = cv2.FONT_HERSHEY_SIMPLEX
             COUNT = 0
             TOTAL = 0
+
+            detector = dlib.get_frontal_face_detector()
+            predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+
             while (True):
 
                 ret, frame = cap.read()
@@ -100,7 +105,7 @@ class EyeBlink():
 
                 # end code
 
-                history += self.eye_blink_cam(frame, ret)
+                history += self.eye_blink_cam(frame, ret, detector, predictor)
 
 
                 if (len(history) > 10):
@@ -139,14 +144,12 @@ class EyeBlink():
                 return True
         return False
 
-    def eye_blink_cam(self,frame,rect):
+    def eye_blink_cam(self,frame,rect, detector, predictor):
         #frame = imutils.resize(frame ,width = 640)
         crop = None
         eyes_detect = ''
         frame = imutils.resize(frame, width = 640)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
         dets = detector(gray, 1)  # Detect the faces in the image
         (left_s,left_e) =face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
