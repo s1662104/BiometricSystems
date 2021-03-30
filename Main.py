@@ -36,7 +36,7 @@ class Page(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(DataEnrollmentPage)
+        self.show_frame(DataRecognitionPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -75,9 +75,8 @@ class EnrollmentPage(tk.Frame):
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
-        button1 = tk.Button(self, text="Back", width=15, height=2, bg='#1E79FA',
-                            command=lambda: back(controller, entryCF, labelError, entryName))
-        button1.pack(pady=100)
+        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                            command=lambda: back(controller, entryCF, labelError, entryName)).pack(side="bottom", pady=240, padx=2)
 
 
 class RecognitionPage(tk.Frame):
@@ -96,9 +95,8 @@ class RecognitionPage(tk.Frame):
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
-        button1 = tk.Button(self, text="Back", width=15, height=2, bg='#1E79FA',
-                            command=lambda: back(controller, entryCF, labelError))
-        button1.pack(pady=125)
+        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                            command=lambda: back(controller, entryCF, labelError)).place(y=520, x=2)
 
 
 class DataEnrollmentPage(tk.Frame):
@@ -138,13 +136,11 @@ class DataEnrollmentPage(tk.Frame):
                             command=lambda: self.addMedicines(entryNMedicine.get()))
         button.pack()
 
-        button2 = tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
-                            command=lambda: self.confirm())
-        button2.pack(side="right", pady=240)
+        tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
+                            command=lambda: self.confirm()).place(y=520, x=220)
 
-        button3 = tk.Button(self, text="Back", width=8, height=1, bg='#1E79FA',
-                            command=lambda: self.back(controller))
-        button3.pack(side="left", pady=240, padx=2)
+        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                            command=lambda: self.back(controller)).place(y=520, x=2)
 
     def update_data(self, cf, img, op, name=None):
         self.name.config(text="NOME: " + name)
@@ -192,11 +188,14 @@ class DataRecognitionPage(tk.Frame):
         self.panel.image = img
         self.panel.pack(pady=10, padx=10)
 
-        self.name = tk.Label(self, text=" ")
-        self.name.pack()
-
-        self.cf = tk.Label(self, text=" ")
+        self.cf = tk.Label(self, text="CODICE FISCALE: ")
         self.cf.pack()
+
+        tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
+                            command=lambda: self.confirm()).place(y=520, x=220)
+
+        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                            command=lambda: self.back(controller)).place(y=520, x=2)
 
     def update_data(self, cf, img, op, name=None):
         self.name.config(text="NOME: " + name)
