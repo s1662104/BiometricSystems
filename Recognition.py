@@ -1,10 +1,11 @@
 import numpy as np
+import pandas as pd
 
 
 def recognize():
     # DA MODIFICARE
-    gallery_data = np.load("npy_db/gallery_data.npy")
-    return gallery_data[:, 0]
+    csv = pd.read_csv("dataset_user.csv")
+    return csv.iloc[0]
 
 
 def main():

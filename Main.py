@@ -19,6 +19,7 @@ numberDelegate = "A chi vuoi delegare il prelievo di farmaci?"
 dim_image = 64
 number_maximum_delegate = 3
 
+
 class Page(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -76,7 +77,8 @@ class EnrollmentPage(tk.Frame):
         labelError.pack(pady=10, padx=10)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                            command=lambda: back(controller, entryCF, labelError, entryName)).pack(side="bottom", pady=240, padx=2)
+                  command=lambda: back(controller, entryCF, labelError, entryName)).pack(side="bottom", pady=240,
+                                                                                         padx=2)
 
 
 class RecognitionPage(tk.Frame):
@@ -96,14 +98,11 @@ class RecognitionPage(tk.Frame):
         labelError.pack(pady=10, padx=10)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                            command=lambda: back(controller, entryCF, labelError)).place(y=520, x=2)
+                  command=lambda: back(controller, entryCF, labelError)).place(y=520, x=2)
 
-
-class DataEnrollmentPage(tk.Frame):
+class UserPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-
-        self.op = 0
 
         array = np.ones((64, 64)) * 150
         img = ImageTk.PhotoImage(image=Image.fromarray(array))
@@ -116,6 +115,13 @@ class DataEnrollmentPage(tk.Frame):
 
         self.cf = tk.Label(self, text="CF")
         self.cf.pack()
+
+
+class DataEnrollmentPage(UserPage):
+    def __init__(self, parent, controller):
+        UserPage.__init__(self, parent, controller)
+
+        self.op = 0
 
         labelDelegate = tk.Label(self, text=numberDelegate)
         labelDelegate.pack()
@@ -133,14 +139,14 @@ class DataEnrollmentPage(tk.Frame):
         entryNMedicine.insert(1, "")
         entryNMedicine.pack(padx=0, pady=0)
         button = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: self.addMedicines(entryNMedicine.get()))
+                           command=lambda: self.addMedicines(entryNMedicine.get()))
         button.pack()
 
         tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
-                            command=lambda: self.confirm()).place(y=520, x=220)
+                  command=lambda: self.confirm()).place(y=520, x=220)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                            command=lambda: self.back(controller)).place(y=520, x=2)
+                  command=lambda: self.back(controller)).place(y=520, x=2)
 
     def update_data(self, cf, img, op, name=None):
         self.name.config(text="NOME: " + name)
@@ -176,26 +182,19 @@ class DataEnrollmentPage(tk.Frame):
         pass
 
 
-class DataRecognitionPage(tk.Frame):
+class DataRecognitionPage(UserPage):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
+        UserPage.__init__(self, parent, controller)
 
         self.op = 0
 
-        array = np.ones((64, 64)) * 150
-        img = ImageTk.PhotoImage(image=Image.fromarray(array))
-        self.panel = tk.Label(self, image=img)
-        self.panel.image = img
-        self.panel.pack(pady=10, padx=10)
-
-        self.cf = tk.Label(self, text="CODICE FISCALE: ")
-        self.cf.pack()
+        self.name.destroy()
 
         tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
-                            command=lambda: self.confirm()).place(y=520, x=220)
+                  command=lambda: self.confirm()).place(y=520, x=220)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                            command=lambda: self.back(controller)).place(y=520, x=2)
+                  command=lambda: self.back(controller)).place(y=520, x=2)
 
     def update_data(self, cf, img, op, name=None):
         self.name.config(text="NOME: " + name)
@@ -203,7 +202,13 @@ class DataRecognitionPage(tk.Frame):
         self.panel.config(image=img)
         self.panel.image = img
         self.op = op
+
+    def confirm(self):
         user = Recognition.recognize()
+        print(user)
+
+    def back(self, controller):
+        controller.show_frame(RecognitionPage)
 
 
 def checkInput(controller, cf, labelError, op, name=None):
