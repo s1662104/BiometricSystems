@@ -2,6 +2,7 @@ import dlib
 import cv2
 import Recognition
 import tkinter as tk
+import tkinter.messagebox as messagebox
 from PIL import ImageTk, Image
 import numpy as np
 
@@ -30,14 +31,15 @@ class Page(tk.Tk):
 
         self.frames = {}
 
-        for F in (StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage):
+        for F in (StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage,
+                  EnrollmentCompleted):
             frame = F(container, self)
 
             self.frames[F] = frame
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(DataRecognitionPage)
+        self.show_frame(DataEnrollmentPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -100,7 +102,8 @@ class RecognitionPage(tk.Frame):
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: back(controller, entryCF, labelError)).place(y=520, x=2)
 
-class UserPage(tk.Frame):
+
+class DataPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
@@ -117,11 +120,9 @@ class UserPage(tk.Frame):
         self.cf.pack()
 
 
-class DataEnrollmentPage(UserPage):
+class DataEnrollmentPage(DataPage):
     def __init__(self, parent, controller):
-        UserPage.__init__(self, parent, controller)
-
-        self.op = 0
+        DataPage.__init__(self, parent, controller)
 
         labelDelegate = tk.Label(self, text=numberDelegate)
         labelDelegate.pack()
@@ -148,12 +149,11 @@ class DataEnrollmentPage(UserPage):
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
 
-    def update_data(self, cf, img, op, name=None):
+    def update_data(self, cf, img, name=None):
         self.name.config(text="NOME: " + name)
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
-        self.op = op
 
     def addMedicines(self, nMedicine):
         if not nMedicine.isdigit():
@@ -179,14 +179,24 @@ class DataEnrollmentPage(UserPage):
         controller.show_frame(EnrollmentPage)
 
     def confirm(self):
-        pass
+        error = False
+        if len(self.medicineEntry) == 0:
+            error = True
+        else:
+            print(len(self.medicineEntry))
+            for medicine in self.medicineEntry:
+                print("GET:",medicine.get())
+                if medicine.get() == "":
+                    error = True
+                    break
+        if error:
+            messagebox.showerror(title="Errore", message="Inserisci i farmaci")
 
 
-class DataRecognitionPage(UserPage):
+
+class DataRecognitionPage(DataPage):
     def __init__(self, parent, controller):
-        UserPage.__init__(self, parent, controller)
-
-        self.op = 0
+        DataPage.__init__(self, parent, controller)
 
         self.name.destroy()
 
@@ -196,12 +206,10 @@ class DataRecognitionPage(UserPage):
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
 
-    def update_data(self, cf, img, op, name=None):
-        self.name.config(text="NOME: " + name)
+    def update_data(self, cf, img):
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
-        self.op = op
 
     def confirm(self):
         user = Recognition.recognize()
@@ -209,6 +217,36 @@ class DataRecognitionPage(UserPage):
 
     def back(self, controller):
         controller.show_frame(RecognitionPage)
+
+
+class EnrollmentCompleted(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="REGISTRAZIONE COMPLETATA!")
+        label.pack(pady=200)
+
+        tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
+                  command=lambda: controller.show_frame(StartPage)).place(y=520, x=110)
+
+
+class UserPage(DataPage):
+    def __init__(self, parent, controller):
+        DataPage.__init__(self, parent, controller)
+        self.label = tk.Label(self, text="INFORMAZIONE")
+        self.label.pack()
+
+        delegates = tk.Label(self, text="Delegati:")
+        delegates.pack()
+        self.delegate1 = tk.Label(self, text="Delegato1")
+        self.delegate1.pack()
+        self.delegate2 = tk.Label(self, text="Delegato2")
+        self.delegate2.pack()
+        self.delegate3 = tk.Label(self, text="Delegato3")
+        self.delegate3.pack()
+
+    def update_data(self, info, name, cf, delegates, medicines):
+        self.cf.config(text="CODICE FISCALE: " + cf)
+        # self.cf.config(text="CODICE FISCALE: " + cf)
 
 
 def checkInput(controller, cf, labelError, op, name=None):
@@ -222,11 +260,14 @@ def checkInput(controller, cf, labelError, op, name=None):
         n = 3
     else:
         n = 4
-    list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), op, name)
+    list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), name)
     if op == 0:
         controller.show_frame(DataEnrollmentPage)
     else:
-        controller.show_frame(DataEnrollmentPage)
+        controller.show_frame(DataRecognitionPage)
+
+
+# def checkDataInput(controller,frame):
 
 
 def back(controller, entryCF, labelError, entryName=None):
