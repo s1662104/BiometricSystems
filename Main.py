@@ -5,6 +5,7 @@ import tkinter as tk
 import tkinter.messagebox as messagebox
 from PIL import ImageTk, Image
 import numpy as np
+import pandas as pd
 
 messageBenvenuto = "Benvenuto! \nCosa vuoi fare? \n0. Registrazione \n1. Riconoscimento"
 messageA = "Inserire scelta: "
@@ -107,8 +108,8 @@ class DataPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        array = np.ones((64, 64)) * 150
-        img = ImageTk.PhotoImage(image=Image.fromarray(array))
+        self.photo = np.ones((64, 64)) * 150
+        img = ImageTk.PhotoImage(image=Image.fromarray(self.photo))
         self.panel = tk.Label(self, image=img)
         self.panel.image = img
         self.panel.pack(pady=10, padx=10)
@@ -154,6 +155,7 @@ class DataEnrollmentPage(DataPage):
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
+        self.photo = img
 
     def addMedicines(self, nMedicine):
         if not nMedicine.isdigit():
@@ -183,14 +185,14 @@ class DataEnrollmentPage(DataPage):
         if len(self.medicineEntry) == 0:
             error = True
         else:
-            print(len(self.medicineEntry))
             for medicine in self.medicineEntry:
-                print("GET:",medicine.get())
                 if medicine.get() == "":
                     error = True
                     break
         if error:
             messagebox.showerror(title="Errore", message="Inserisci i farmaci")
+        else:
+            addUser(self.photo,self.name.cget("text"))
 
 
 
@@ -210,6 +212,7 @@ class DataRecognitionPage(DataPage):
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
+        self.photo = img
 
     def confirm(self):
         user = Recognition.recognize()
@@ -279,6 +282,15 @@ def back(controller, entryCF, labelError, entryName=None):
     labelError.configure(fg="#f0f0f0")
     controller.show_frame(StartPage)
 
+def addUser(photo,name):
+    gallery_data = np.load("npy_db/gallery_data.npy").tolist()
+    gallery_target = np.load("npy_db/gallery_target.npy").tolist()
+    medicine_csv = pd.read_csv("dataset_user.csv")
+    gallery_data.append(photo)
+    gallery_target.append(name)
+    print(len(gallery_data), len(gallery_target))
+    print(photo, gallery_data[len(gallery_data)-1])
+    print(name, gallery_target[len(gallery_target) - 1])
 
 def videoCapture():
     cap = cv2.VideoCapture(0)

@@ -286,6 +286,8 @@ class Database():
 
 if __name__ == '__main__':
     db = Database(0)
+    # print(db.gallery_data[0])
+    # print(db.gallery_target[0])
     # img = db.get_normalized_template(0, db.gallery_data)
     # db.show_image(img)
     #
