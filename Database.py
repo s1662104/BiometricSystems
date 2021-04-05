@@ -66,9 +66,10 @@ class Database():
         # Se si specifica un indice, carica l'intero DB, lo splitta e salva i singoli database (gallery, probe)
         if self.db_index is not None:
             data, target = self.load_db()
+            cfs = self.defineCFlist(target)
             self.gallery_data, self.gallery_target, self.pn_data, self.pn_target, self.pg_data, self.pg_target = \
-                self.split_gallery_probe(data, target )
-            self.csv_maker()
+                self.split_gallery_probe(data, target, cfs)
+            self.csv_maker(cfs)
             np.save("npy_db/gallery_data.npy",self.gallery_data)
             np.save("npy_db/gallery_target.npy",self.gallery_target)
             np.save("npy_db/pn_data.npy", self.pn_data)
@@ -85,7 +86,7 @@ class Database():
 
     # pn = percentuale di utenti che non sono nella gallery
     # probe = percentuale di template che sono nel probe set e non nel gallery set per lo stesso utente
-    def split_gallery_probe(self, data,target, pn=30, probe=50):
+    def split_gallery_probe(self, data,target, cfs, pn=30, probe=50):
         num_user = self.num_user(target)
         # calcola il numero di template per utente
         unique, counts = np.unique(target, return_counts=True)
@@ -93,7 +94,7 @@ class Database():
         # numero di utenti che non sono nella gallery
         pn_user = round(num_user * pn / 100)
         # conteggio dei template
-        count = 0
+        countTemp = 0
         # conteggio
         countUser = 0
         gallery_target, gallery_data, pn_data, pn_target, pg_data, pg_target = [], [], [], [], [], []
@@ -103,15 +104,18 @@ class Database():
             occ = occurrences[val]
             # numero di template per il probe set
             n_probe_temp = round(occ * probe / 100)
+
             # seleziono il nome
-            if self.db_index == 0:
-                name = Olivetti_Names(int(target[i])).name.replace("_"," ")
-            else:
-                name = target[i]
+            # if self.db_index == 0:
+            #     name = Olivetti_Names(int(target[i])).name.replace("_"," ")
+            # else:
+            #     name = target[i]
+
+            name = cfs[countUser]
             # se il numero del template e' minore del numero massimo di template destinati alla gallery
             # e il numero di utenti rientra negli utenti che sono nella gallery, allora inserisco il template nella
             # gallery
-            if (count < occ - n_probe_temp or occ == 1) and countUser < num_user - pn_user:
+            if (countTemp < occ - n_probe_temp or occ == 1) and countUser < num_user - pn_user:
                 gallery_data.append(self.get_normalized_template(i, data))
                 gallery_target.append(name)
             else:
@@ -122,10 +126,10 @@ class Database():
                 else:
                     pn_data.append(self.get_normalized_template(i, data))
                     pn_target.append(name)
-            count += 1
+            countTemp += 1
             # se ho finito i template, passo all'utente successivo
-            if count == occ:
-                count = 0
+            if countTemp == occ:
+                countTemp = 0
                 countUser += 1
         return gallery_data, gallery_target, pn_data, pn_target, pg_data, pg_target
 
@@ -168,19 +172,18 @@ class Database():
             print("VALORE NON VALIDO!")
         return data, target
 
-    def csv_maker(self):
+    def csv_maker(self,cfs):
         dataset = []
         # numero di utenti nella gallery
         n_user = self.num_user(self.gallery_target)
-        # utenti nella gallery
-        users = np.unique(self.gallery_target)
         # per ogni  utente
-        for user in users:
+        count=0
+        for user in cfs:
             row = []
             # aggiungo nome
-            row.append(user)
+            row.append(Olivetti_Names(count).name.replace("_"," "))
             # genero il codice fiscale
-            row.append(self.generateCF(user))
+            row.append(user)
             # genero la lista casuale di farmaci
             row.append(self.generateMedicineList())
             # definisco il numero di delegati
@@ -188,9 +191,10 @@ class Database():
             family = []
             for j in range(n_family):
                 family_member = randrange(n_user)
-                family.append(users[family_member])
+                family.append(cfs[family_member])
             row.append(family)
             dataset.append(row)
+            count += 1
         # trasformo in np array
         dataset = np.array(dataset)
         df = pd.DataFrame({'User': dataset[::, 0],
@@ -284,10 +288,18 @@ class Database():
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
+    def defineCFlist(self,list):
+        cfs = []
+        users = np.unique(list)
+        # per ogni  utente
+        for user in users:
+            cfs.append(self.generateCF(Olivetti_Names(int(user)).name.replace("_", " ")))
+        return cfs
+
 if __name__ == '__main__':
     db = Database(0)
-    # print(db.gallery_data[0])
-    # print(db.gallery_target[0])
+    print(db.gallery_data[0])
+    print(db.gallery_target[0])
     # img = db.get_normalized_template(0, db.gallery_data)
     # db.show_image(img)
     #
@@ -300,6 +312,4 @@ if __name__ == '__main__':
     # print("probe PN:", len(db.pn_data), len(db.pn_target), len(np.unique(db.pn_target)))
 
     #db.csv_medicine_maker()
-    db.csv_maker()
-
 
