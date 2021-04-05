@@ -181,18 +181,34 @@ class DataEnrollmentPage(DataPage):
         controller.show_frame(EnrollmentPage)
 
     def confirm(self):
-        error = False
+        medicineError = False
         if len(self.medicineEntry) == 0:
-            error = True
+            medicineError = True
         else:
             for medicine in self.medicineEntry:
                 if medicine.get() == "":
-                    error = True
+                    medicineError = True
                     break
-        if error:
+        if medicineError:
             messagebox.showerror(title="Errore", message="Inserisci i farmaci")
         else:
-            addUser(self.photo,self.name.cget("text"))
+            delegatesError = False
+            delegates = []
+            for delegate in self.delegateEntry:
+                if delegate.get() != "":
+                    if not isCF(delegate.get()):
+                        delegatesError = True
+                        break
+                    else:
+                        delegates.append(delegate.get())
+            if delegatesError:
+                messagebox.showerror(title="Errore", message="Inserisci i codici fiscali dei tuoi delegati")
+            else:
+                medicines = []
+                for medicine in self.medicineEntry:
+                    medicines.append(medicine.get())
+                print(delegates)
+                addUser(self.photo,self.cf.cget("text"), self.name.cget("text"), medicines, delegates)
 
 
 
@@ -282,15 +298,19 @@ def back(controller, entryCF, labelError, entryName=None):
     labelError.configure(fg="#f0f0f0")
     controller.show_frame(StartPage)
 
-def addUser(photo,name):
+def addUser(photo, cf, name, medicines, delegates):
     gallery_data = np.load("npy_db/gallery_data.npy").tolist()
     gallery_target = np.load("npy_db/gallery_target.npy").tolist()
     medicine_csv = pd.read_csv("dataset_user.csv")
     gallery_data.append(photo)
-    gallery_target.append(name)
+    gallery_target.append(cf)
     print(len(gallery_data), len(gallery_target))
     print(photo, gallery_data[len(gallery_data)-1])
-    print(name, gallery_target[len(gallery_target) - 1])
+    print(cf, gallery_target[len(gallery_target) - 1])
+    medicine_csv = medicine_csv.append({"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates}, ignore_index=True)
+    medicine_csv.index = pd.RangeIndex(0, len(medicine_csv))
+    print(medicine_csv.iloc[39])
+    print(medicine_csv.iloc[40])
 
 def videoCapture():
     cap = cv2.VideoCapture(0)
@@ -337,6 +357,11 @@ def detect_face(img, vis, crop=None):
             print(str(e))
     return crop
 
+
+def isCF(cf):
+    if len(cf) != 16:
+        return False
+    return any(i.isdigit() for i in cf)
 
 def main():
     app = Page()
