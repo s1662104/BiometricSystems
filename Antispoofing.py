@@ -132,20 +132,24 @@ class EyeBlink():
                 eyedetect, TOTAL, COUNTER, ear_top = self.eye_blink_cam(frame, ret, detector, predictor,
                                                 COUNTER, TOTAL,ear_top)
                 history += eyedetect
+                if TOTAL >= 1:
+                  cv2.putText(frame, "Real", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
+                elif (len(history) > 100):
+                        print(history)
+                        result = self.isBlinking(history, 3)
+                        print(result)
+                        if (result):
+                            pass
+                            #superfluo
+                            #cv2.putText(frame, "Real", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
+                        else:
+                            cv2.putText(frame, "Fake", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
+                        #cv2.imshow('Face', vis)
+                else:
+                  cv2.putText(frame, "Check...", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 165, 255), 3, cv2.LINE_AA)
 
-                if (len(history) > 10):
-                    print(history)
-                    result = self.isBlinking(history, 3)
-                    print(result)
-                    if (result):
-                        pass
-                        #cv2.putText(vis, "Real", (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
-                    else:
-                        pass
-                        #cv2.putText(vis, "Fake", (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
-                    #cv2.imshow('Face', vis)
-
-                # cv2.imshow("Frame", frame)
+                cv2.imshow("Frame", frame)
+                cv2.waitKey(1)
                 #cv2.imshow("Face", vis)
                 # if cv2.waitKey(1) & 0xFF == ord('q'):
                 #     break
@@ -209,19 +213,24 @@ class EyeBlink():
             for (x, y) in shape:
                 cv2.circle(rect, (x, y), 1, (0, 0, 255), -1)
 
-            if ear < ear_threshold:
+            if ear_top != 0:
+                ear_threshold = (ear_top * 2) / 3
+                print("Ear_th", ear_threshold)
+                print("EAR TOP", ear_top)
 
-                eyes_detect = '1'
-                COUNTER +=1
-            else:
-                eyes_detect = '0'
+                if ear < ear_threshold:
 
-                if COUNTER >= ear_threshold:
-                    TOTAL += 1
+                    eyes_detect = '1'
+                    COUNTER +=1
+                else:
+                    eyes_detect = '0'
+
+                    if COUNTER >= ear_threshold:
+                        TOTAL += 1
 
 
 
-                COUNTER = 0
+                    COUNTER = 0
 
 
 
@@ -233,8 +242,8 @@ class EyeBlink():
             if ear > ear_top:
                 ear_top = ear
 
-        cv2.imshow('Face', frame)
-        cv2.waitKey(1)
+        #cv2.imshow('Frame', frame)
+        #cv2.waitKey(1)
         return eyes_detect, TOTAL, COUNTER, ear_top
 
     def eye_blink_video(self, frame, detector, predictor, COUNTER, TOTAL, ear_top):
