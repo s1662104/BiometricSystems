@@ -19,9 +19,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="Evaluation SVC">
+    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="farmaci prelevabili: pt. 5.2 calcolo dei farmaci prelevabili in base alla data dell'ultimo prelievo e aggiornamento del db">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset_user.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dataset_user.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +38,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1nHf3tQAIkFWrpRPLYJDIdoMPmL" />
@@ -49,7 +56,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.Database">
+  <component name="RunManager" selected="Python.Main (1)">
     <configuration name="CaptureFace" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="BiometricSystems" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -178,15 +185,15 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Database" />
-        <item itemvalue="Python.LBP" />
         <item itemvalue="Python.Main (1)" />
+        <item itemvalue="Python.Database" />
         <item itemvalue="Python.Recognition" />
+        <item itemvalue="Python.LBP" />
         <item itemvalue="Python.CaptureFace" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -387,7 +394,91 @@
       <option name="project" value="LOCAL" />
       <updated>1614676330700</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="merge">
+      <created>1616855319064</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1616855319064</updated>
+    </task>
+    <task id="LOCAL-00029" summary="bug fix">
+      <created>1616868095216</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1616868095216</updated>
+    </task>
+    <task id="LOCAL-00030" summary="eyeblink fix">
+      <created>1616924264827</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1616924264827</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Posizione bottoni">
+      <created>1617131905269</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1617131905269</updated>
+    </task>
+    <task id="LOCAL-00032" summary="ereditarietà">
+      <created>1617193964738</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1617193964738</updated>
+    </task>
+    <task id="LOCAL-00033" summary="interfaccia: Box alert, pagina di registrazione completata">
+      <created>1617466686624</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1617466686624</updated>
+    </task>
+    <task id="LOCAL-00034" summary="update gallery pt. 1">
+      <created>1617472073842</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1617472073842</updated>
+    </task>
+    <task id="LOCAL-00035" summary="db fondato su cf invece che nome dell'utente">
+      <created>1617616652646</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1617616652646</updated>
+    </task>
+    <task id="LOCAL-00036" summary="interfaccia: pt. 2 aggiornare i db">
+      <created>1617620139409</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1617620139409</updated>
+    </task>
+    <task id="LOCAL-00037" summary="interfaccia: pt. 3 db salvati con i dati aggiornati">
+      <created>1617700304119</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1617700304119</updated>
+    </task>
+    <task id="LOCAL-00038" summary="farmaci prelevabili: pt. 5.1 calcolo della differenza tra la data dell'ultima somministrazione e oggi (in giorni)">
+      <created>1617707033911</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1617707033911</updated>
+    </task>
+    <task id="LOCAL-00039" summary="farmaci prelevabili: pt. 5.2 calcolo dei farmaci prelevabili in base alla data dell'ultimo prelievo e aggiornamento del db">
+      <created>1617723546860</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1617723546860</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -403,13 +494,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="set-up" />
-    <MESSAGE value="codice fiscale + face detection" />
-    <MESSAGE value="aggiunta db, creati set data e target" />
-    <MESSAGE value="crop face" />
-    <MESSAGE value="probe and gallery set setup" />
-    <MESSAGE value="bug fix" />
-    <MESSAGE value="change name class" />
     <MESSAGE value="prevent error caused by no face detected" />
     <MESSAGE value="deleted print" />
     <MESSAGE value="convert numpy array to cv2-readable array" />
@@ -423,18 +507,35 @@
     <MESSAGE value="suddivisione train e test set" />
     <MESSAGE value="CSV" />
     <MESSAGE value="Evaluation SVC" />
-    <option name="LAST_COMMIT_MESSAGE" value="Evaluation SVC" />
+    <MESSAGE value="merge" />
+    <MESSAGE value="bug fix" />
+    <MESSAGE value="eyeblink fix" />
+    <MESSAGE value="Posizione bottoni" />
+    <MESSAGE value="ereditarietà" />
+    <MESSAGE value="interfaccia: Box alert, pagina di registrazione completata" />
+    <MESSAGE value="update gallery pt. 1" />
+    <MESSAGE value="db fondato su cf invece che nome dell'utente" />
+    <MESSAGE value="interfaccia: pt. 2 aggiornare i db" />
+    <MESSAGE value="interfaccia: pt. 3 db salvati con i dati aggiornati" />
+    <MESSAGE value="farmaci prelevabili: pt. 5.1 calcolo della differenza tra la data dell'ultima somministrazione e oggi (in giorni)" />
+    <MESSAGE value="farmaci prelevabili: pt. 5.2 calcolo dei farmaci prelevabili in base alla data dell'ultimo prelievo e aggiornamento del db" />
+    <option name="LAST_COMMIT_MESSAGE" value="farmaci prelevabili: pt. 5.2 calcolo dei farmaci prelevabili in base alla data dell'ultimo prelievo e aggiornamento del db" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="463" y="259" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1614093779831">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="617" y="299" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1617467703078">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="463" y="259" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900@0.0.1440.900" timestamp="1614093779831" />
+    <state x="617" y="299" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1617467703078" />
     <state x="518" y="231" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1614167177884">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="518" y="231" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.900@0.0.1440.900" timestamp="1614167177884" />
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1613826445923" />
+    <state x="184" y="86" key="DiffContextDialog" timestamp="1617119310861">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="184" y="86" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617119310861" />
     <state x="740" y="261" key="FileChooserDialogImpl" timestamp="1614114167639">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -443,42 +544,42 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="418" key="Github.ShareDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1611052239681" />
-    <state width="1419" height="2" key="GridCell.Tab.0.bottom" timestamp="1614719136957">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1899" height="255" key="GridCell.Tab.0.bottom" timestamp="1617736022677">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1419" height="2" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1614719136957" />
-    <state width="1899" height="213" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1614159807703" />
-    <state width="1419" height="2" key="GridCell.Tab.0.center" timestamp="1614719136956">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1899" height="255" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1617736022677" />
+    <state width="1899" height="255" key="GridCell.Tab.0.center" timestamp="1617736022677">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1419" height="2" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1614719136956" />
-    <state width="1899" height="213" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1614159807702" />
-    <state width="1419" height="2" key="GridCell.Tab.0.left" timestamp="1614719136956">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1899" height="255" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1617736022677" />
+    <state width="1899" height="255" key="GridCell.Tab.0.left" timestamp="1617736022677">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1419" height="2" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1614719136956" />
-    <state width="1899" height="213" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1614159807702" />
-    <state width="1419" height="2" key="GridCell.Tab.0.right" timestamp="1614719136957">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1899" height="255" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1617736022677" />
+    <state width="1899" height="255" key="GridCell.Tab.0.right" timestamp="1617736022677">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1419" height="2" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1614719136957" />
-    <state width="1899" height="213" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1614159807703" />
-    <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1612776688567">
+    <state width="1899" height="255" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1617736022677" />
+    <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1617723588703">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
-    <state width="1899" height="348" key="GridCell.Tab.1.center" timestamp="1612776688567">
+    <state width="1899" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1617723588703" />
+    <state width="1899" height="348" key="GridCell.Tab.1.center" timestamp="1617723588703">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
-    <state width="1899" height="348" key="GridCell.Tab.1.left" timestamp="1612776688567">
+    <state width="1899" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1617723588703" />
+    <state width="1899" height="348" key="GridCell.Tab.1.left" timestamp="1617723588703">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
-    <state width="1899" height="348" key="GridCell.Tab.1.right" timestamp="1612776688567">
+    <state width="1899" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1617723588703" />
+    <state width="1899" height="348" key="GridCell.Tab.1.right" timestamp="1617723588703">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612776688567" />
+    <state width="1899" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1617723588703" />
     <state x="144" y="79" key="MergeDialog" timestamp="1614245433679">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -487,15 +588,15 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="360" y="218" key="MultipleFileMergeDialog/0.0.1440.900@0.0.1440.900" timestamp="1614245433697" />
-    <state x="461" y="165" key="SettingsEditor" timestamp="1613758752091">
+    <state x="725" y="167" key="SettingsEditor" timestamp="1616922887239">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1613758752091" />
-    <state x="414" y="219" key="Vcs.Push.Dialog.v2" timestamp="1614676343662">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="725" y="167" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1616922887239" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1617723552020">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="414" y="219" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1614676343662" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1614010502313" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1617723552020" />
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1612174336111">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -504,6 +605,10 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="421" y="176" width="598" height="548" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1614700456410" />
+    <state x="740" y="233" key="git4idea.branch.GitSmartOperationDialog" timestamp="1617119312735">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="233" key="git4idea.branch.GitSmartOperationDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617119312735" />
     <state x="393" y="245" key="git4idea.merge.GitPullDialog" timestamp="1614616176196">
       <screen x="0" y="0" width="1440" height="900" />
     </state>

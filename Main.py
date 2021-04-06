@@ -170,7 +170,7 @@ class DataEnrollmentPage(DataPage):
                 for m in range(n):
                     entryMedicine = tk.Entry(self)
                     entryMedicine.insert(1, "")
-                    entryMedicine.pack(pady=1)
+                    entryMedicine.pack(pady=1, padx=30)
                     self.medicineEntry.append(entryMedicine)
             elif n < actualN:
                 n = actualN - n
@@ -297,9 +297,15 @@ class UserPage(DataPage):
         medicine_dataset = pd.read_csv("dataset_medicine.csv")
         for row in medicine_dataset.iterrows():
             for medicine in medicines:
-                s = medicine.split(":")
-                name = s[0]
-                dose = s[1]
+                s = medicine.split(" ")
+                name = ""
+                print(s)
+                for i, val in enumerate(s):
+                    if i < len(s)-2:
+                        name += s[i]
+                print(name)
+                dose = s[len(s)-2] + " " + s[len(s)-1]
+                print(dose)
                 if row[1]["Nome"] == name and row[1]["Dosaggio"] == dose:
                     n = row[1]["Numero Pasticche"]
                     dose_x_day = row[1]["Dose x giorno"]
@@ -349,7 +355,6 @@ def addUser(photo, cf, name, medicines, delegates):
     np.save("npy_db/gallery_data.npy", gallery_data)
     np.save("npy_db/gallery_target.npy", gallery_target)
     medicine_csv.to_csv('dataset_user.csv')
-
 
 def videoCapture():
     cap = cv2.VideoCapture(0)
