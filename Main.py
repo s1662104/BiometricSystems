@@ -301,16 +301,16 @@ def back(controller, entryCF, labelError, entryName=None):
 def addUser(photo, cf, name, medicines, delegates):
     gallery_data = np.load("npy_db/gallery_data.npy").tolist()
     gallery_target = np.load("npy_db/gallery_target.npy").tolist()
-    medicine_csv = pd.read_csv("dataset_user.csv")
+    medicine_csv = pd.read_csv("dataset_user.csv", index_col=[0])
     gallery_data.append(photo)
     gallery_target.append(cf)
     print(len(gallery_data), len(gallery_target))
     print(photo, gallery_data[len(gallery_data)-1])
     print(cf, gallery_target[len(gallery_target) - 1])
     medicine_csv = medicine_csv.append({"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates}, ignore_index=True)
-    medicine_csv.index = pd.RangeIndex(0, len(medicine_csv))
-    print(medicine_csv.iloc[39])
-    print(medicine_csv.iloc[40])
+    np.save("npy_db/gallery_data.npy", gallery_data)
+    np.save("npy_db/gallery_target.npy", gallery_target)
+    medicine_csv.to_csv('dataset_user.csv')
 
 def videoCapture():
     cap = cv2.VideoCapture(0)

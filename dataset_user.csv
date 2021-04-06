@@ -1,41 +1,41 @@
 ,User,Codice Fiscale,Farmaci,Delegati
-0,Xander Bolton,BLTXND45T00F507V,"['SIMESTAT 5 mg', 'DAFLON 500 mg', 'Adalat 60 mg', 'Prefolic 15 mg']",[]
-1,Jameson Sierra,SRRJMS18A12Z423C,"['Prefolic 15 mg', 'Cardioaspirina 100 mg']","['WTTJ67L21A201ROU', 'WHTCB96A09H035SA']"
-2,Myron Kay,KMRN20C17L231BDU,"['Prefolic 15 mg', 'Cardioaspirina 100 mg', 'SIMESTAT 5 mg', 'Lasopranzolo 30 mg']",['WTTJ67L21A201ROU']
-3,Liam Cote,CTLM53T22R222UFF,[],['WLLCRT76L10R487P']
-4,Ronnie Connor,CNNRNN97L21D051T,"['Prefolic 15 mg', 'DAFLON 500 mg']",['DCKMRT67B15C821M']
-5,Carlton Stubbs,STBCRL72B06A312G,"['Cardioaspirina 100 mg', 'DAFLON 500 mg', 'Motilex 0,5 mg', 'Prefolic 15 mg', 'Lasopranzolo 30 mg']",[]
-6,Luis Richards,RCHLS56A05P514ZB,['Prefolic 15 mg'],['CBRTB93H04B558GD']
-7,Carolina Aldred,LDRCRL78T06M070H,"['SIMESTAT 5 mg', 'Motilex 0,5 mg', 'Adalat 60 mg', 'Prefolic 15 mg']",['CHPHRL43B17U399L']
-8,Esme Suarez,SRZSM13R28M685TM,[],[]
-9,Giulia Sutherland,STHGL92S07T055DP,"['SIMESTAT 5 mg', 'DAFLON 500 mg', 'Adalat 60 mg']","['HNSDRR07E13F630E', 'MDWKRK91P00V840I']"
-10,Eduardo Villalobos,VLLDRD35S24H496Z,"['Adalat 60 mg', 'Motilex 0,5 mg', 'Lasopranzolo 30 mg']",['DCKMRT67B15C821M']
-11,Maxime Koch,KCHMXM66S18G723V,"['Motilex 0,5 mg']","['WHTCB96A09H035SA', 'BLTXND45T00F507V']"
-12,Francis Oconnor,CNNFRN20B18R841Z,"['Adalat 60 mg', 'SIMESTAT 5 mg', 'DAFLON 500 mg', 'Motilex 0,5 mg']","['DCKMRT67B15C821M', 'CTLM53T22R222UFF']"
-13,Omari Bellamy,BLLMR89C02A579SB,['DAFLON 500 mg'],['KCHMXM66S18G723V']
-14,Harlan Chapman,CHPHRL43B17U399L,[],['CRRFNN72A10E188F']
-15,Kirk Meadows,MDWKRK91P00V840I,[],[]
-16,Darren Haynes,HNSDRR07E13F630E,['Adalat 60 mg'],['HNSDRR07E13F630E']
-17,Jim Bostock,BSTJM90R18P544BP,"['Adalat 60 mg', 'DAFLON 500 mg', 'Lasopranzolo 30 mg']",[]
-18,Vladimir Sumner,SMNVLD24C04C888T,[],"['CTLM53T22R222UFF', 'BSTJM90R18P544BP']"
-19,Keyan Suarez,SRZKN43L13Z063IC,"['DAFLON 500 mg', 'Adalat 60 mg', 'SIMESTAT 5 mg', 'Prefolic 15 mg', 'Lasopranzolo 30 mg']",[]
-20,Curtis Willis,WLLCRT76L10R487P,"['DAFLON 500 mg', 'Adalat 60 mg']",[]
-21,Jae Watt,WTTJ67L21A201ROU,"['SIMESTAT 5 mg', 'Cardioaspirina 100 mg', 'Prefolic 15 mg', 'DAFLON 500 mg', 'Motilex 0,5 mg']",['BLTXND45T00F507V']
-22,Merlin Heaton,HTNMRL77M00F686A,[],"['MDWKRK91P00V840I', 'MDWKRK91P00V840I']"
-23,Matthew Lloyd,LLDMTT97D04F746B,"['Lasopranzolo 30 mg', 'Prefolic 15 mg', 'Motilex 0,5 mg']",[]
-24,Finn Curry,CRRFNN72A10E188F,"['Motilex 0,5 mg']",['STHGL92S07T055DP']
-25,Toby Cabrera,CBRTB93H04B558GD,['DAFLON 500 mg'],[]
-26,Martin Dickinson,DCKMRT67B15C821M,"['Motilex 0,5 mg', 'SIMESTAT 5 mg', 'Prefolic 15 mg', 'Lasopranzolo 30 mg']","['KMRN20C17L231BDU', 'VLLDRD35S24H496Z']"
-27,Cobie Whitfield,WHTCB96A09H035SA,"['DAFLON 500 mg', 'Lasopranzolo 30 mg', 'Motilex 0,5 mg', 'Cardioaspirina 100 mg']",['STBCRL72B06A312G']
-28,Elyas Vo,VLS60T05F761UMOA,"['SIMESTAT 5 mg', 'Cardioaspirina 100 mg', 'Motilex 0,5 mg']",[]
-29,Dominick Deacon,DCNDMN70C07Z680T,"['SIMESTAT 5 mg', 'Cardioaspirina 100 mg', 'Motilex 0,5 mg', 'Lasopranzolo 30 mg', 'Adalat 60 mg']",[]
-30,Tobey Davis,DVSTB32B04P464AC,"['Lasopranzolo 30 mg', 'SIMESTAT 5 mg']","['CRRFNN72A10E188F', 'KCHMXM66S18G723V']"
-31,Caitlyn Schneider,SCHCTL16M21H133R,[],"['MDWKRK91P00V840I', 'BSTJM90R18P544BP']"
-32,Rayan Diaz,DZRN06B29P501FIL,[],['KCHMXM66S18G723V']
-33,Phillip Donaldson,DNLPHL36L27S582F,"['SIMESTAT 5 mg', 'DAFLON 500 mg', 'Adalat 60 mg', 'Motilex 0,5 mg']",['RCHLS56A05P514ZB']
-34,Karina Anthony,NTHKRN22E17P718I,"['Lasopranzolo 30 mg', 'Prefolic 15 mg', 'Adalat 60 mg', 'SIMESTAT 5 mg']",['CHPHRL43B17U399L']
-35,Stan Curran,CRRSTN91T05F761P,['Adalat 60 mg'],"['WHTCB96A09H035SA', 'SRZSM13R28M685TM']"
-36,Aston Andrews,NDRSTN35B19G428B,[],[]
-37,Junior Pham,PHMJNR55C01C489T,[],['RCHLS56A05P514ZB']
-38,Konnor Buck,BCKKNN77M10H191S,"['Cardioaspirina 100 mg', 'Motilex 0,5 mg', 'Lasopranzolo 30 mg', 'DAFLON 500 mg']",[]
-39,Martyn Mays,MSMRT56P24H222FH,"['Prefolic 15 mg', 'Cardioaspirina 100 mg', 'Adalat 60 mg', 'Motilex 0,5 mg', 'Lasopranzolo 30 mg', 'DAFLON 500 mg']",[]
+0,Xander Bolton,BLTXND08P14U353E,['Prefolic 15 mg'],"['DCKMRT78T28M757E', 'SRZSM96P17O372SZ']"
+1,Jameson Sierra,SRRJMS90D24A388V,"['Motilex 0,5 mg', 'Lasopranzolo 30 mg', 'Adalat 60 mg']",['DCKMRT78T28M757E']
+2,Myron Kay,KMRN47M11G618TPV,"['DAFLON 500 mg', 'Motilex 0,5 mg']",['CTLM34A09S513VAZ']
+3,Liam Cote,CTLM34A09S513VAZ,"['DAFLON 500 mg', 'SIMESTAT 5 mg', 'Adalat 60 mg']",['SRZSM96P17O372SZ']
+4,Ronnie Connor,CNNRNN19A02A667B,['Adalat 60 mg'],['LLDMTT82L20T961I']
+5,Carlton Stubbs,STBCRL72S09G174T,"['Adalat 60 mg', 'SIMESTAT 5 mg', 'Motilex 0,5 mg']","['CBRTB49H01S478OG', 'CNNFRN04S23F435P']"
+6,Luis Richards,RCHLS14H07O999CM,"['Motilex 0,5 mg']",['CBRTB49H01S478OG']
+7,Carolina Aldred,LDRCRL52D27D195M,['Prefolic 15 mg'],[]
+8,Esme Suarez,SRZSM96P17O372SZ,"['SIMESTAT 5 mg', 'Lasopranzolo 30 mg']",[]
+9,Giulia Sutherland,STHGL34L20E161MT,"['Cardioaspirina 100 mg', 'Prefolic 15 mg', 'Adalat 60 mg', 'SIMESTAT 5 mg']","['CTLM34A09S513VAZ', 'CRRFNN69L15E570T']"
+10,Eduardo Villalobos,VLLDRD87T03C679I,"['Motilex 0,5 mg', 'Cardioaspirina 100 mg', 'Lasopranzolo 30 mg', 'Prefolic 15 mg']","['SRZKN84L28M969IM', 'SMNVLD20H23L602M']"
+11,Maxime Koch,KCHMXM69H29O068H,"['SIMESTAT 5 mg', 'Adalat 60 mg', 'DAFLON 500 mg', 'Cardioaspirina 100 mg']",['WTTJ26T02B866MGE']
+12,Francis Oconnor,CNNFRN04S23F435P,"['Cardioaspirina 100 mg', 'Lasopranzolo 30 mg', 'Adalat 60 mg']",[]
+13,Omari Bellamy,BLLMR71P30D164GZ,"['Lasopranzolo 30 mg', 'Cardioaspirina 100 mg', 'Motilex 0,5 mg', 'DAFLON 500 mg']",[]
+14,Harlan Chapman,CHPHRL25D06B785P,['Adalat 60 mg'],"['CRRFNN69L15E570T', 'MDWKRK51D15P861S']"
+15,Kirk Meadows,MDWKRK51D15P861S,"['Adalat 60 mg', 'DAFLON 500 mg', 'SIMESTAT 5 mg', 'Motilex 0,5 mg']",[]
+16,Darren Haynes,HNSDRR95E18C652V,[],['WHTCB64R29E552EO']
+17,Jim Bostock,BSTJM91C14T676MC,['Prefolic 15 mg'],['WLLCRT16R26L313U']
+18,Vladimir Sumner,SMNVLD20H23L602M,"['Lasopranzolo 30 mg', 'Adalat 60 mg']",[]
+19,Keyan Suarez,SRZKN84L28M969IM,['Cardioaspirina 100 mg'],['RCHLS14H07O999CM']
+20,Curtis Willis,WLLCRT16R26L313U,"['Cardioaspirina 100 mg', 'Adalat 60 mg', 'Prefolic 15 mg']","['VLLDRD87T03C679I', 'BLLMR71P30D164GZ']"
+21,Jae Watt,WTTJ26T02B866MGE,"['Adalat 60 mg', 'Prefolic 15 mg', 'DAFLON 500 mg', 'SIMESTAT 5 mg']",['WHTCB64R29E552EO']
+22,Merlin Heaton,HTNMRL33T28S389C,"['Lasopranzolo 30 mg', 'Adalat 60 mg']",[]
+23,Matthew Lloyd,LLDMTT82L20T961I,[],[]
+24,Finn Curry,CRRFNN69L15E570T,['Prefolic 15 mg'],[]
+25,Toby Cabrera,CBRTB49H01S478OG,[],['KCHMXM69H29O068H']
+26,Martin Dickinson,DCKMRT78T28M757E,"['Prefolic 15 mg', 'Lasopranzolo 30 mg', 'Cardioaspirina 100 mg', 'DAFLON 500 mg']",['WTTJ26T02B866MGE']
+27,Cobie Whitfield,WHTCB64R29E552EO,[],"['BSTJM91C14T676MC', 'LDRCRL52D27D195M']"
+28,Elyas Vo,VLS67H14U592CORG,"['Lasopranzolo 30 mg', 'Adalat 60 mg', 'Motilex 0,5 mg', 'SIMESTAT 5 mg']",[]
+29,Dominick Deacon,DCNDMN27L07C989A,"['SIMESTAT 5 mg', 'Cardioaspirina 100 mg']",[]
+30,Tobey Davis,DVSTB11T18P989UO,"['Motilex 0,5 mg', 'SIMESTAT 5 mg', 'Prefolic 15 mg']",[]
+31,Caitlyn Schneider,SCHCTL19L27R863P,"['Cardioaspirina 100 mg', 'Lasopranzolo 30 mg', 'DAFLON 500 mg']",[]
+32,Rayan Diaz,DZRN80A11F439BLC,"['SIMESTAT 5 mg', 'Prefolic 15 mg', 'DAFLON 500 mg', 'Lasopranzolo 30 mg']","['HTNMRL33T28S389C', 'BLTXND08P14U353E']"
+33,Phillip Donaldson,DNLPHL08L00G857D,['DAFLON 500 mg'],"['BLTXND08P14U353E', 'MDWKRK51D15P861S']"
+34,Karina Anthony,NTHKRN64A08U649G,"['SIMESTAT 5 mg', 'Adalat 60 mg']",['DCKMRT78T28M757E']
+35,Stan Curran,CRRSTN75M12U099G,"['Adalat 60 mg', 'Cardioaspirina 100 mg']","['SRRJMS90D24A388V', 'KCHMXM69H29O068H']"
+36,Aston Andrews,NDRSTN75P27O388P,"['Cardioaspirina 100 mg', 'Prefolic 15 mg', 'SIMESTAT 5 mg']",['CHPHRL25D06B785P']
+37,Junior Pham,PHMJNR88A19I158P,"['Lasopranzolo 30 mg', 'Cardioaspirina 100 mg', 'Adalat 60 mg', 'Motilex 0,5 mg', 'DAFLON 500 mg']",[]
+38,Konnor Buck,BCKKNN70H02Z553D,"['Lasopranzolo 30 mg', 'DAFLON 500 mg', 'Prefolic 15 mg', 'Motilex 0,5 mg']",['SRZKN84L28M969IM']
+39,Martyn Mays,MSMRT45C19R166CV,"['Prefolic 15 mg', 'Motilex 0,5 mg']","['KMRN47M11G618TPV', 'HTNMRL33T28S389C']"
