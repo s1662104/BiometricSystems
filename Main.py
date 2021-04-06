@@ -6,6 +6,8 @@ import tkinter.messagebox as messagebox
 from PIL import ImageTk, Image
 import numpy as np
 import pandas as pd
+import ast
+from datetime import date
 
 messageBenvenuto = "Benvenuto! \nCosa vuoi fare? \n0. Registrazione \n1. Riconoscimento"
 messageA = "Inserire scelta: "
@@ -33,14 +35,14 @@ class Page(tk.Tk):
         self.frames = {}
 
         for F in (StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage,
-                  EnrollmentCompleted):
+                  EnrollmentCompleted, UserPage):
             frame = F(container, self)
 
             self.frames[F] = frame
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(DataEnrollmentPage)
+        self.show_frame(DataRecognitionPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -73,7 +75,7 @@ class EnrollmentPage(tk.Frame):
         entryName.insert(1, messageN)
         entryName.pack(pady=2)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: checkInput(controller, entryCF.get(), labelError, 0, entryName.get()))
+                            command=lambda: check_input(controller, entryCF.get(), labelError, 0, entryName.get()))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
@@ -94,7 +96,7 @@ class RecognitionPage(tk.Frame):
         entryCF.insert(1, messageCF)
         entryCF.pack(padx=0, pady=0)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: checkInput(controller, entryCF.get(), labelError, 1))
+                            command=lambda: check_input(controller, entryCF.get(), labelError, 1))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
@@ -108,8 +110,8 @@ class DataPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.photo = np.ones((64, 64)) * 150
-        img = ImageTk.PhotoImage(image=Image.fromarray(self.photo))
+        photo = np.ones((64, 64)) * 150
+        img = ImageTk.PhotoImage(image=Image.fromarray(photo))
         self.panel = tk.Label(self, image=img)
         self.panel.image = img
         self.panel.pack(pady=10, padx=10)
@@ -208,8 +210,7 @@ class DataEnrollmentPage(DataPage):
                 for medicine in self.medicineEntry:
                     medicines.append(medicine.get())
                 print(delegates)
-                addUser(self.photo,self.cf.cget("text"), self.name.cget("text"), medicines, delegates)
-
+                addUser(self.photo, self.cf.cget("text"), self.name.cget("text"), medicines, delegates)
 
 
 class DataRecognitionPage(DataPage):
@@ -219,20 +220,23 @@ class DataRecognitionPage(DataPage):
         self.name.destroy()
 
         tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
-                  command=lambda: self.confirm()).place(y=520, x=220)
+                  command=lambda: self.confirm(controller)).place(y=520, x=220)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
 
-    def update_data(self, cf, img):
+    def update_data(self, cf, img, name=None):
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
-        self.photo = img
+        # self.photo = img
 
-    def confirm(self):
+    def confirm(self, controller):
         user = Recognition.recognize()
         print(user)
+        list(controller.frames.values())[6].update_data(user["User"], user["Codice Fiscale"],
+                                                        user["Delegati"], user["Farmaci"], user["Data"], self.panel.image)
+        controller.show_frame(UserPage)
 
     def back(self, controller):
         controller.show_frame(RecognitionPage)
@@ -251,25 +255,46 @@ class EnrollmentCompleted(tk.Frame):
 class UserPage(DataPage):
     def __init__(self, parent, controller):
         DataPage.__init__(self, parent, controller)
-        self.label = tk.Label(self, text="INFORMAZIONE")
-        self.label.pack()
 
-        delegates = tk.Label(self, text="Delegati:")
+        delegates = tk.Label(self, text="DELEGATI:")
         delegates.pack()
-        self.delegate1 = tk.Label(self, text="Delegato1")
-        self.delegate1.pack()
-        self.delegate2 = tk.Label(self, text="Delegato2")
-        self.delegate2.pack()
-        self.delegate3 = tk.Label(self, text="Delegato3")
-        self.delegate3.pack()
+        self.delegatesLabels = []
+        for i in range(3):
+            delegate = tk.Label(self, text="Delegato")
+            delegate.pack()
+            self.delegatesLabels.append(delegate)
+        medicineLabel = tk.Label(self, text="FARMACI:")
+        medicineLabel.pack()
 
-    def update_data(self, info, name, cf, delegates, medicines):
+    def update_data(self, name, cf, delegates, medicines, date, photo):
         self.cf.config(text="CODICE FISCALE: " + cf)
-        # self.cf.config(text="CODICE FISCALE: " + cf)
+        self.name.config(text="NOME: " + name)
+        print(photo)
+        self.panel.config(image=photo)
+        self.panel.image = photo
+        # self.photo = photo
+        delegates = ast.literal_eval(delegates)
+        for i, label in enumerate(self.delegatesLabels):
+            if i < len(delegates):
+                self.delegatesLabels[i].config(text=delegates[i])
+            else:
+                self.delegatesLabels[i].config(text="-")
+        medicines = ast.literal_eval(medicines)
+        for medicine in medicines:
+            label = tk.Label(self, text=medicine)
+            label.pack()
+        tk.Label(self, text="FARMACI PRELEVATI:").pack()
+        self.obtainable_medicines(date)
 
+    def obtainable_medicines(self,d: str):
+        dmy = d.split("/")
+        last_date = date(int(dmy[2]),int(dmy[1]),int(dmy[0]))
+        today = date.today()
+        days = (today - last_date).days
+        print(days)
 
-def checkInput(controller, cf, labelError, op, name=None):
-    if len(cf) != 16 or cf == messageCF or (name != None and name == messageN):
+def check_input(controller, cf, labelError, op, name=None):
+    if len(cf) != 16 or cf == messageCF or (name is not None and name == messageN):
         labelError.configure(fg="red")
         return
     else:
@@ -286,9 +311,6 @@ def checkInput(controller, cf, labelError, op, name=None):
         controller.show_frame(DataRecognitionPage)
 
 
-# def checkDataInput(controller,frame):
-
-
 def back(controller, entryCF, labelError, entryName=None):
     entryCF.delete(0, tk.END)
     entryCF.insert(0, messageCF)
@@ -298,6 +320,7 @@ def back(controller, entryCF, labelError, entryName=None):
     labelError.configure(fg="#f0f0f0")
     controller.show_frame(StartPage)
 
+
 def addUser(photo, cf, name, medicines, delegates):
     gallery_data = np.load("npy_db/gallery_data.npy").tolist()
     gallery_target = np.load("npy_db/gallery_target.npy").tolist()
@@ -305,12 +328,14 @@ def addUser(photo, cf, name, medicines, delegates):
     gallery_data.append(photo)
     gallery_target.append(cf)
     print(len(gallery_data), len(gallery_target))
-    print(photo, gallery_data[len(gallery_data)-1])
+    print(photo, gallery_data[len(gallery_data) - 1])
     print(cf, gallery_target[len(gallery_target) - 1])
-    medicine_csv = medicine_csv.append({"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates}, ignore_index=True)
+    medicine_csv = medicine_csv.append(
+        {"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates}, ignore_index=True)
     np.save("npy_db/gallery_data.npy", gallery_data)
     np.save("npy_db/gallery_target.npy", gallery_target)
     medicine_csv.to_csv('dataset_user.csv')
+
 
 def videoCapture():
     cap = cv2.VideoCapture(0)
@@ -362,6 +387,7 @@ def isCF(cf):
     if len(cf) != 16:
         return False
     return any(i.isdigit() for i in cf)
+
 
 def main():
     app = Page()

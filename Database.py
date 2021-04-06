@@ -5,6 +5,7 @@ import os
 from enum import Enum
 import pandas as pd
 from random import randrange
+from datetime import date
 
 class Olivetti_Names(Enum):
     Xander_Bolton = 0
@@ -197,11 +198,14 @@ class Database():
             count += 1
         # trasformo in np array
         dataset = np.array(dataset)
+        # e' passato almeno un mese dall'ultimo prelievo di farmaci
+        today = date.today()
+        today = today.replace(month=int(today.strftime("%m"))-1)
         df = pd.DataFrame({'User': dataset[::, 0],
                            'Codice Fiscale': dataset[::, 1],
                            'Farmaci': dataset[::, 2],
                            'Delegati': dataset[::, 3],
-                           })
+                           'Data': today.strftime("%d/%m/%Y")})
         #salvo in csv
         df.to_csv('dataset_user.csv')
 
