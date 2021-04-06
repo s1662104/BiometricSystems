@@ -280,7 +280,7 @@ class Database():
         for i in range(randrange(len)):
             rnd = randrange(len)
             m = medicines.loc[rnd]
-            medicine = m['Nome'] + " " + m['Dosaggio']
+            medicine = m['Nome'] + ":" + m['Dosaggio']
             if medicine not in list:
                 list.append(medicine)
         return list

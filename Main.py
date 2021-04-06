@@ -232,9 +232,9 @@ class DataRecognitionPage(DataPage):
         # self.photo = img
 
     def confirm(self, controller):
-        user = Recognition.recognize()
+        user,index = Recognition.recognize()
         print(user)
-        list(controller.frames.values())[6].update_data(user["User"], user["Codice Fiscale"],
+        list(controller.frames.values())[6].update_data(index, user["User"], user["Codice Fiscale"],
                                                         user["Delegati"], user["Farmaci"], user["Data"], self.panel.image)
         controller.show_frame(UserPage)
 
@@ -266,13 +266,12 @@ class UserPage(DataPage):
         medicineLabel = tk.Label(self, text="FARMACI:")
         medicineLabel.pack()
 
-    def update_data(self, name, cf, delegates, medicines, date, photo):
+    def update_data(self, index, name, cf, delegates, medicines, last_date, photo):
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.name.config(text="NOME: " + name)
         print(photo)
         self.panel.config(image=photo)
         self.panel.image = photo
-        # self.photo = photo
         delegates = ast.literal_eval(delegates)
         for i, label in enumerate(self.delegatesLabels):
             if i < len(delegates):
@@ -284,14 +283,29 @@ class UserPage(DataPage):
             label = tk.Label(self, text=medicine)
             label.pack()
         tk.Label(self, text="FARMACI PRELEVATI:").pack()
-        self.obtainable_medicines(date)
+        self.obtainable_medicines(last_date, medicines)
+        csv = pd.read_csv("dataset_user.csv", index_col=[0])
+        csv.iloc[index]["Data"] = date.today().strftime("%d/%m/%Y")
+        csv.to_csv('dataset_user.csv')
 
-    def obtainable_medicines(self,d: str):
+    def obtainable_medicines(self,d: str, medicines):
         dmy = d.split("/")
         last_date = date(int(dmy[2]),int(dmy[1]),int(dmy[0]))
         today = date.today()
         days = (today - last_date).days
         print(days)
+        medicine_dataset = pd.read_csv("dataset_medicine.csv")
+        for row in medicine_dataset.iterrows():
+            for medicine in medicines:
+                s = medicine.split(":")
+                name = s[0]
+                dose = s[1]
+                if row[1]["Nome"] == name and row[1]["Dosaggio"] == dose:
+                    n = row[1]["Numero Pasticche"]
+                    dose_x_day = row[1]["Dose x giorno"]
+                    box = int(days / n) * dose_x_day
+                    tk.Label(self, text=medicine+" x "+str(box)).pack()
+
 
 def check_input(controller, cf, labelError, op, name=None):
     if len(cf) != 16 or cf == messageCF or (name is not None and name == messageN):
