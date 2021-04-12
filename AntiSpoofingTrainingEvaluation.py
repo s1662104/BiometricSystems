@@ -3,13 +3,14 @@ from typing import Any, Union
 
 import matplotlib
 import seaborn as sns
+import sklearn
 
 import Antispoofing
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve, auc, roc_auc_score
+from sklearn.metrics import roc_curve, auc, roc_auc_score, det_curve
 from mlxtend.plotting import plot_decision_regions
 from matplotlib import pyplot as plt
 from sklearn.preprocessing import label_binarize
@@ -182,14 +183,18 @@ def calculate_FAR_FRR(y_test,y_test_score):
 
 
 
-def plot_det_curve(y_true,y_score):
-    FPR, FNR, t = roc_curve(y_true, y_score)
-    print("FPR",FPR)
-    print("FNR",FNR)
+
+
+#Depicts FRR vs FAR, plotted in log form
+def plot_det_curve(y_test,y_test_score):
+    FAR, FRR, t = det_curve(y_test, y_test_score)
+    print("FAR",FAR)
+    print("FRR",FRR)
     print(t)
-    axis_min = min(FPR[0], FNR[-1])
+
+    axis_min = min(FAR[0], FRR[-1])
     fig, ax = plt.subplots()
-    plt.plot(FPR, FNR)
+    plt.plot(FAR, FRR)
     plt.yscale('log')
     plt.xscale('log')
     ticks_to_use = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50]
