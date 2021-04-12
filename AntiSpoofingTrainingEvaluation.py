@@ -2,6 +2,7 @@ import csv
 from typing import Any, Union
 
 import matplotlib
+import seaborn as sns
 
 import Antispoofing
 import matplotlib.pyplot as plt
@@ -11,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, auc, roc_auc_score
 from mlxtend.plotting import plot_decision_regions
 from matplotlib import pyplot as plt
+from sklearn.preprocessing import label_binarize
 import numpy as np
 import os
 
@@ -43,7 +45,30 @@ class ModelSVM:
 
 ###FUNZIONE TEMPORANEA
 
+def true_false_positive(threshold_vector, y_test):
+    true_positive = np.equal(threshold_vector, 1) & np.equal(y_test, 1)
+    true_negative = np.equal(threshold_vector, 0) & np.equal(y_test, 0)
+    false_positive = np.equal(threshold_vector, 1) & np.equal(y_test, 0)
+    false_negative = np.equal(threshold_vector, 0) & np.equal(y_test, 1)
+
+    tpr = true_positive.sum() / (true_positive.sum() + false_negative.sum())
+    fpr = false_positive.sum() / (false_positive.sum() + true_negative.sum())
+
+    return tpr, fpr
+def roc_from_scratch(y_test_score, y_test, partitions=100):
+    roc = np.array([])
+    for i in range(partitions + 1):
+        threshold_vector = np.greater_equal(y_test_score, i / partitions).astype(int)
+        tpr, fpr = true_false_positive(threshold_vector, y_test)
+        roc = np.append(roc, [fpr, tpr])
+
+    return roc.reshape(-1, 2)
+
+
 def plot_roc_curve(y_test, y_test_score):
+
+
+
         FPR, TPR, t = roc_curve(y_test, y_test_score)
         print(FPR)
         print()
@@ -62,6 +87,10 @@ def plot_roc_curve(y_test, y_test_score):
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
         plt.show()
+        sns.set()
+
+
+
 
 
 
@@ -124,9 +153,9 @@ def plot_FAR_FRR_ERR(FAR,FRR,threshold):
 
     plt.show()
 
-def calculate_FAR_FRR_ERR(y_test,y_test_score):
-    FAR =[]
-    FRR =[]
+def calculate_FAR_FRR(y_test,y_test_score):
+    # FAR =[]
+    # FRR =[]
     FA = 0
     FR = 0
     num_fake = 0
@@ -141,14 +170,14 @@ def calculate_FAR_FRR_ERR(y_test,y_test_score):
         if y_test[i] == 1: ##Utente Real
             if y_test[i] != y_test_score[i]:
                 FR+=1
-                FRR.append(FR / num_real)
+                # FRR.append(FR / num_real)
         if y_test[i] == 0:
             if y_test[i] != y_test_score[i]:
                 FA += 1
-                FAR.append(FA / num_fake)
+                # FAR.append(FA / num_fake)
 
-    FAR = sorted(FAR)
-    FRR = sorted(FRR, reverse = True)
+    FAR = FA / num_fake
+    FRR = FR / num_real
     return FAR, FRR
 
 

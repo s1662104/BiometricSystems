@@ -137,7 +137,7 @@ def main():
     # #print(y_test_score)
     # print("Fake",accuracy_score(y_test, y_test_score))
     #FRR,FAR,_ = evaluation.licit_scenario(y_test,y_test_score)
-    FAR, FRR = evaluation.calculate_FAR_FRR_ERR(y_test, y_test_score)
+    FAR, FRR = evaluation.calculate_FAR_FRR(y_test, y_test_score)
     print("FAR",FAR)
     print("FRR",FRR)
     evaluation.plot_det_curve(y_test, y_test_score)
