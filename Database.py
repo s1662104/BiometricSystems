@@ -66,6 +66,7 @@ class Database():
         self.family_number = 2
         # Se si specifica un indice, carica l'intero DB, lo splitta e salva i singoli database (gallery, probe)
         if self.db_index is not None:
+            print("CREATING NEW DB")
             data, target = self.load_db()
             cfs = self.defineCFlist(target)
             self.gallery_data, self.gallery_target, self.pn_data, self.pn_target, self.pg_data, self.pg_target = \
@@ -78,6 +79,7 @@ class Database():
             np.save("npy_db/pg_data.npy", self.pg_data)
             np.save("npy_db/pg_target.npy", self.pg_target)
         else:
+            print("LOADING NEW DB")
             self.gallery_data = np.load("npy_db/gallery_data.npy")
             self.gallery_target = np.load("npy_db/gallery_target.npy")
             self.pn_data = np.load("npy_db/pn_data.npy")

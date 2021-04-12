@@ -19,10 +19,14 @@ choice2 = "Riconoscimento"
 messageWelcome = "Benvenuto\n Che operazione desideri svolgere?"
 numberMedicines = "Quanti farmaci assumi?"
 numberDelegate = "A chi vuoi delegare il prelievo di farmaci?"
+enrollmentCompleted = "REGISTRAZIONE COMPLETATA!"
+recognitionRejected = "UTENTE NON RICONOSCIUTO"
 
 dim_image = 64
 number_maximum_delegate = 3
 
+
+# TODO: RESET ENROLLMENT PAGE E RECOGNITION PAGE AFTER HOME
 
 class Page(tk.Tk):
 
@@ -35,14 +39,14 @@ class Page(tk.Tk):
         self.frames = {}
 
         for F in (StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage,
-                  EnrollmentCompleted, UserPage):
+                  InformationPage, UserPage):
             frame = F(container, self)
 
             self.frames[F] = frame
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(DataRecognitionPage)
+        self.show_frame(StartPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -110,8 +114,8 @@ class DataPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        photo = np.ones((64, 64)) * 150
-        img = ImageTk.PhotoImage(image=Image.fromarray(photo))
+        self.photo = np.ones((64, 64)) * 150
+        img = ImageTk.PhotoImage(image=Image.fromarray(self.photo))
         self.panel = tk.Label(self, image=img)
         self.panel.image = img
         self.panel.pack(pady=10, padx=10)
@@ -147,17 +151,17 @@ class DataEnrollmentPage(DataPage):
         button.pack()
 
         tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
-                  command=lambda: self.confirm()).place(y=520, x=220)
+                  command=lambda: self.confirm(controller)).place(y=520, x=220)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
 
-    def update_data(self, cf, img, name=None):
+    def update_data(self, cf, img, photo, name=None):
         self.name.config(text="NOME: " + name)
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
-        self.photo = img
+        self.photo = photo
 
     def addMedicines(self, nMedicine):
         if not nMedicine.isdigit():
@@ -182,7 +186,7 @@ class DataEnrollmentPage(DataPage):
     def back(self, controller):
         controller.show_frame(EnrollmentPage)
 
-    def confirm(self):
+    def confirm(self, controller):
         medicineError = False
         if len(self.medicineEntry) == 0:
             medicineError = True
@@ -209,8 +213,9 @@ class DataEnrollmentPage(DataPage):
                 medicines = []
                 for medicine in self.medicineEntry:
                     medicines.append(medicine.get())
-                print(delegates)
                 addUser(self.photo, self.cf.cget("text"), self.name.cget("text"), medicines, delegates)
+                list(controller.frames.values())[5].update_data(enrollmentCompleted)
+                controller.show_frame(InformationPage)
 
 
 class DataRecognitionPage(DataPage):
@@ -225,31 +230,39 @@ class DataRecognitionPage(DataPage):
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
 
-    def update_data(self, cf, img, name=None):
+    def update_data(self, cf, img, photo, name=None):
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
-        # self.photo = img
+        self.photo = photo
 
     def confirm(self, controller):
-        user,index = Recognition.recognize()
+        user, index = Recognition.recognize()
         print(user)
-        list(controller.frames.values())[6].update_data(index, user["User"], user["Codice Fiscale"],
-                                                        user["Delegati"], user["Farmaci"], user["Data"], self.panel.image)
-        controller.show_frame(UserPage)
+        if user is not None:
+            list(controller.frames.values())[6].update_data(index, user["User"], user["Codice Fiscale"],
+                                                            user["Delegati"], user["Farmaci"], user["Data"],
+                                                            self.panel.image)
+            controller.show_frame(UserPage)
+        else:
+            list(controller.frames.values())[5].update_data(recognitionRejected)
+            controller.show_frame(InformationPage)
 
     def back(self, controller):
         controller.show_frame(RecognitionPage)
 
 
-class EnrollmentCompleted(tk.Frame):
+class InformationPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="REGISTRAZIONE COMPLETATA!")
-        label.pack(pady=200)
+        self.label = tk.Label(self, text="")
+        self.label.pack(pady=200)
 
         tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
                   command=lambda: controller.show_frame(StartPage)).place(y=520, x=110)
+
+    def update_data(self, info):
+        self.label.config(text=info)
 
 
 class UserPage(DataPage):
@@ -265,6 +278,9 @@ class UserPage(DataPage):
             self.delegatesLabels.append(delegate)
         medicineLabel = tk.Label(self, text="FARMACI:")
         medicineLabel.pack()
+
+        tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
+                  command=lambda: controller.show_frame(StartPage)).place(y=520, x=110)
 
     def update_data(self, index, name, cf, delegates, medicines, last_date, photo):
         self.cf.config(text="CODICE FISCALE: " + cf)
@@ -288,9 +304,9 @@ class UserPage(DataPage):
         csv.iloc[index]["Data"] = date.today().strftime("%d/%m/%Y")
         csv.to_csv('dataset_user.csv')
 
-    def obtainable_medicines(self,d: str, medicines):
+    def obtainable_medicines(self, d: str, medicines):
         dmy = d.split("/")
-        last_date = date(int(dmy[2]),int(dmy[1]),int(dmy[0]))
+        last_date = date(int(dmy[2]), int(dmy[1]), int(dmy[0]))
         today = date.today()
         days = (today - last_date).days
         print(days)
@@ -301,16 +317,16 @@ class UserPage(DataPage):
                 name = ""
                 print(s)
                 for i, val in enumerate(s):
-                    if i < len(s)-2:
+                    if i < len(s) - 2:
                         name += s[i]
                 print(name)
-                dose = s[len(s)-2] + " " + s[len(s)-1]
+                dose = s[len(s) - 2] + " " + s[len(s) - 1]
                 print(dose)
                 if row[1]["Nome"] == name and row[1]["Dosaggio"] == dose:
                     n = row[1]["Numero Pasticche"]
                     dose_x_day = row[1]["Dose x giorno"]
                     box = int(days / n) * dose_x_day
-                    tk.Label(self, text=medicine+" x "+str(box)).pack()
+                    tk.Label(self, text=medicine + " x " + str(box)).pack()
 
 
 def check_input(controller, cf, labelError, op, name=None):
@@ -324,7 +340,7 @@ def check_input(controller, cf, labelError, op, name=None):
         n = 3
     else:
         n = 4
-    list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), name)
+    list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop, name)
     if op == 0:
         controller.show_frame(DataEnrollmentPage)
     else:
@@ -352,9 +368,13 @@ def addUser(photo, cf, name, medicines, delegates):
     print(cf, gallery_target[len(gallery_target) - 1])
     medicine_csv = medicine_csv.append(
         {"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates}, ignore_index=True)
-    np.save("npy_db/gallery_data.npy", gallery_data)
-    np.save("npy_db/gallery_target.npy", gallery_target)
+    np.save("npy_db/gallery_data.npy", np.array(gallery_data))
+    np.save("npy_db/gallery_target.npy", np.array(gallery_target))
     medicine_csv.to_csv('dataset_user.csv')
+
+def reset_pages():
+    pass
+
 
 def videoCapture():
     cap = cv2.VideoCapture(0)
