@@ -97,31 +97,7 @@ def plot_roc_curve(y_test, y_test_score):
 
 def licit_scenario(y_test,y_test_score):
 
-        FPR, TPR, t = roc_curve(y_test, y_test_score)
-        ###EER Parte
-        # fpr, tpr, threshold = roc_curve(y_train, y_pred, pos_label=1)
-        fnr = 1 - TPR
-        # eer_threshold = t[np.nanargmin(np.absolute((fnr - FPR)))]
-        #
-        # print("EER_THRESHOLD: ", eer_threshold)
-        #
-        # EER = FPR[np.nanargmin(np.absolute((fnr - FPR)))]
-        #
-        # print("EER:", EER)
-        #
-        # EER = fnr[np.nanargmin(np.absolute((fnr - FPR2)))]
-        #
-        # print("EER: ", EER)
-
-        ### FAR + FRR + HTER
-
-        # print("#### LICIT SCENARIO ####")
-        # FRR = FN / (TP + FN) = 1 - TPR
-        # FAR = FP / (FP + TN) = FPR
-        FRR = 1 - TPR
-        FAR = FPR
-        # print("FRR: ",FRR)
-        # print("FAR: ", FAR)
+        FAR , FRR = calculate_FAR_FRR(y_test,y_test_score)
 
         HTER = ((FAR + FRR) / 2)
 
@@ -130,15 +106,15 @@ def licit_scenario(y_test,y_test_score):
 
 def spoofing_scenario(y_test,y_test_score):
 
-        FPR, TPR, t = roc_curve(y_test, y_test_score)
-        fnr = 1 - TPR
-        FRR = 1 - TPR
-        SFAR = FPR
+        FAR, FRR = calculate_FAR_FRR(y_test,y_test_score)
+
+        SFAR = FAR
 
 
         return FRR,SFAR
 
 
+#ToDo Rimuoverei questa funzione:
 def plot_FAR_FRR_ERR(FAR,FRR,threshold):
     fig, ax = plt.subplots()
 
