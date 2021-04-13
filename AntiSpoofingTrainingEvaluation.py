@@ -75,7 +75,7 @@ def plot_roc_curve(y_test, y_test_score):
         print()
         print(TPR)
         print()
-        print(t)
+        print("TH:",t)
         auc = roc_auc_score(y_test,y_test_score)
 
         # Plot ROC curve
@@ -89,10 +89,6 @@ def plot_roc_curve(y_test, y_test_score):
         plt.legend(loc="lower right")
         plt.show()
         sns.set()
-
-
-
-
 
 
 def licit_scenario(y_test,y_test_score):
@@ -166,17 +162,28 @@ def plot_det_curve(y_test,y_test_score):
     FAR, FRR, t = det_curve(y_test, y_test_score)
     print("FAR",FAR)
     print("FRR",FRR)
-    print(t)
+    print("TH:",t)
+    #
+    # axis_min = min(FAR[0], FRR[-1])
+    # fig, ax = plt.subplots()
+    # plt.plot(FAR, FRR)
+    # plt.yscale('log')
+    # plt.xscale('log')
+    # ticks_to_use = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50]
+    # ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    # ax.get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    # ax.set_xticks(ticks_to_use)
+    # ax.set_yticks(ticks_to_use)
+    # plt.axis([0.001, 50, 0.001, 50])
+    # plt.show()
 
-    axis_min = min(FAR[0], FRR[-1])
-    fig, ax = plt.subplots()
-    plt.plot(FAR, FRR)
-    plt.yscale('log')
-    plt.xscale('log')
-    ticks_to_use = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50]
-    ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    ax.get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    ax.set_xticks(ticks_to_use)
-    ax.set_yticks(ticks_to_use)
-    plt.axis([0.001, 50, 0.001, 50])
+    plt.plot(FAR, FRR, label='DET curve')
+    plt.plot([0, 1], [0, 1], 'k--')  # random predictions curve
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.0])
+    plt.xlabel('False Acceptance Rate')
+    plt.ylabel('False Rejection Rate')
+    plt.title('Detection Error Tradeoff ')
+    plt.legend(loc="lower right")
     plt.show()
+    sns.set()

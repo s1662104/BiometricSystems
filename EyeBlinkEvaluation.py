@@ -116,7 +116,7 @@ class EyeBlinkEvaluation:
 
 
 def main():
-    EyeBlinkEvaluation().createDataSetEyeBlink(False, False)
+    #EyeBlinkEvaluation().createDataSetEyeBlink(False, False)
     data = pd.read_csv("eyeblink.csv", sep=';', header=None)
     y_test, y_test_score = data.iloc[:, 1], data.iloc[:, -1]
     print("###y_test###")
@@ -142,6 +142,7 @@ def main():
     print("FRR", FRR)
     print("##############")
 
+    print("ROC CURVE:")
     evaluation.plot_roc_curve(y_test, y_test_score)
     # ##Parte solo real
     # y_test = data.iloc[0:897, 1]
@@ -158,6 +159,7 @@ def main():
     # print("Fake",accuracy_score(y_test, y_test_score))
     #FRR,FAR,_ = evaluation.licit_scenario(y_test,y_test_score)
 
+    print("DET CURVE")
     evaluation.plot_det_curve(y_test, y_test_score)
     # _,_,threshold = roc_curve(y_test,y_test_score)
     # evaluation.plot_FAR_FRR_ERR(FAR,FRR,threshold)
