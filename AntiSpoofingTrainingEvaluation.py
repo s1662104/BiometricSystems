@@ -101,10 +101,16 @@ def licit_scenario(y_test,y_test_score):
 
 
 def spoofing_scenario(y_test,y_test_score):
-
+        num_fake = 0
+        count = 0
         FAR, FRR = calculate_FAR_FRR(y_test,y_test_score)
 
-        SFAR = FAR
+        for i in range(len(y_test)):
+            if y_test[i] == 0:
+                num_fake += 1
+                if y_test[i] != y_test_score[i]:
+                    count+=1
+        SFAR = count / num_fake
 
 
         return FRR,SFAR
