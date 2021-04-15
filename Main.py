@@ -59,11 +59,19 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text=messageWelcome)
         label.pack(pady=10, padx=50)
         button1 = tk.Button(self, text=choice1, width=15, height=2, bg='#1E79FA',
-                            command=lambda: controller.show_frame(EnrollmentPage))
+                            command=lambda: goToEnroll())
         button2 = tk.Button(self, text=choice2, width=15, height=2, bg='#1E79FA',
-                            command=lambda: controller.show_frame(RecognitionPage))
+                            command=lambda: goToRecognize())
         button1.pack()
         button2.pack(pady=1)
+
+        def goToEnroll():
+            list(controller.frames.values())[1].reset()
+            controller.show_frame(EnrollmentPage)
+
+        def goToRecognize():
+            list(controller.frames.values())[2].reset()
+            controller.show_frame(RecognitionPage)
 
 
 class EnrollmentPage(tk.Frame):
@@ -72,23 +80,32 @@ class EnrollmentPage(tk.Frame):
         label = tk.Label(self, text=choice1)
         label.pack(pady=10, padx=10)
 
-        entryCF = tk.Entry(self)
-        entryCF.insert(1, messageCF)
-        entryCF.pack(pady=2)
-        entryName = tk.Entry(self)
-        entryName.insert(1, messageN)
-        entryName.pack(pady=2)
-        button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: check_input(controller, entryCF.get(), labelError, 0, entryName.get()))
-        button2.pack()
-
+        # self.entryCF = tk.Entry(self)
+        # self.entryCF.insert(1, messageCF)
+        # self.entryCF.pack(pady=2)
+        # self.entryName = tk.Entry(self)
+        # self.entryName.insert(1, messageN)
+        # self.entryName.pack(pady=2)
+        # button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+        #                     command=lambda: check_input(controller, self.entryCF.get(), labelError, 0,
+        #                                                 self.entryName.get()))
+        # button2.pack()
+        #
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, entryCF, labelError, entryName)).pack(side="bottom", pady=240,
-                                                                                         padx=2)
+                  command=lambda: back(controller, self.entryCF, labelError, self.entryName)).pack(side="bottom",
+                                                                                                   pady=240,
+                                                                                                   padx=2)
 
+    def reset(self):
+        # self.entryCF.delete(0, tk.END)
+        # self.entryCF.insert(0, messageCF)
+        # self.entryName.delete(0, tk.END)
+
+        # self.entryName.insert(0, messageN)
+        pass
 
 class RecognitionPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -96,18 +113,22 @@ class RecognitionPage(tk.Frame):
         label = tk.Label(self, text=choice2)
         label.pack(pady=10, padx=10)
 
-        entryCF = tk.Entry(self)
-        entryCF.insert(1, messageCF)
-        entryCF.pack(padx=0, pady=0)
+        self.entryCF = tk.Entry(self)
+        self.entryCF.insert(1, messageCF)
+        self.entryCF.pack(padx=0, pady=0)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: check_input(controller, entryCF.get(), labelError, 1))
+                            command=lambda: check_input(controller, self.entryCF.get(), labelError, 1))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, entryCF, labelError)).place(y=520, x=2)
+                  command=lambda: back(controller, self.entryCF, labelError)).place(y=520, x=2)
+
+    def reset(self):
+        self.entryCF.delete(0, tk.END)
+        self.entryCF.insert(0, messageCF)
 
 
 class DataPage(tk.Frame):
@@ -143,11 +164,11 @@ class DataEnrollmentPage(DataPage):
         self.medicineEntry = []
         labelNMedicine = tk.Label(self, text=numberMedicines)
         labelNMedicine.pack()
-        entryNMedicine = tk.Entry(self)
-        entryNMedicine.insert(1, "")
-        entryNMedicine.pack(padx=0, pady=0)
+        self.entryNMedicine = tk.Entry(self)
+        self.entryNMedicine.insert(1, "")
+        self.entryNMedicine.pack(padx=0, pady=0)
         button = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                           command=lambda: self.addMedicines(entryNMedicine.get()))
+                           command=lambda: self.addMedicines(self.entryNMedicine.get()))
         button.pack()
 
         tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
@@ -155,6 +176,14 @@ class DataEnrollmentPage(DataPage):
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
+
+    def reset(self):
+        self.entryNMedicine.delete(0, tk.END)
+        self.entryNMedicine.insert(0, "")
+        self.addMedicines("0")
+        for i in range(number_maximum_delegate):
+            self.delegateEntry[i].delete(0, tk.END)
+            self.delegateEntry[i].insert(0, "")
 
     def update_data(self, cf, img, photo, name=None):
         self.name.config(text="NOME: " + name)
@@ -230,6 +259,9 @@ class DataRecognitionPage(DataPage):
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
 
+    def reset(self):
+        pass
+
     def update_data(self, cf, img, photo, name=None):
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
@@ -240,6 +272,7 @@ class DataRecognitionPage(DataPage):
         user, index = Recognition.recognize()
         print(user)
         if user is not None:
+            list(controller.frames.values())[6].reset()
             list(controller.frames.values())[6].update_data(index, user["User"], user["Codice Fiscale"],
                                                             user["Delegati"], user["Farmaci"], user["Data"],
                                                             self.panel.image)
@@ -279,13 +312,20 @@ class UserPage(DataPage):
         medicineLabel = tk.Label(self, text="FARMACI:")
         medicineLabel.pack()
 
+        self.entries = []
+
         tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
                   command=lambda: controller.show_frame(StartPage)).place(y=520, x=110)
+
+    def reset(self):
+        for i, label in enumerate(self.delegatesLabels):
+            self.delegatesLabels[i].config(text="-")
+        for entry in self.entries:
+            entry.destroy()
 
     def update_data(self, index, name, cf, delegates, medicines, last_date, photo):
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.name.config(text="NOME: " + name)
-        print(photo)
         self.panel.config(image=photo)
         self.panel.image = photo
         delegates = ast.literal_eval(delegates)
@@ -298,6 +338,7 @@ class UserPage(DataPage):
         for medicine in medicines:
             label = tk.Label(self, text=medicine)
             label.pack()
+            self.entries.append(label)
         tk.Label(self, text="FARMACI PRELEVATI:").pack()
         self.obtainable_medicines(last_date, medicines)
         csv = pd.read_csv("dataset_user.csv", index_col=[0])
@@ -309,24 +350,22 @@ class UserPage(DataPage):
         last_date = date(int(dmy[2]), int(dmy[1]), int(dmy[0]))
         today = date.today()
         days = (today - last_date).days
-        print(days)
         medicine_dataset = pd.read_csv("dataset_medicine.csv")
         for row in medicine_dataset.iterrows():
             for medicine in medicines:
                 s = medicine.split(" ")
                 name = ""
-                print(s)
                 for i, val in enumerate(s):
                     if i < len(s) - 2:
                         name += s[i]
-                print(name)
                 dose = s[len(s) - 2] + " " + s[len(s) - 1]
-                print(dose)
                 if row[1]["Nome"] == name and row[1]["Dosaggio"] == dose:
                     n = row[1]["Numero Pasticche"]
                     dose_x_day = row[1]["Dose x giorno"]
                     box = int(days / n) * dose_x_day
-                    tk.Label(self, text=medicine + " x " + str(box)).pack()
+                    label = tk.Label(self, text=medicine + " x " + str(box))
+                    label.pack()
+                    self.entries.append(label)
 
 
 def check_input(controller, cf, labelError, op, name=None):
@@ -340,6 +379,7 @@ def check_input(controller, cf, labelError, op, name=None):
         n = 3
     else:
         n = 4
+    list(controller.frames.values())[n].reset()
     list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop, name)
     if op == 0:
         controller.show_frame(DataEnrollmentPage)
@@ -371,6 +411,7 @@ def addUser(photo, cf, name, medicines, delegates):
     np.save("npy_db/gallery_data.npy", np.array(gallery_data))
     np.save("npy_db/gallery_target.npy", np.array(gallery_target))
     medicine_csv.to_csv('dataset_user.csv')
+
 
 def reset_pages():
     pass
