@@ -25,9 +25,6 @@ recognitionRejected = "UTENTE NON RICONOSCIUTO"
 dim_image = 64
 number_maximum_delegate = 3
 
-
-# TODO: RESET ENROLLMENT PAGE E RECOGNITION PAGE AFTER HOME
-
 class Page(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -101,12 +98,10 @@ class EnrollmentPage(tk.Frame):
                   command=lambda: back(controller, self.entryCF, labelError, self.entryName)).pack(side="left",pady=300)
 
     def reset(self):
-        # self.entryCF.delete(0, tk.END)
-        # self.entryCF.insert(0, messageCF)
-        # self.entryName.delete(0, tk.END)
-
-        # self.entryName.insert(0, messageN)
-        pass
+        self.entryCF.delete(0, tk.END)
+        self.entryCF.insert(0, messageCF)
+        self.entryName.delete(0, tk.END)
+        self.entryName.insert(0, messageN)
 
 class RecognitionPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -340,7 +335,9 @@ class UserPage(DataPage):
             label = tk.Label(self, text=medicine)
             label.pack()
             self.entries.append(label)
-        tk.Label(self, text="FARMACI PRELEVATI:").pack()
+        label = tk.Label(self, text="FARMACI PRELEVATI:")
+        label.pack()
+        self.entries.append(label)
         self.obtainable_medicines(last_date, medicines)
         csv = pd.read_csv("dataset_user.csv", index_col=[0])
         csv.iloc[index]["Data"] = date.today().strftime("%d/%m/%Y")
