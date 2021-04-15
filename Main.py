@@ -46,7 +46,7 @@ class Page(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(StartPage)
+        self.show_frame(EnrollmentPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -80,24 +80,25 @@ class EnrollmentPage(tk.Frame):
         label = tk.Label(self, text=choice1)
         label.pack(pady=10, padx=10)
 
-        # self.entryCF = tk.Entry(self)
-        # self.entryCF.insert(1, messageCF)
-        # self.entryCF.pack(pady=2)
-        # self.entryName = tk.Entry(self)
-        # self.entryName.insert(1, messageN)
-        # self.entryName.pack(pady=2)
-        # button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-        #                     command=lambda: check_input(controller, self.entryCF.get(), labelError, 0,
-        #                                                 self.entryName.get()))
-        # button2.pack()
-        #
+        self.entryCF = tk.Entry(self)
+        self.entryCF.insert(1, messageCF)
+        self.entryCF.pack(pady=2)
+        self.entryName = tk.Entry(self)
+        self.entryName.insert(1, messageN)
+        self.entryName.pack(pady=2)
+        button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+                            command=lambda: check_input(controller, self.entryCF.get(), labelError, 0,
+                                                        self.entryName.get()))
+        button2.pack()
+
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
+        # tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+        #           command=lambda: back(controller, self.entryCF, labelError, self.entryName)).place(y=400,x=2)
+
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, self.entryCF, labelError, self.entryName)).pack(side="bottom",
-                                                                                                   pady=240,
-                                                                                                   padx=2)
+                  command=lambda: back(controller, self.entryCF, labelError, self.entryName)).pack(side="left",pady=300)
 
     def reset(self):
         # self.entryCF.delete(0, tk.END)
@@ -124,7 +125,7 @@ class RecognitionPage(tk.Frame):
         labelError.pack(pady=10, padx=10)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, self.entryCF, labelError)).place(y=520, x=2)
+                  command=lambda: back(controller, self.entryCF, labelError)).pack(side="left",pady=385)
 
     def reset(self):
         self.entryCF.delete(0, tk.END)
