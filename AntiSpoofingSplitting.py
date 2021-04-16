@@ -165,80 +165,82 @@ def count_print_row(filecsv):
     #                       res=0.02, legend=2)
     # plt.show()
 
+def main():
+    root_dir = 'Data'
+    fill_csv_real = False
+    fill_csv_fake = False
 
-root_dir = 'Data'
-fill_csv_real = False
-fill_csv_fake = False
+    try:
+        os.makedirs(root_dir+'/hist_real')
+    except:
+        print("La directory seguente è già stata creata: "+root_dir+"/hist_real")
+    try:
+        os.makedirs(root_dir+'/hist_fake')
+    except:
+        print("La directory seguente è già stata creata: " + root_dir + "/hist_fake")
 
-try:
-    os.makedirs(root_dir+'/hist_real')
-except:
-    print("La directory seguente è già stata creata: "+root_dir+"/hist_real")
-try:
-    os.makedirs(root_dir+'/hist_fake')
-except:
-    print("La directory seguente è già stata creata: " + root_dir + "/hist_fake")
+    current_real = '/Real'
+    current_fake = '/Fake'
 
-current_real = '/Real'
-current_fake = '/Fake'
+    # Qui andiamo ad inserire histogram in csv per ogni immagine Real
+    if fill_csv_real == True:
+        src_real = "Data" + current_real
 
-# Qui andiamo ad inserire histogram in csv per ogni immagine Real
-if fill_csv_real == True:
-    src_real = "Data" + current_real
-
-    allFileNames = os.listdir(src_real)
-
-
-    filesName = np.array(allFileNames)
-
-    filesName = [src_real + '/' + name for name in filesName.tolist()]
-
-    for name in filesName:
-        hist_real = convert_image_to_hist(name)
-        #print(len(hist_real))
-        writeCsv(hist_real, 0)
+        allFileNames = os.listdir(src_real)
 
 
+        filesName = np.array(allFileNames)
 
-    #shutil.copy(name, "Data/hist_real/")
+        filesName = [src_real + '/' + name for name in filesName.tolist()]
 
-# Qui andiamo ad inserire histogram in csv per ogni immagine Fake
-if fill_csv_fake == True:
-    src_fake = "Data" + current_fake
-
-    allFileNames = os.listdir(src_fake)
-
-
-    filesName = np.array(allFileNames)
-
-    filesName = [src_fake + '/' + name for name in filesName.tolist()]
-
-    for name in filesName:
-         hist_real = convert_image_to_hist(name)
-         writeCsv(hist_real, 1)
+        for name in filesName:
+            hist_real = convert_image_to_hist(name)
+            #print(len(hist_real))
+            writeCsv(hist_real, 0)
 
 
-#count_print_row('histogram.csv')
-X_train, X_test, y_train, y_test = splitting_train_test('histogram.csv')
-svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test, y_test).train_svm()
-print ("Y_test_pred")
-print (y_test_score)
-print ("Y_test")
-print (y_test)
-print ("X_train")
-print (X_train)
-print ("X_train_score")
 
-AntiSpoofingTrainingEvaluation.plot_roc_curve(y_test, y_test_score)
-FRR,SFAR=AntiSpoofingTrainingEvaluation.spoofing_scenario(y_test,y_test_score)
-print("Spoofing Scenario")
-print("FRR: ", FRR)
-print("SFAR: ", SFAR)
-FRR, FAR , HTER = AntiSpoofingTrainingEvaluation.licit_scenario(y_test,y_test_score)
-print("Licit Scenario:")
-print("FRR: ", FRR)
-print("FAR: ", FAR)
-print("HTER: ", HTER)
+        #shutil.copy(name, "Data/hist_real/")
+
+    # Qui andiamo ad inserire histogram in csv per ogni immagine Fake
+    if fill_csv_fake == True:
+        src_fake = "Data" + current_fake
+
+        allFileNames = os.listdir(src_fake)
+
+
+        filesName = np.array(allFileNames)
+
+        filesName = [src_fake + '/' + name for name in filesName.tolist()]
+
+        for name in filesName:
+             hist_real = convert_image_to_hist(name)
+             writeCsv(hist_real, 1)
+
+
+    #count_print_row('histogram.csv')
+    X_train, X_test, y_train, y_test = splitting_train_test('histogram.csv')
+    svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test, y_test).train_svm()
+    print ("Y_test_pred")
+    print (y_test_score)
+    print ("Y_test")
+    print (y_test)
+    print ("X_train")
+    print (X_train)
+    print ("X_train_score")
+
+    AntiSpoofingTrainingEvaluation.plot_roc_curve(y_test, y_test_score)
+    FRR,SFAR=AntiSpoofingTrainingEvaluation.spoofing_scenario(y_test,y_test_score)
+    print("Spoofing Scenario")
+    print("FRR: ", FRR)
+    print("SFAR: ", SFAR)
+    FRR, FAR , HTER = AntiSpoofingTrainingEvaluation.licit_scenario(y_test,y_test_score)
+    print("Licit Scenario:")
+    print("FRR: ", FRR)
+    print("FAR: ", FAR)
+    print("HTER: ", HTER)
+
+    return svm
 
 
 
@@ -323,7 +325,8 @@ def splitting():
         shutil.copy(name, "Data/test_fake/")
 
 
-
+if __name__ == '__main__':
+    main()
 
 
 

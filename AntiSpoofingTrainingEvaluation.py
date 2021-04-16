@@ -139,6 +139,10 @@ def calculate_FAR_FRR(y_test,y_test_score):
     FR = 0
     num_fake = 0
     num_real = 0
+    print("y_test")
+    print(y_test)
+    print("y_test_score")
+    print(y_test_score)
     for i in range(len(y_test)):
         if y_test[i] == 0:
             num_fake+=1
@@ -147,7 +151,7 @@ def calculate_FAR_FRR(y_test,y_test_score):
 
     for i in range(len(y_test)):
         if y_test[i] == 1: ##Utente Real
-            if y_test[i] != y_test_score[i]:
+            if y_test.iloc[i] != y_test_score[i]:
                 FR+=1
                 # FRR.append(FR / num_real)
         if y_test[i] == 0:
