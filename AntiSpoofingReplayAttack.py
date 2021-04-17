@@ -68,13 +68,24 @@ def main():
         # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # detector = dlib.get_frontal_face_detector()
         # predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-            myLBP = LBP.Local_Binary_Pattern(1, 8, crop)
+            myLBP = LBP.Spoof_Local_Binary_Pattern(1, 8, crop)
 
 
         new_img = myLBP.compute_lbp()
         hist = myLBP.createHistogram(new_img)
         svm = AntiSpoofingSplitting.main()
-        print(svm.predict(hist))
+        nsamples = hist.shape
+        print("nsamples",nsamples)
+        hist = hist.reshape(1,-1)
+        print("histogram")
+        print(hist)
+        value = (svm.predict(hist))
+        print(value)
+        if value == 0:
+            print("REAL")
+        else:
+            print("FAKE")
+        return
 
         plt.figure()
         plt.title("Grayscale Histogram")

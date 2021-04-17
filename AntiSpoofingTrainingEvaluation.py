@@ -106,9 +106,9 @@ def spoofing_scenario(y_test,y_test_score):
         FAR, FRR = calculate_FAR_FRR(y_test,y_test_score)
 
         for i in range(len(y_test)):
-            if y_test[i] == 0:
+            if y_test.iloc[i] == 0:
                 num_fake += 1
-                if y_test[i] != y_test_score[i]:
+                if y_test.iloc[i] != y_test_score[i]:
                     count+=1
         SFAR = count / num_fake
 
@@ -144,18 +144,19 @@ def calculate_FAR_FRR(y_test,y_test_score):
     print("y_test_score")
     print(y_test_score)
     for i in range(len(y_test)):
-        if y_test[i] == 0:
+
+        if y_test.iloc[i] == 0:
             num_fake+=1
-        if y_test[i] == 1:
+        if y_test.iloc[i] == 1:
             num_real+=1
 
     for i in range(len(y_test)):
-        if y_test[i] == 1: ##Utente Real
+        if y_test.iloc[i] == 1: ##Utente Real
             if y_test.iloc[i] != y_test_score[i]:
                 FR+=1
                 # FRR.append(FR / num_real)
-        if y_test[i] == 0:
-            if y_test[i] != y_test_score[i]:
+        if y_test.iloc[i] == 0:
+            if y_test.iloc[i] != y_test_score[i]:
                 FA += 1
                 # FAR.append(FA / num_fake)
 
