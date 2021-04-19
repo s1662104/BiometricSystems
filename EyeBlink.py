@@ -1,3 +1,9 @@
+#######################################################
+#Qui abbiamo la classe EyeBlink il cui compito è quello
+#di rilevare se uno utente tramite video o tramite
+#webcam sta battendo le palpebre oppure no.
+#######################################################
+
 import cv2
 import imutils
 from imutils.video import FileVideoStream
@@ -23,6 +29,15 @@ class EyeBlink():
         self.inputType = inputType
 
 
+
+    #Il metodo sottostante va a prendere un frame per volta dal video
+    # (se è stato passato un input alla classe) oppure utilizza come
+    # sorgente la webcam e passa i frame ai relativi metodi "eye_blink_video"(se si tratta di un video)
+    # o "eye_blink_cam" se la sorgente è una webcam tali metodi andranno ad analizzare i singoli frame e ritornano
+    # dei parametri come l'EAR_TOP ( che è Eye_aspect_ratio più alto che si incontra durante l'analisi dei frame
+    # di uno streaming video), il conteggio di blinking e l'eventuale history se abbiamo ottenuto almeno un eyeblink
+    # ritorniamo True altrimenti continuiamo fino alla fine del video e se non è stato mai rilevato un eyeblinking
+    # torna False
 
     def eyeBlinkStart(self):
         inputType = self.inputType
@@ -150,9 +165,6 @@ class EyeBlink():
 
                 cv2.imshow("Frame", frame)
                 cv2.waitKey(1)
-                #cv2.imshow("Face", vis)
-                # if cv2.waitKey(1) & 0xFF == ord('q'):
-                #     break
 
                 # if the `q` key was pressed, break from the loop
             cap.release()
@@ -160,6 +172,7 @@ class EyeBlink():
         else:
             exit("Il valore di inputType è errato")
 
+    # Il metodo sottostante value l'eye_aspect_ratio in questo modo:
     # EAR = (||p2 - p6||+ ||p3 - p5||)/(2||p1-p4||)
     def eye_aspect_ratio(self, eye):
         A = distance.euclidean(eye[1], eye[5])
@@ -168,6 +181,7 @@ class EyeBlink():
         EAR = (A + B) / (2.0 * C)
         return EAR
 
+    #ToDo non so se lasciare questa funzione superflua
     def isBlinking(self, history, maxFrames):
         for i in range(maxFrames):
             pattern = '1' + '0' * (i + 1) + '1'
@@ -176,16 +190,16 @@ class EyeBlink():
         return False
 
     def eye_blink_cam(self, frame, rect, detector, predictor, COUNTER, TOTAL, ear_top):
-        # frame = imutils.resize(frame ,width = 640)
-        crop = None
+
+
         eyes_detect = ''
         frame = imutils.resize(frame, width=450)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         dets = detector(gray, 1)  # Detect the faces in the image
         (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
-        ear = 0
-        # history = {}
+
+
 
         for det in dets:
             shape = predictor(gray, det)
@@ -247,13 +261,13 @@ class EyeBlink():
         return eyes_detect, TOTAL, COUNTER, ear_top
 
     def eye_blink_video(self, frame, detector, predictor, COUNTER, TOTAL, ear_top):
-        crop = None
+
         eyes_detect = ''
 
         rects = detector(frame, 1)  # Detect the faces in the image
         (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
-        ear = 0
+
 
 
         for rect in rects:
@@ -275,8 +289,7 @@ class EyeBlink():
                 ear_threshold = (ear_top * 2) / 3
                 print("Ear_th", ear_threshold)
                 print("EAR TOP", ear_top)
-            # for (x, y) in shape:
-            #     cv2.circle(rect, (x, y), 1, (0, 0, 255), -1)
+
 
                 if ear < ear_threshold:
                     COUNTER += 1

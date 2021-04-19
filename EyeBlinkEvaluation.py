@@ -1,3 +1,5 @@
+#Qui viene effettuata l'evaluation di Eyeblink
+
 import csv
 import os
 from shutil import which
@@ -6,7 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, roc_curve
 
-import Antispoofing
+import EyeBlink
 
 
 import AntiSpoofingTrainingEvaluation as evaluation
@@ -16,6 +18,8 @@ class EyeBlinkEvaluation:
     def __init__(self):
         pass
 
+
+    #viene creato il file csv e scritti i valori al suo interno
     def writeEyeBlinkCsv(self, eyeblink, val):
         print(eyeblink)
         list = []
@@ -27,10 +31,11 @@ class EyeBlinkEvaluation:
             writer = csv.writer(cvsfile, delimiter=';')
             writer.writerow(list)
 
-            # cvsfile.write(str(val))
-            # cvsfile.write('\n')
+
             cvsfile.close()
 
+
+     #vengono letti i video dalle rispettive directory EyeBlink e valutati inserendo le informazioni nel csv.
     def createDataSetEyeBlink(self, real, fake):
         root_dir = 'Data/EyeBlink/'
         current_real = 'Real/'
@@ -72,7 +77,7 @@ class EyeBlinkEvaluation:
                     list.append(name)
                     list.append(1)
                     print(name)
-                    var = Antispoofing.EyeBlink(name).eyeBlinkStart()
+                    var = EyeBlink.EyeBlink(name).eyeBlinkStart()
                     if var:
                         val = 1
                     else:
@@ -89,7 +94,7 @@ class EyeBlinkEvaluation:
                 list.append(0)
                 print(name)
 
-                var = Antispoofing.EyeBlink(name).eyeBlinkStart()
+                var = EyeBlink.EyeBlink(name).eyeBlinkStart()
 
                 if var:
                     val = 1
@@ -97,6 +102,8 @@ class EyeBlinkEvaluation:
                     val = 0
 
                 self.writeEyeBlinkCsv(list, val)
+
+
 
     def readEyeBlinkCsv(self, val):
         list2 = []
@@ -106,114 +113,50 @@ class EyeBlinkEvaluation:
                 list2.append(row[val])
         return list2
 
-    def readEyeBlinkBlackCsv(self, val):
-        list2 = []
-        with open("black_eyeblink.csv", 'r') as f:
-            csv_reader = csv.reader(f, delimiter=';')
-            for row in csv_reader:
-                list2.append(row[val])
-        return list2
+
+    #qui viene effettuata l'evaluation per eyeBlink
+    def evaluation(self,nameFileCsv):
+        data = pd.read_csv(nameFileCsv, sep=';', header=None)
+        y_test, y_test_score = data.iloc[:, 1], data.iloc[:, -1]
+        print("###y_test###")
+        print(y_test)
+        print("##############")
+        print("###y_score###")
+        print(y_test_score)
+        print("##############")
+        print("###SPOOFING SCENARIO###")
+        FRR, SFAR = evaluation.spoofing_scenario(y_test, y_test_score, index=0)
+        print("FRR", FRR)
+        print("SFAR", SFAR)
+        print("##############")
+        print("###LICIT SCENARIO###")
+        FRR, FAR, HTER = evaluation.licit_scenario(y_test, y_test_score, index=0)
+        print("FAR", FAR)
+        print("FRR", FRR)
+        print("HTER", HTER)
+        print("##############")
+        print("### FAR AND FRR ###")
+        FAR, FRR = evaluation.calculate_FAR_FRR(y_test, y_test_score, index=0)
+        print("FAR", FAR)
+        print("FRR", FRR)
+        print("##############")
+
+        print("ROC CURVE:")
+        evaluation.plot_roc_curve(y_test, y_test_score)
+
+        print("DET CURVE")
+        evaluation.plot_det_curve(y_test, y_test_score)
 
 
 def main():
     #EyeBlinkEvaluation().createDataSetEyeBlink(False, False)
-    data = pd.read_csv("eyeblink.csv", sep=';', header=None)
-    y_test, y_test_score = data.iloc[:, 1], data.iloc[:, -1]
-    print("###y_test###")
-    print(y_test)
-    print("##############")
-    print("###y_score###")
-    print(y_test_score)
-    print("##############")
-    print("###SPOOFING SCENARIO###")
-    FRR, SFAR = evaluation.spoofing_scenario(y_test, y_test_score)
-    print("FRR", FRR)
-    print("SFAR", SFAR)
-    print("##############")
-    print("###LICIT SCENARIO###")
-    FRR, FAR, HTER = evaluation.licit_scenario(y_test,y_test_score)
-    print("FAR",FAR)
-    print("FRR",FRR)
-    print("HTER", HTER)
-    print("##############")
-    print("### FAR AND FRR ###")
-    FAR, FRR = evaluation.calculate_FAR_FRR(y_test, y_test_score)
-    print("FAR", FAR)
-    print("FRR", FRR)
-    print("##############")
-
-    print("ROC CURVE:")
-    evaluation.plot_roc_curve(y_test, y_test_score)
-    # ##Parte solo real
-    # y_test = data.iloc[0:897, 1]
-    # #print(y_test)
-    # y_test_score = data.iloc[0:897, -1]
-    # #print(y_test_score)
-    # print("Real",accuracy_score(y_test, y_test_score))
-    #
-    # ##Parte solo fake
-    # y_test = data.iloc[897:1897, 1]
-    # #print(y_test)
-    # y_test_score = data.iloc[897:1897, -1]
-    # #print(y_test_score)
-    # print("Fake",accuracy_score(y_test, y_test_score))
-    #FRR,FAR,_ = evaluation.licit_scenario(y_test,y_test_score)
-
-    print("DET CURVE")
-    evaluation.plot_det_curve(y_test, y_test_score)
-    # _,_,threshold = roc_curve(y_test,y_test_score)
-    # evaluation.plot_FAR_FRR_ERR(FAR,FRR,threshold)
+    EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblink.csv')
 
 
 
-def temp_comment():
-    data = pd.read_csv("eyeblink.csv", sep=';', header=None)
-    black = EyeBlinkEvaluation().readEyeBlinkBlackCsv(0)
-    number = 1897
-    for i in range(number):
-        list = []
-        if data.iloc[i, 0] in black:
-            print(black)
-            print(data.iloc[i, 0])
-            continue
-        if data.iloc[i, 1] != data.iloc[i, -1]:
-            print(data.iloc[i, 0])
-            name = data.iloc[i, 0]
-            var = Antispoofing.EyeBlink(name).eyeBlinkStart()
-
-            ###Scrive un nuovo csv, questa parte è temporanea e di test
-            list.append(data.iloc[i, 0])
-            list.append(data.iloc[i, 1])
-            if var == True:
-                list.append(1)
-            elif var == False:
-                list.append(0)
-
-            with open('black_eyeblink.csv', 'a+') as cvsfile:
-                writer = csv.writer(cvsfile, delimiter=';')
-                writer.writerow(list)
-
-                # cvsfile.write(str(val))
-                # cvsfile.write('\n')
-                cvsfile.close()
-
-            print(name, var)
-        else:
-            continue
-    print(list)
-    bData = pd.read_csv("black_eyeblink.csv", sep=';', header=None)
-    print(bData)
-    y_test = bData.iloc[:,1]
-    y_test_score = bData.iloc[:,-1]
 
 
-    #y_test_score = bData[2].astype(int)
-    print(y_test)
-    #y_test_score = EyeBlinkEvaluation().readEyeBlinkBlackCsv(-1)
-    print(y_test_score)
 
-
-    #evaluation.plot_roc_curve(y_test, y_test_score)
 
 
 
@@ -221,27 +164,4 @@ def temp_comment():
 if __name__ == '__main__':
     main()
 
-    #
-    #
-    # y_test, y_test_score = data.iloc[:,1], data.iloc[:, -1]
-    # #y_test = EyeBlinkEvaluation().readEyeBlinkCsv(1)
-    # print(y_test)
-    # #y_test_score = EyeBlinkEvaluation().readEyeBlinkCsv(2)
-    # print(y_test_score)
-    # FRR, SFAR = evaluation.spoofing_scenario(y_test,y_test_score)
-    # #evaluation.plot_roc_curve(y_test, y_test_score)
-    #
-    # ##Parte solo real
-    # y_test = data.iloc[0:897,1]
-    # print(y_test)
-    # y_test_score = data.iloc[0:897,-1]
-    # print(y_test_score)
-    # y_test = data.iloc[897:1897,1]
-    # print(y_test)
-    # y_test_score = data.iloc[897:1897,-1]
-    # #FRR, SFAR = evaluation.spoofing_scenario(y_test, y_test_score)
-    # print(accuracy_score(y_test, y_test_score))
-    #
-    #
-    # #evaluation.plot_roc_curve(y_test, y_test_score)
-    # #Antispoofing.EyeBlink(None).eyeBlinkStart()
+
