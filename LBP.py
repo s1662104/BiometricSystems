@@ -3,7 +3,6 @@ import numpy as np
 import cv2
 import Database
 from sklearn.svm import SVC
-import matplotlib.pyplot as plt
 
 class Local_Binary_Pattern:
 
@@ -136,8 +135,6 @@ class Local_Binary_Pattern:
         #Get the matrix dimensions
         h = len(new_img)
         w = len(new_img[0])
-        #print("Altezza:",h)
-        #print("Larghezza:",w)
 
         #The LBPHFaceRecognizer uses Extended Local Binary Patterns
         #(it's probably configurable with other operators at a later
@@ -170,6 +167,7 @@ class Local_Binary_Pattern:
 
                 #Concatenate two slices
                 histogram = np.concatenate((histogram, regionHistogram), axis=None)
+        cv2.normalize(histogram, histogram)
         return histogram
 
 
@@ -194,23 +192,6 @@ if __name__ == '__main__':
         print("train_data\n",train_data[0])
         print("train_target\n",train_target[0])
         classifier = SVC(kernel='rbf', random_state=1)
-        #classifier.fit(train_data, train_target)        #In this case, the X_train is train_data, while the  Y_train is train_target
-
-        #Predicting the classes for test set
-        #pred_target = classifier.predict(test_data)
-
-
-        # data = db.get_normalized_template(1)
-        # lbp = Local_Binary_Pattern(1, 8, data)
-        # new_img = lbp.compute_lbp()
-        # hist = lbp.createHistogram(new_img)
-
-        # plt.figure()
-        # plt.title("Grayscale Histogram")
-        # plt.xlabel("Bins")
-        # plt.ylabel("# of Pixels")
-        # plt.plot(hist)
-        # plt.show()
 
     elif db_index == "1":
         db = Database.Database(1)

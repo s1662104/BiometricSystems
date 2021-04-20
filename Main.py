@@ -167,7 +167,7 @@ class DataEnrollmentPage(DataPage):
                            command=lambda: self.addMedicines(self.entryNMedicine.get()))
         button.pack()
 
-        tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
+        tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.confirm(controller)).place(y=520, x=220)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
@@ -238,7 +238,7 @@ class DataEnrollmentPage(DataPage):
                 medicines = []
                 for medicine in self.medicineEntry:
                     medicines.append(medicine.get())
-                addUser(self.photo, self.cf.cget("text"), self.name.cget("text"), medicines, delegates)
+                addUser(self.photo, self.cf.cget("text")[16:], self.name.cget("text")[6:], medicines, delegates)
                 list(controller.frames.values())[5].update_data(enrollmentCompleted)
                 controller.show_frame(InformationPage)
 
@@ -249,7 +249,7 @@ class DataRecognitionPage(DataPage):
 
         self.name.destroy()
 
-        tk.Button(self, text="Confirma", width=8, height=1, bg='#1E79FA',
+        tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.confirm(controller)).place(y=520, x=220)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
@@ -265,7 +265,7 @@ class DataRecognitionPage(DataPage):
         self.photo = photo
 
     def confirm(self, controller):
-        user, index = Recognition.recognize()
+        user, index = Recognition.recognize(self.cf.cget("text")[16:],self.photo)
         print(user)
         if user is not None:
             list(controller.frames.values())[6].reset()
@@ -373,6 +373,7 @@ def check_input(controller, cf, labelError, op, name=None):
     else:
         labelError.configure(fg="#f0f0f0")
     crop = videoCapture()
+    print("CROP FATTO!")
     if op == 0:
         n = 3
     else:
@@ -401,6 +402,8 @@ def addUser(photo, cf, name, medicines, delegates):
     medicine_csv = pd.read_csv("dataset_user.csv", index_col=[0])
     gallery_data.append(photo)
     gallery_target.append(cf)
+    print("L'utente",name,"viene aggiunto al dataset")
+    print("Il codice fiscale è",cf)
     print(len(gallery_data), len(gallery_target))
     print(photo, gallery_data[len(gallery_data) - 1])
     print(cf, gallery_target[len(gallery_target) - 1])
@@ -414,29 +417,59 @@ def addUser(photo, cf, name, medicines, delegates):
 def reset_pages():
     pass
 
-
 def videoCapture():
     cap = cv2.VideoCapture(0)
-    # while (True):
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-    vis = frame.copy()
-
-    # Our operations on the frame come here
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     crop = None
-    while crop is None:
-        crop = detect_face(gray, vis)
+    while True:
+        ret, frame = cap.read()
+        dets = detector(frame, 1)
+        for i, d in enumerate(dets):
+            landmark = predictor(frame, d)
+            top = landmark.part(19).y
+            left = landmark.part(0).x
+            right = landmark.part(16).x
+            bottom = landmark.part(8).y
+            cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 3)
+            crop = frame[top:bottom, left:right]
+            try:
+                crop = cv2.resize(crop, (64, 64))
+            except Exception as e:
+                print(str(e))
+        cv2.imshow('Frame', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-    # # Display the resulting frame
-    # cv2.imshow('frame', vis)
-    # if cv2.waitKey(1) & 0xFF == ord('q'):
-    #     break
-
-    # When everything done, release the capture
     cap.release()
     cv2.destroyAllWindows()
-    return crop
+    gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+    return gray
+
+
+# def videoCapture():
+#     cap = cv2.VideoCapture(0)
+#     # while (True):
+#     # Capture frame-by-frame
+#     ret, frame = cap.read()
+#     vis = frame.copy()
+#
+#     # Our operations on the frame come here
+#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#     crop = None
+#     while crop is None:
+#         print("CROP NON FATTO!")
+#         crop = detect_face(gray, vis)
+
+    # # # Display the resulting frame
+    # # cv2.imshow('frame', vis)
+    # # if cv2.waitKey(1) & 0xFF == ord('q'):
+    # #     break
+    #
+    # # When everything done, release the capture
+    # cap.release()
+    # cv2.destroyAllWindows()
+    # return crop
 
 
 def detect_face(img, vis, crop=None):
