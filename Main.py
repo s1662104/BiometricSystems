@@ -9,21 +9,23 @@ import pandas as pd
 import ast
 from datetime import date
 
-messageBenvenuto = "Benvenuto! \nCosa vuoi fare? \n0. Registrazione \n1. Riconoscimento"
-messageA = "Inserire scelta: "
 messageCF = "Inserire codice fiscale: "
 messageError = "Input non valido"
 messageN = "Inserire nome: "
 choice1 = "Registrazione"
-choice2 = "Riconoscimento"
+choice2 = "Prelievo Farmaci"
 messageWelcome = "Benvenuto\n Che operazione desideri svolgere?"
 numberMedicines = "Quanti farmaci assumi?"
 numberDelegate = "A chi vuoi delegare il prelievo di farmaci?"
 enrollmentCompleted = "REGISTRAZIONE COMPLETATA!"
 recognitionRejected = "UTENTE NON RICONOSCIUTO"
+messageRecognition = "Chi sei?"
+recognitionChoice1 = "Paziente"
+recognitionChoice2 = "Delegato"
 
 dim_image = 64
 number_maximum_delegate = 3
+
 
 class Page(tk.Tk):
 
@@ -36,7 +38,7 @@ class Page(tk.Tk):
         self.frames = {}
 
         for F in (StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage,
-                  InformationPage, UserPage):
+                  InformationPage, UserPage, RecognitionChoicePage):
             frame = F(container, self)
 
             self.frames[F] = frame
@@ -67,8 +69,7 @@ class StartPage(tk.Frame):
             controller.show_frame(EnrollmentPage)
 
         def goToRecognize():
-            list(controller.frames.values())[2].reset()
-            controller.show_frame(RecognitionPage)
+            controller.show_frame(RecognitionChoicePage)
 
 
 class EnrollmentPage(tk.Frame):
@@ -84,7 +85,7 @@ class EnrollmentPage(tk.Frame):
         self.entryName.insert(1, messageN)
         self.entryName.pack(pady=2)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: check_input(controller, self.entryCF.get(), labelError, 0,
+                            command=lambda: check_input(controller, self.entryCF.get(), labelError, 0, None,
                                                         self.entryName.get()))
         button2.pack()
 
@@ -95,7 +96,8 @@ class EnrollmentPage(tk.Frame):
         #           command=lambda: back(controller, self.entryCF, labelError, self.entryName)).place(y=400,x=2)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, self.entryCF, labelError, self.entryName)).pack(side="left",pady=300)
+                  command=lambda: back(controller, self.entryCF, labelError, self.entryName)).pack(side="left",
+                                                                                                   pady=300)
 
     def reset(self):
         self.entryCF.delete(0, tk.END)
@@ -103,28 +105,54 @@ class EnrollmentPage(tk.Frame):
         self.entryName.delete(0, tk.END)
         self.entryName.insert(0, messageN)
 
+
+class RecognitionChoicePage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text=messageRecognition)
+        label.pack(pady=10, padx=50)
+        button1 = tk.Button(self, text=recognitionChoice1, width=15, height=2, bg='#1E79FA',
+                            command=lambda: confirm(0))
+        button2 = tk.Button(self, text=recognitionChoice2, width=15, height=2, bg='#1E79FA',
+                            command=lambda: confirm(1))
+        button1.pack()
+        button2.pack(pady=1)
+
+        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                  command=lambda: controller.show_frame(StartPage)).place(y=520, x=2)
+
+        def confirm(role):
+            list(controller.frames.values())[2].update_data(role)
+            controller.show_frame(RecognitionPage)
+
+
 class RecognitionPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text=choice2)
         label.pack(pady=10, padx=10)
 
+        self.role = 0
+
         self.entryCF = tk.Entry(self)
         self.entryCF.insert(1, messageCF)
         self.entryCF.pack(padx=0, pady=0)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: check_input(controller, self.entryCF.get(), labelError, 1))
+                            command=lambda: check_input(controller, self.entryCF.get(), labelError, 1, self.role))
         button2.pack()
 
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, self.entryCF, labelError)).pack(side="left",pady=385)
+                  command=lambda: back(controller, self.entryCF, labelError)).pack(side="left", pady=385)
 
     def reset(self):
         self.entryCF.delete(0, tk.END)
         self.entryCF.insert(0, messageCF)
+
+    def update_data(self,role):
+        self.role = role
 
 
 class DataPage(tk.Frame):
@@ -181,7 +209,8 @@ class DataEnrollmentPage(DataPage):
             self.delegateEntry[i].delete(0, tk.END)
             self.delegateEntry[i].insert(0, "")
 
-    def update_data(self, cf, img, photo, name=None):
+    def update_data(self, cf, img, photo, name):
+        print(name)
         self.name.config(text="NOME: " + name)
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
@@ -248,6 +277,7 @@ class DataRecognitionPage(DataPage):
         DataPage.__init__(self, parent, controller)
 
         self.name.destroy()
+        self.role = 0
 
         tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.confirm(controller)).place(y=520, x=220)
@@ -258,14 +288,21 @@ class DataRecognitionPage(DataPage):
     def reset(self):
         pass
 
-    def update_data(self, cf, img, photo, name=None):
+    def update_data(self, cf, img, photo, role, name=None):
+        self.role = role
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
         self.photo = photo
 
     def confirm(self, controller):
-        user, index = Recognition.recognize(self.cf.cget("text")[16:],self.photo)
+        print("role", self.role)
+        if self.role == 0:
+            print("REC")
+            user, index = Recognition.recognize(self.cf.cget("text")[16:], self.photo)
+        else:
+            print("IDE")
+            user, index = Recognition.identify(self.cf.cget("text")[16:], self.photo)
         print(user)
         if user is not None:
             list(controller.frames.values())[6].reset()
@@ -366,7 +403,7 @@ class UserPage(DataPage):
                     self.entries.append(label)
 
 
-def check_input(controller, cf, labelError, op, name=None):
+def check_input(controller, cf, labelError, op, role=None, name=None):
     if len(cf) != 16 or cf == messageCF or (name is not None and name == messageN):
         labelError.configure(fg="red")
         return
@@ -379,21 +416,25 @@ def check_input(controller, cf, labelError, op, name=None):
     else:
         n = 4
     list(controller.frames.values())[n].reset()
-    list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop, name)
     if op == 0:
+        list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop, name)
         controller.show_frame(DataEnrollmentPage)
     else:
+        list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop, role)
         controller.show_frame(DataRecognitionPage)
 
 
 def back(controller, entryCF, labelError, entryName=None):
     entryCF.delete(0, tk.END)
     entryCF.insert(0, messageCF)
-    if entryName != None:
+    if entryName is not None:
         entryName.delete(0, tk.END)
         entryName.insert(0, messageN)
     labelError.configure(fg="#f0f0f0")
-    controller.show_frame(StartPage)
+    if entryName is not None:
+        controller.show_frame(StartPage)
+    else:
+        controller.show_frame(RecognitionChoicePage)
 
 
 def addUser(photo, cf, name, medicines, delegates):
@@ -402,8 +443,8 @@ def addUser(photo, cf, name, medicines, delegates):
     medicine_csv = pd.read_csv("dataset_user.csv", index_col=[0])
     gallery_data.append(photo)
     gallery_target.append(cf)
-    print("L'utente",name,"viene aggiunto al dataset")
-    print("Il codice fiscale è",cf)
+    print("L'utente", name, "viene aggiunto al dataset")
+    print("Il codice fiscale è", cf)
     print(len(gallery_data), len(gallery_target))
     print(photo, gallery_data[len(gallery_data) - 1])
     print(cf, gallery_target[len(gallery_target) - 1])
@@ -417,6 +458,7 @@ def addUser(photo, cf, name, medicines, delegates):
 
 def reset_pages():
     pass
+
 
 def videoCapture():
     cap = cv2.VideoCapture(0)
@@ -462,15 +504,15 @@ def videoCapture():
 #         print("CROP NON FATTO!")
 #         crop = detect_face(gray, vis)
 
-    # # # Display the resulting frame
-    # # cv2.imshow('frame', vis)
-    # # if cv2.waitKey(1) & 0xFF == ord('q'):
-    # #     break
-    #
-    # # When everything done, release the capture
-    # cap.release()
-    # cv2.destroyAllWindows()
-    # return crop
+# # # Display the resulting frame
+# # cv2.imshow('frame', vis)
+# # if cv2.waitKey(1) & 0xFF == ord('q'):
+# #     break
+#
+# # When everything done, release the capture
+# cap.release()
+# cv2.destroyAllWindows()
+# return crop
 
 
 def detect_face(img, vis, crop=None):

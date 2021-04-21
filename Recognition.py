@@ -44,6 +44,7 @@ def identify(cf, img):
     print("L'identità del delegato è:",identity)
     return user, index
 
+
 #face verification (or 1:1 face recognition) consists in checking if a face corresponds to a given identity
 def recognize(cf, img):
 
