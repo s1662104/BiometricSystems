@@ -408,7 +408,8 @@ def addUser(photo, cf, name, medicines, delegates):
     print(photo, gallery_data[len(gallery_data) - 1])
     print(cf, gallery_target[len(gallery_target) - 1])
     medicine_csv = medicine_csv.append(
-        {"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates}, ignore_index=True)
+        {"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates,
+         "Data": date.today().strftime("%d/%m/%Y")}, ignore_index=True)
     np.save("npy_db/gallery_data.npy", np.array(gallery_data))
     np.save("npy_db/gallery_target.npy", np.array(gallery_target))
     medicine_csv.to_csv('dataset_user.csv')
