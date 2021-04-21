@@ -24,10 +24,15 @@ def identify(cf, img):
     index = cf_list.tolist().index(cf)
     user = users.iloc[index]
     print(user)
-
+    print(user["Delegati"])
     #find the user's delegates
     delegati = ast.literal_eval(user["Delegati"])
     print(delegati)
+
+    #if the user doesn't have delegates
+    if len(delegati) == 0:
+        print("L'utente non ha delegati!")
+        return None, 0
 
     #we begin to find out which delegate is trying to access to the system
     max = 0
