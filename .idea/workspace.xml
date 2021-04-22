@@ -19,7 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="Face recognition">
+    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="Identification bug fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Recognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/Recognition.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dataset_user.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dataset_user.csv" afterDir="false" />
@@ -190,8 +190,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Main (1)" />
         <item itemvalue="Python.Database" />
+        <item itemvalue="Python.Main (1)" />
         <item itemvalue="Python.Recognition" />
         <item itemvalue="Python.LBP" />
         <item itemvalue="Python.CaptureFace" />
@@ -490,7 +490,14 @@
       <option name="project" value="LOCAL" />
       <updated>1618943919199</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="Identification bug fix">
+      <created>1619037587146</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1619037587146</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -506,7 +513,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="deleted print" />
     <MESSAGE value="convert numpy array to cv2-readable array" />
     <MESSAGE value="change name function" />
     <MESSAGE value="bilinear interpolation" />
@@ -531,7 +537,8 @@
     <MESSAGE value="farmaci prelevabili: pt. 5.1 calcolo della differenza tra la data dell'ultima somministrazione e oggi (in giorni)" />
     <MESSAGE value="farmaci prelevabili: pt. 5.2 calcolo dei farmaci prelevabili in base alla data dell'ultimo prelievo e aggiornamento del db" />
     <MESSAGE value="Face recognition" />
-    <option name="LAST_COMMIT_MESSAGE" value="Face recognition" />
+    <MESSAGE value="Identification bug fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Identification bug fix" />
   </component>
   <component name="WindowStateProjectService">
     <state x="617" y="299" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1617467703078">
@@ -556,25 +563,25 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="818" y="418" key="Github.ShareDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1611052239681" />
-    <state width="1419" height="110" key="GridCell.Tab.0.bottom" timestamp="1619037502173">
+    <state width="1419" height="185" key="GridCell.Tab.0.bottom" timestamp="1619107469429">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="110" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1619037502173" />
+    <state width="1419" height="185" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1619107469429" />
     <state width="1899" height="255" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1617736022677" />
-    <state width="1419" height="110" key="GridCell.Tab.0.center" timestamp="1619037502171">
+    <state width="1419" height="185" key="GridCell.Tab.0.center" timestamp="1619107469427">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="110" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1619037502171" />
+    <state width="1419" height="185" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1619107469427" />
     <state width="1899" height="255" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1617736022677" />
-    <state width="1419" height="110" key="GridCell.Tab.0.left" timestamp="1619037502171">
+    <state width="1419" height="185" key="GridCell.Tab.0.left" timestamp="1619107469426">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="110" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1619037502171" />
+    <state width="1419" height="185" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1619107469426" />
     <state width="1899" height="255" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1617736022677" />
-    <state width="1419" height="110" key="GridCell.Tab.0.right" timestamp="1619037502172">
+    <state width="1419" height="185" key="GridCell.Tab.0.right" timestamp="1619107469428">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="110" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1619037502172" />
+    <state width="1419" height="185" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1619107469428" />
     <state width="1899" height="255" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1617736022677" />
     <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1617723588703">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -604,10 +611,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="725" y="167" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1616922887239" />
-    <state x="414" y="219" key="Vcs.Push.Dialog.v2" timestamp="1618943930750">
+    <state x="414" y="219" key="Vcs.Push.Dialog.v2" timestamp="1619037607541">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="414" y="219" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1618943930750" />
+    <state x="414" y="219" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1619037607541" />
     <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1617723552020" />
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1612174336111">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -621,10 +628,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="233" key="git4idea.branch.GitSmartOperationDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617119312735" />
-    <state x="393" y="245" key="git4idea.merge.GitPullDialog" timestamp="1619036716959">
+    <state x="393" y="245" key="git4idea.merge.GitPullDialog" timestamp="1619037595590">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="393" y="245" key="git4idea.merge.GitPullDialog/0.0.1440.900@0.0.1440.900" timestamp="1619036716959" />
+    <state x="393" y="245" key="git4idea.merge.GitPullDialog/0.0.1440.900@0.0.1440.900" timestamp="1619037595590" />
     <state x="741" y="421" key="git4idea.remote.GitConfigureRemotesDialog" timestamp="1611052368644">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

@@ -47,7 +47,10 @@ def identify(cf, img):
             max = val
             identity = d    #the identity of the delegate who gets the best value for the moment
     print("L'identità del delegato è:",identity)
-    return user, index
+    if identity is not None:
+        indexd = cf_list.tolist().index(identity)
+        recUser = users.iloc[indexd]
+    return user, index, recUser
 
 
 #face verification (or 1:1 face recognition) consists in checking if a face corresponds to a given identity
@@ -82,7 +85,7 @@ def recognize(cf, img):
         index = cf_list.tolist().index(cf)
         user = users.iloc[index]
 
-    return user, index
+    return user, index, user
 
 def testRecognition(user, template):
 
@@ -216,6 +219,8 @@ def topMatch(probe, identity, gallery_data, gallery_target):
             diff = compareHistogram(hist_probe, hist_gallley)
             if diff >= max:
                 max = diff
+    if max == 0:
+        print("L'utente",identity,"non è nella gallery")
     return max
 
 def main():
