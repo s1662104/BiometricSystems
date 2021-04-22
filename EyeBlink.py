@@ -149,6 +149,9 @@ class EyeBlink():
                 history += eyedetect
                 if TOTAL >= 1:
                   cv2.putText(frame, "Real", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
+                  cap.release()
+                  cv2.destroyAllWindows()
+                  return True
                 elif (len(history) > 100):
                         print(history)
                         result = self.isBlinking(history, 3)
@@ -159,6 +162,9 @@ class EyeBlink():
                             #cv2.putText(frame, "Real", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
                         else:
                             cv2.putText(frame, "Fake", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
+                            cap.release()
+                            cv2.destroyAllWindows()
+                            return False
                         #cv2.imshow('Face', vis)
                 else:
                   cv2.putText(frame, "Check...", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 165, 255), 3, cv2.LINE_AA)

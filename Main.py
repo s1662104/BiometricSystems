@@ -9,6 +9,9 @@ import pandas as pd
 import ast
 from datetime import date
 
+from EyeBlink import EyeBlink
+from ReplayAttack import ReplayAttack
+
 messageCF = "Inserire codice fiscale: "
 messageError = "Input non valido"
 messageN = "Inserire nome: "
@@ -22,6 +25,7 @@ recognitionRejected = "UTENTE NON RICONOSCIUTO"
 messageRecognition = "Chi sei?"
 recognitionChoice1 = "Paziente"
 recognitionChoice2 = "Delegato"
+spoofingMessage = "ANTISPOOFING ERROR!\n L'UTENTE NON SEMBRA ESSERE REALE!"
 
 dim_image = 64
 number_maximum_delegate = 3
@@ -409,6 +413,8 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         return
     else:
         labelError.configure(fg="#f0f0f0")
+
+
     crop = videoCapture()
     print("CROP FATTO!")
     if op == 0:
@@ -417,12 +423,27 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         n = 4
     list(controller.frames.values())[n].reset()
     if op == 0:
-        list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop, name)
+        list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop,
+                                                        name)
         controller.show_frame(DataEnrollmentPage)
     else:
-        list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop, role)
-        controller.show_frame(DataRecognitionPage)
-
+        ##Inizio parte antispoofing
+        user = False
+        nameFileCsv = 'histogram.csv'
+        if (EyeBlink(None).eyeBlinkStart()) == False:
+            user = False
+        elif (ReplayAttack(nameFileCsv).replayAttackCam(nameFileCsv) == False):
+            user = False
+        else:
+            user = True
+        ##Fine parte antispoofing
+        if (user == True):
+            list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)),
+                                                            crop, role)
+            controller.show_frame(DataRecognitionPage)
+        else:
+            list(controller.frames.values())[n].updata_data(spoofingMessage)
+            controller.show_frame(InformationPage)
 
 def back(controller, entryCF, labelError, entryName=None):
     entryCF.delete(0, tk.END)

@@ -9,7 +9,7 @@ import LBP
 from ReplayAttackSplitting import ReplayAttackSplitting
 
 
-class ReplayAttack():
+class ReplayAttack:
     def __init__(self,nameFileCsv):
         self.nameFileCsv = nameFileCsv
 
