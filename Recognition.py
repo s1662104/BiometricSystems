@@ -216,6 +216,8 @@ def topMatch(probe, identity, gallery_data, gallery_target):
             diff = compareHistogram(hist_probe, hist_gallley)
             if diff >= max:
                 max = diff
+    if max == 0:
+        print("L'utente",identity,"non è nella gallery")
     return max
 
 def main():
