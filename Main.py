@@ -122,6 +122,7 @@ class RecognitionChoicePage(tk.Frame):
                   command=lambda: controller.show_frame(StartPage)).place(y=520, x=2)
 
         def confirm(role):
+            list(controller.frames.values())[2].reset()
             list(controller.frames.values())[2].update_data(role)
             controller.show_frame(RecognitionPage)
 
@@ -165,16 +166,22 @@ class DataPage(tk.Frame):
         self.panel.image = img
         self.panel.pack(pady=10, padx=10)
 
-        self.name = tk.Label(self, text="NOME")
+        self.name = tk.Label(self, text="UTENTE RICONOSCIUTO")
         self.name.pack()
+
+        self.patient = tk.Label(self, text="PAZIENTE")
+        self.patient.pack()
 
         self.cf = tk.Label(self, text="CF")
         self.cf.pack()
 
 
+
 class DataEnrollmentPage(DataPage):
     def __init__(self, parent, controller):
         DataPage.__init__(self, parent, controller)
+
+        self.patient.destroy()
 
         labelDelegate = tk.Label(self, text=numberDelegate)
         labelDelegate.pack()
@@ -277,6 +284,7 @@ class DataRecognitionPage(DataPage):
         DataPage.__init__(self, parent, controller)
 
         self.name.destroy()
+        self.patient.destroy()
         self.role = 0
 
         tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
@@ -299,14 +307,14 @@ class DataRecognitionPage(DataPage):
         print("role", self.role)
         if self.role == 0:
             print("REC")
-            user, index = Recognition.recognize(self.cf.cget("text")[16:], self.photo)
+            user, index, patient = Recognition.recognize(self.cf.cget("text")[16:], self.photo)
         else:
             print("IDE")
-            user, index = Recognition.identify(self.cf.cget("text")[16:], self.photo)
+            user, index, patient = Recognition.identify(self.cf.cget("text")[16:], self.photo)
         print(user)
         if user is not None:
             list(controller.frames.values())[6].reset()
-            list(controller.frames.values())[6].update_data(index, user["User"], user["Codice Fiscale"],
+            list(controller.frames.values())[6].update_data(index, user["User"], patient["User"], user["Codice Fiscale"],
                                                             user["Delegati"], user["Farmaci"], user["Data"],
                                                             self.panel.image)
             controller.show_frame(UserPage)
@@ -356,9 +364,10 @@ class UserPage(DataPage):
         for entry in self.entries:
             entry.destroy()
 
-    def update_data(self, index, name, cf, delegates, medicines, last_date, photo):
+    def update_data(self, index, name, patient, cf, delegates, medicines, last_date, photo):
         self.cf.config(text="CODICE FISCALE: " + cf)
-        self.name.config(text="NOME: " + name)
+        self.name.config(text="UTENTE RICONOSCIUTO: " + patient)
+        self.patient.config(text="PAZIENTE: " + name)
         self.panel.config(image=photo)
         self.panel.image = photo
         delegates = ast.literal_eval(delegates)
