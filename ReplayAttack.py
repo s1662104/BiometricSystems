@@ -2,11 +2,34 @@ import cv2
 import imutils
 
 
-
+import dlib
 import AntiSpoofingTrainingEvaluation
-import Main
+#import Main
 import LBP
 from ReplayAttackSplitting import ReplayAttackSplitting
+dim_image = 64
+def detect_face(img, vis, crop=None):
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+    dets = detector(img, 1)  # Detect the faces in the image
+    for i, d in enumerate(dets):
+        landmark = predictor(img, d)
+        top = landmark.part(19).y
+        left = landmark.part(0).x
+        right = landmark.part(16).x
+        bottom = landmark.part(8).y
+        crop = img[top:bottom, left:right]
+        cv2.rectangle(vis, (left, top), (right, bottom), (0, 255, 0), 3)
+        try:
+            crop = cv2.resize(crop, (dim_image, dim_image))
+        except Exception as e:
+            print(str(e))
+    if len(dets) > 0:
+        try:
+            cv2.imshow('Face', crop)
+        except Exception as e:
+            print(str(e))
+    return crop
 
 
 class ReplayAttack:
@@ -27,7 +50,7 @@ class ReplayAttack:
             # Our operations on the frame come here
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            crop = Main.detect_face(gray, vis)
+            crop = detect_face(gray, vis)
 
             if crop is not None:
                 myLBP = LBP.Spoof_Local_Binary_Pattern(1, 8, crop)
