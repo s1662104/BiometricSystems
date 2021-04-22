@@ -451,7 +451,7 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
                                                             crop, role)
             controller.show_frame(DataRecognitionPage)
         else:
-            list(controller.frames.values())[n].updata_data(spoofingMessage)
+            list(controller.frames.values())[5].update_data(spoofingMessage)
             controller.show_frame(InformationPage)
 
 def back(controller, entryCF, labelError, entryName=None):
