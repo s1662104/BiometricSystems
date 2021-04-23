@@ -1,5 +1,6 @@
 import cv2
 import imutils
+import pickle
 
 
 import dlib
@@ -57,13 +58,15 @@ class ReplayAttack:
 
             new_img = myLBP.compute_lbp()
             hist = myLBP.createHistogram(new_img)
-            svm = ReplayAttack(nameFileCsv).replayAttackEvaluation(nameFileCsv, False)
+
+            # Andiamo a prendere il modello trained e salvato.
+            with open('modelSVM.pkl', 'rb') as f:
+                clf = pickle.load(f)
             # nsamples = hist.shape
             # print("nsamples",nsamples)
             hist = hist.reshape(1, -1)
-            # print("histogram")
             # print(hist)
-            value = (svm.predict(hist))
+            value = (clf.predict(hist))
             print(value)
             if value == 0:
                 print("REAL")
@@ -81,36 +84,36 @@ class ReplayAttack:
 
     # viene effettuata l'evaluation dal file csv, nel caso in cui questa funzione viene richiamata da replayAttackCam,
     # non mostra i calcoli e grafici
-    def replayAttackEvaluation(self,nameFileCsv, evaluation):
+    def replayAttackEvaluation(self,nameFileCsv):
         X_train, X_test, y_train, y_test = ReplayAttackSplitting(nameFileCsv).splitting_train_test(nameFileCsv)
         svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test,
                                                                                    y_test).train_svm()
+        with open('modelSVM.pkl', 'wb') as f:
+            pickle.dump(svm,f)
 
-
-        if evaluation == True:
-            AntiSpoofingTrainingEvaluation.plot_roc_curve(y_test, y_test_score)
-            FRR, SFAR = AntiSpoofingTrainingEvaluation.spoofing_scenario(y_test, y_test_score, index = 1)
-            print("#######################")
-            print("###Spoofing Scenario###")
-            print("#######################")
-            print("FRR: ", FRR)
-            print("SFAR: ", SFAR)
-            FRR, FAR, HTER = AntiSpoofingTrainingEvaluation.licit_scenario(y_test, y_test_score, index = 1)
-            print()
-            print("####################")
-            print("###Licit Scenario###")
-            print("####################")
-            print("FRR: ", FRR)
-            print("FAR: ", FAR)
-            print("HTER: ", HTER)
+        AntiSpoofingTrainingEvaluation.plot_roc_curve(y_test, y_test_score)
+        FRR, SFAR = AntiSpoofingTrainingEvaluation.spoofing_scenario(y_test, y_test_score, index=1)
+        print("#######################")
+        print("###Spoofing Scenario###")
+        print("#######################")
+        print("FRR: ", FRR)
+        print("SFAR: ", SFAR)
+        FRR, FAR, HTER = AntiSpoofingTrainingEvaluation.licit_scenario(y_test, y_test_score, index=1)
+        print()
+        print("####################")
+        print("###Licit Scenario###")
+        print("####################")
+        print("FRR: ", FRR)
+        print("FAR: ", FAR)
+        print("HTER: ", HTER)
 
         return svm
 
 
 def main():
     nameFileCsv = 'histogram.csv'
-    ReplayAttack(nameFileCsv).replayAttackCam(nameFileCsv)
-    ReplayAttack(nameFileCsv).replayAttackEvaluation(nameFileCsv,True)
+    #ReplayAttack(nameFileCsv).replayAttackCam(nameFileCsv)
+    ReplayAttack(nameFileCsv).replayAttackEvaluation(nameFileCsv)
 
 
 
