@@ -9,6 +9,7 @@ import AntiSpoofingTrainingEvaluation
 import LBP
 from ReplayAttackSplitting import ReplayAttackSplitting
 dim_image = 64
+#TODO CAMBIARE NOME DA REPLAYATTACK A MICROTEXTURE
 def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -54,7 +55,8 @@ class ReplayAttack:
             crop = detect_face(gray, vis)
 
             if crop is not None:
-                myLBP = LBP.Spoof_Local_Binary_Pattern(1, 8, crop)
+                # myLBP = LBP.Spoof_Local_Binary_Pattern(1, 8, crop)
+                myLBP = LBP.Local_Binary_Pattern(1, 8, crop)
 
             new_img = myLBP.compute_lbp()
             hist = myLBP.createHistogram(new_img)
@@ -98,6 +100,7 @@ class ReplayAttack:
         print("#######################")
         print("FRR: ", FRR)
         print("SFAR: ", SFAR)
+        #TODO CANCELLARE QUESTA PARTE
         FRR, FAR, HTER = AntiSpoofingTrainingEvaluation.licit_scenario(y_test, y_test_score, index=1)
         print()
         print("####################")

@@ -26,6 +26,7 @@ class ModelSVM:
         model = SVC(kernel='rbf', random_state=0, gamma='scale', C=1)
 
         svm = model.fit(self.X_train, self.y_train)
+        #TODO: TOGLIERE QUESTA RIGA DI CODICE
         y_train_score = svm.decision_function(self.X_train)
 
 

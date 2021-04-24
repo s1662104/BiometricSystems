@@ -357,6 +357,7 @@ class UserPage(DataPage):
         medicineLabel = tk.Label(self, text="FARMACI:")
         medicineLabel.pack()
 
+
         self.entries = []
 
         tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',

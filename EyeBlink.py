@@ -151,6 +151,7 @@ class EyeBlink():
                   cv2.putText(frame, "Real", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
                   cap.release()
                   cv2.destroyAllWindows()
+                  print("EYEBLINK: REAL")
                   return True
                 elif (len(history) > 100):
                         print(history)
@@ -164,6 +165,7 @@ class EyeBlink():
                             cv2.putText(frame, "Fake", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
                             cap.release()
                             cv2.destroyAllWindows()
+                            print("EYEBLINK: FAKE")
                             return False
                         #cv2.imshow('Face', vis)
                 else:
