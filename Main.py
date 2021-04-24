@@ -424,7 +424,6 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
     else:
         labelError.configure(fg="#f0f0f0")
 
-
     crop = videoCapture()
     print("CROP FATTO!")
     if op == 0:
@@ -443,11 +442,14 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         if (EyeBlink(None).eyeBlinkStart()) == False:
             user = False
         elif (ReplayAttack(nameFileCsv).replayAttackCam() == False):
+            print("REPLAY ATTACK E' FALSE")
             user = False
         else:
             user = True
         ##Fine parte antispoofing
+        print("E' terminato l'anti spooring")
         if (user == True):
+            print("USER == TRUE")
             list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)),
                                                             crop, role)
             controller.show_frame(DataRecognitionPage)
@@ -578,7 +580,7 @@ def isCF(cf):
 
 def main():
     app = Page()
-    app.geometry('290x550')
+    app.geometry('320x550')
     app.mainloop()
 
 

@@ -38,7 +38,7 @@ class ReplayAttack:
     # un video/foto in esecuzione sul dispositivo dove la webcam sta puntando .
     def replayAttackCam(self):
         cap = cv2.VideoCapture(0)
-
+        val = False
         while (True):
             ret, frame = cap.read()
 
@@ -52,7 +52,8 @@ class ReplayAttack:
             if crop is not None:
                 # myLBP = LBP.Spoof_Local_Binary_Pattern(1, 8, crop)
                 myLBP = LBP.Local_Binary_Pattern(1, 8, crop)
-
+            else:
+                continue
             new_img = myLBP.compute_lbp()
             hist = myLBP.createHistogram(new_img)
 
@@ -67,17 +68,18 @@ class ReplayAttack:
             print(value)
             if value == 0:
                 print("REAL")
-                return True
+                val = True
+                break
             else:
                 print("FAKE")
-                return False
-
-            # if the `q` key was pressed, break from the loop
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+                val = False
                 break
-
+            # if the `q` key was pressed, break from the loop
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
         cap.release()
         cv2.destroyAllWindows()
+        return val
 
     # viene effettuata l'evaluation dal file csv, nel caso in cui questa funzione viene richiamata da replayAttackCam,
     # non mostra i calcoli e grafici
