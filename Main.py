@@ -442,7 +442,7 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         nameFileCsv = 'histogram.csv'
         if (EyeBlink(None).eyeBlinkStart()) == False:
             user = False
-        elif (ReplayAttack(nameFileCsv).replayAttackCam(nameFileCsv) == False):
+        elif (ReplayAttack(nameFileCsv).replayAttackCam() == False):
             user = False
         else:
             user = True

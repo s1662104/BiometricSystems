@@ -101,8 +101,8 @@ class ReplayAttack:
 
 def main():
     nameFileCsv = 'histogram.csv'
-    #ReplayAttack(nameFileCsv).replayAttackCam()
-    ReplayAttack(nameFileCsv).replayAttackEvaluation()
+    ReplayAttack(nameFileCsv).replayAttackCam()
+    #ReplayAttack(nameFileCsv).replayAttackEvaluation()
 
 if __name__ == '__main__':
     main()

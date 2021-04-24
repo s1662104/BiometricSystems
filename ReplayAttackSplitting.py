@@ -34,7 +34,7 @@ class ReplayAttackSplitting():
 
         X, y = data.iloc[:, :-1], data.iloc[:, -1]
 
-        X = StandardScaler().fit_transform(X)
+        #X = StandardScaler().fit_transform(X)
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle=True)
 
@@ -67,7 +67,7 @@ class ReplayAttackSplitting():
 
     # viene effettuato lo splitting tra real e fake  e inserite le informazioni in un csv
     def splitting_real_fake(self, fill_csv_real, fill_csv_fake):
-        root_dir = 'Data'
+        root_dir = 'ReplayAttackDB'
         # fill_csv_real = False
         # fill_csv_fake = False
 
@@ -80,12 +80,12 @@ class ReplayAttackSplitting():
         except:
             print("La directory seguente è già stata creata: " + root_dir + "/hist_fake")
 
-        current_real = '/ReplayAttack/Real'
-        current_fake = '/ReplayAttack/Fake'
+        current_real = '/Real'
+        current_fake = '/Fake'
 
         # Qui andiamo ad inserire histogram in csv per ogni immagine Real
         if fill_csv_real == True:
-            src_real = "Data" + current_real
+            src_real = "ReplayAttackDB" + current_real
 
             allFileNames = os.listdir(src_real)
 
@@ -103,7 +103,7 @@ class ReplayAttackSplitting():
 
         # Qui andiamo ad inserire histogram in csv per ogni immagine Fake
         if fill_csv_fake == True:
-            src_fake = "Data" + current_fake
+            src_fake = "ReplayAttackDB" + current_fake
 
             allFileNames = os.listdir(src_fake)
 
@@ -134,7 +134,7 @@ class ReplayAttackSplitting():
 
 def main():
     nameFileCsv = 'histogram.csv'
-    ReplayAttackSplitting(nameFileCsv).splitting_real_fake(False,False)
+    ReplayAttackSplitting(nameFileCsv).splitting_real_fake(False,True)
 
 
 if __name__ == '__main__':
