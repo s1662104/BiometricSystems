@@ -100,15 +100,7 @@ class ReplayAttack:
         print("#######################")
         print("FRR: ", FRR)
         print("SFAR: ", SFAR)
-        #TODO CANCELLARE QUESTA PARTE
-        FRR, FAR, HTER = AntiSpoofingTrainingEvaluation.licit_scenario(y_test, y_test_score, index=1)
-        print()
-        print("####################")
-        print("###Licit Scenario###")
-        print("####################")
-        print("FRR: ", FRR)
-        print("FAR: ", FAR)
-        print("HTER: ", HTER)
+
 
         return svm
 

@@ -94,8 +94,8 @@ class ReplayAttackSplitting():
         except:
             print("La directory seguente è già stata creata: " + root_dir + "/hist_fake")
 
-        current_real = '/Real'
-        current_fake = '/Fake'
+        current_real = '/ReplayAttack/Real'
+        current_fake = '/ReplayAttack/Fake'
 
         # Qui andiamo ad inserire histogram in csv per ogni immagine Real
         if fill_csv_real == True:
@@ -148,7 +148,7 @@ class ReplayAttackSplitting():
 
 def main():
     nameFileCsv = 'histogram.csv'
-    ReplayAttackSplitting(nameFileCsv).splitting_real_fake(False, False)
+    ReplayAttackSplitting(nameFileCsv).splitting_real_fake(False,False)
 
 
 if __name__ == '__main__':
