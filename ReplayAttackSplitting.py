@@ -5,21 +5,7 @@ import cv2
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import LBP
-
-# import dask
-# import dask.array as da
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
-from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve, auc
-from mlxtend.plotting import plot_decision_regions
-
-
-# from dask_ml.model_selection import train_test_split
-
-# csv.field_size_limit(sys.maxsize)
-
 
 def get_normalized(image):
     norm_image = cv2.normalize(image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
@@ -40,11 +26,11 @@ class ReplayAttackSplitting():
     def __init__(self, nomeFileCsv):
         self.nomeFileCsv = nomeFileCsv
 
-    def splitting_train_test(self, filecsv):
-        num_columns = column_len_csv(filecsv)
+    def splitting_train_test(self):
+        num_columns = column_len_csv(self.nomeFileCsv)
         print(num_columns)
 
-        data = pd.read_csv(filecsv, sep=';', header=None)
+        data = pd.read_csv(self.nomeFileCsv, sep=';', header=None)
 
         X, y = data.iloc[:, :-1], data.iloc[:, -1]
 

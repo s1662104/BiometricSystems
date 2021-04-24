@@ -1,10 +1,7 @@
 import cv2
-import imutils
 import pickle
-
 import dlib
 import AntiSpoofingTrainingEvaluation
-#import Main
 import LBP
 from ReplayAttackSplitting import ReplayAttackSplitting
 dim_image = 64
@@ -39,11 +36,10 @@ class ReplayAttack:
 
     #Viene effettuata la verifica tramite webcam se abbiamo una persona reale, oppure abbiamo davanti alla webcam
     # un video/foto in esecuzione sul dispositivo dove la webcam sta puntando .
-    def replayAttackCam(self,nameFileCsv):
+    def replayAttackCam(self):
         cap = cv2.VideoCapture(0)
 
         while (True):
-            crop = None
             ret, frame = cap.read()
 
             vis = frame.copy()
@@ -76,17 +72,17 @@ class ReplayAttack:
                 print("FAKE")
                 return False
 
+            # if the `q` key was pressed, break from the loop
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-            # if the `q` key was pressed, break from the loop
         cap.release()
         cv2.destroyAllWindows()
 
     # viene effettuata l'evaluation dal file csv, nel caso in cui questa funzione viene richiamata da replayAttackCam,
     # non mostra i calcoli e grafici
-    def replayAttackEvaluation(self,nameFileCsv):
-        X_train, X_test, y_train, y_test = ReplayAttackSplitting(nameFileCsv).splitting_train_test(nameFileCsv)
+    def replayAttackEvaluation(self):
+        X_train, X_test, y_train, y_test = ReplayAttackSplitting(self.nameFileCsv).splitting_train_test()
 
         svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test,
                                                                                    y_test).train_svm()
@@ -101,16 +97,12 @@ class ReplayAttack:
         print("FRR: ", FRR)
         print("SFAR: ", SFAR)
 
-
         return svm
-
 
 def main():
     nameFileCsv = 'histogram.csv'
-    #ReplayAttack(nameFileCsv).replayAttackCam(nameFileCsv)
-    ReplayAttack(nameFileCsv).replayAttackEvaluation(nameFileCsv)
-
-
+    #ReplayAttack(nameFileCsv).replayAttackCam()
+    ReplayAttack(nameFileCsv).replayAttackEvaluation()
 
 if __name__ == '__main__':
     main()

@@ -1,15 +1,10 @@
 
 #Qui viene realizzato il modello SVM, i vari calcoli come FAR, FRR, HTER,SFAR e il plotting delle curve.
 
-
-
-import matplotlib
 import seaborn as sns
 
 from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve, auc, roc_auc_score, det_curve
-from mlxtend.plotting import plot_decision_regions
+from sklearn.metrics import roc_curve, roc_auc_score, det_curve
 from matplotlib import pyplot as plt
 
 
@@ -137,16 +132,9 @@ def calculate_FAR_FRR(y_test,y_test_score, index):
     else:
         exit("WRONG INDEX")
 
-
-
-
     FAR = FA / num_fake
     FRR = FR / num_real
     return FAR, FRR
-
-
-
-
 
 #Plot della det_curve
 def plot_det_curve(y_test,y_test_score):
@@ -154,7 +142,6 @@ def plot_det_curve(y_test,y_test_score):
     print("FAR",FAR)
     print("FRR",FRR)
     print("TH:",t)
-
 
     plt.plot(FAR, FRR, label='DET curve')
     plt.plot([0, 1], [0, 1], 'k--')  # random predictions curve
