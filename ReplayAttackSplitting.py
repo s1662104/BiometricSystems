@@ -1,12 +1,9 @@
 import csv
-import sys
 import os
 import numpy as np
-import shutil
 import cv2
 import pandas as pd
-import AntiSpoofingTrainingEvaluation
-
+from sklearn.preprocessing import StandardScaler
 import LBP
 
 # import dask
@@ -50,6 +47,8 @@ class ReplayAttackSplitting():
         data = pd.read_csv(filecsv, sep=';', header=None)
 
         X, y = data.iloc[:, :-1], data.iloc[:, -1]
+
+        X = StandardScaler().fit_transform(X)
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle=True)
 
@@ -149,7 +148,7 @@ class ReplayAttackSplitting():
 
 def main():
     nameFileCsv = 'histogram.csv'
-    ReplayAttackSplitting(nameFileCsv).splitting_real_fake(True, True)
+    ReplayAttackSplitting(nameFileCsv).splitting_real_fake(False, False)
 
 
 if __name__ == '__main__':

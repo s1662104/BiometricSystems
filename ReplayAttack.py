@@ -2,7 +2,6 @@ import cv2
 import imutils
 import pickle
 
-
 import dlib
 import AntiSpoofingTrainingEvaluation
 #import Main
@@ -88,6 +87,7 @@ class ReplayAttack:
     # non mostra i calcoli e grafici
     def replayAttackEvaluation(self,nameFileCsv):
         X_train, X_test, y_train, y_test = ReplayAttackSplitting(nameFileCsv).splitting_train_test(nameFileCsv)
+
         svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test,
                                                                                    y_test).train_svm()
         with open('modelSVM.pkl', 'wb') as f:
