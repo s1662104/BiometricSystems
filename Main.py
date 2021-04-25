@@ -10,7 +10,7 @@ import ast
 from datetime import date
 
 from EyeBlink import EyeBlink
-from ReplayAttack import ReplayAttack
+from MicroTexture import MicroTexture
 
 messageCF = "Inserire codice fiscale: "
 messageError = "Input non valido"
@@ -441,7 +441,7 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         nameFileCsv = 'histogram.csv'
         if (EyeBlink(None).eyeBlinkStart()) == False:
             user = False
-        elif (ReplayAttack(nameFileCsv).replayAttackCam() == False):
+        elif (MicroTexture(nameFileCsv).microTextureCam() == False):
             print("REPLAY ATTACK E' FALSE")
             user = False
         else:
