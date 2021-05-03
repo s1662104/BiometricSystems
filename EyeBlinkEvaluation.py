@@ -129,17 +129,7 @@ class EyeBlinkEvaluation:
         print("FRR", FRR)
         print("SFAR", SFAR)
         print("##############")
-        print("###LICIT SCENARIO###")
-        FRR, FAR, HTER = evaluation.licit_scenario(y_test, y_test_score, index=0)
-        print("FAR", FAR)
-        print("FRR", FRR)
-        print("HTER", HTER)
-        print("##############")
-        print("### FAR AND FRR ###")
-        FAR, FRR = evaluation.calculate_FAR_FRR(y_test, y_test_score, index=0)
-        print("FAR", FAR)
-        print("FRR", FRR)
-        print("##############")
+        
 
         print("ROC CURVE:")
         evaluation.plot_roc_curve(y_test, y_test_score)
