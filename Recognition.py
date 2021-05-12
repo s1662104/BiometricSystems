@@ -1,17 +1,15 @@
 import cv2
-import dlib
 import pandas as pd
 import numpy as np
 import LBP
 import math
-import random
 import ast
+from matplotlib import pyplot as plt
+from sklearn.metrics import roc_curve, roc_auc_score
 
-#MZZLSN95R16H501Q
+threshold = 0.55
 
-threshold = 0.6
-
-#face identification (or 1:N face recognition) consists in finding the identity corresponding to a given face
+#face identification (or 1:N face recognition) consists in finding the identity corresponding to a given face.
 def identify(cf, img):
 
     #upload the various datasets
@@ -40,10 +38,9 @@ def identify(cf, img):
     norm_image = cv2.normalize(img, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     norm_image = norm_image.astype(np.uint8)
     for d in delegati:
-        print("Delegato",d)
         #the best value obtained by comparing the input image with the delegate images in the gallery
         val = topMatch(norm_image,d,gallery_data,gallery_target)
-        if val > max:
+        if val > max  and val > threshold:
             max = val
             identity = d    #the identity of the delegate who gets the best value for the moment
     print("L'identità del delegato è:",identity)
@@ -52,8 +49,7 @@ def identify(cf, img):
         recUser = users.iloc[indexd]
     return user, index, recUser
 
-
-#face verification (or 1:1 face recognition) consists in checking if a face corresponds to a given identity
+#face verification (or 1:1 face recognition) consists in checking if a face corresponds to a given identity.
 def recognize(cf, img):
 
     #upload the various datasets
@@ -79,49 +75,13 @@ def recognize(cf, img):
 
     #calculates the maximum match between the image taken in input and the images in the user's gallery
     val = topMatch(norm_image,cf,gallery_data,gallery_target)
-
+    print("val:",val)
     #if the maximum match is greater than the threshold, then the identity is verified
-    if val > 0.6:
+    if val > threshold:
         index = cf_list.tolist().index(cf)
         user = users.iloc[index]
 
     return user, index, user
-
-def testRecognition(user, template):
-
-    # upload the various datasets
-    gallery_data = np.load("npy_db/gallery_data.npy")
-    gallery_target = np.load("npy_db/gallery_target.npy")
-
-    #compute LBP to calculate the histogram of the probe image
-    lbp_probe = LBP.Local_Binary_Pattern(1, 8, template)
-    new_img = lbp_probe.compute_lbp()
-    hist_probe = lbp_probe.createHistogram(new_img)
-    compareHistogram(hist_probe, hist_probe)
-
-    print("Verifichiamo l'identità di",user)
-
-    #check if the user is registered
-    if gallery_target.tolist().__contains__(user):
-        n = gallery_target.tolist().count(user)     #num dei template dell'utente presenti nella gallery
-        print("Numero di template presenti nella gallery:",n)
-        i = gallery_target.tolist().index(user)     #index of the user's first template in the gallery
-        print("Primo indice:", i)
-        max = 0
-        for j in range(0, n):
-            #compute LBP to calculate the histogram of the gallery image
-            lbp_gallery = LBP.Local_Binary_Pattern(1, 8, gallery_data[i+j])
-            list_hist_user = lbp_probe.createHistogram(lbp_gallery.compute_lbp())
-            diff = compareHistogram(hist_probe,list_hist_user)
-            if diff >= max: max = diff
-            print("\n")
-
-        print("Il valore maggiore ottenuto tra gli istogrammi:", max)
-
-    #if the maximum matching is greater than the threshold, then the identity is verified
-    if max > threshold: print("L'IDENTITA' DELL'UTENTE E' STATA VERIFICTA CORRETTAMENTE")
-    else: print("L'IDENTITA' DICHIARATA NON CORRIISPONDE")
-    return
 
 def compareHistogram(H1, H2):
 
@@ -144,7 +104,7 @@ def compareHistogram(H1, H2):
 
     #calculate the difference using the correlation method
     d = sum1 / math.sqrt(sum_H1*sum_H2)
-    print("La differenza tra i due istogrammi ottenuta usando la Correlation è:",d)
+    #print("La differenza tra i due istogrammi ottenuta usando la Correlation è:",d)
 
     return d
 
@@ -164,13 +124,8 @@ def verificationFRR():
         #topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
         gx = topMatch(pg_template, pg_identity, gallery_data, gallery_target)
         if gx <= threshold:
-            print("L'identità dichiarata",pg_identity,"non è stata accettata")
-            print("Il valore di similarity ottenuto è:", gx)
             P = P + 1
-        else:
-            print("L'dentità dichiarata", pg_identity, "è stata accettata")
-            print("Il valore di similarity ottenuto è:", gx)
-    print("Il numero di identità rifiutate è:",P)
+    #print("Il numero di identità rifiutate è:",P)
     print("FRR:", P/len(pg_data))
     return
 
@@ -181,7 +136,6 @@ def verificationFRR():
 #an authorized person is 0.1 percent.
 def verificationFAR():
     pg_target = np.load("npy_db/pg_target.npy")
-    pn_target = np.load("npy_db/pn_target.npy")
     pn_data = np.load("npy_db/pn_data.npy")
     gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
@@ -189,21 +143,64 @@ def verificationFAR():
     #Scenario in which the impostor doesn't belong to the gallery
     for i in range(len(pn_data)):
         pn_template = pn_data[i]
-        pn_identity = pn_target[i]
-        pg_identity = pg_target[random.randrange(len(pg_target))]
-        #topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
-        gx = topMatch(pn_template, pg_identity, gallery_data, gallery_target)
-        if gx > threshold:
-            print("L'identità dichiarata", pg_identity, "è stata accettata")
-            print("La vera identità però è:",pn_identity)
-            print("Il valore di similarity ottenuto è:", gx)
-            P = P + 1
+        for t in range(len(np.unique(gallery_target))):
+            pg_identity = pg_target[t]
+            #topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
+            val = topMatch(pn_template, pg_identity, gallery_data, gallery_target)
+            if val > threshold:
+                P = P + 1
+    #print("Il numero di identità errate accettate è:", P)
+    print("FAR:", P / (len(pn_data)*len(np.unique(gallery_target))))
+
+    return
+
+#The Receiver Operating Characteristics (ROC) curve is an evaluation metric for a binary classifier,
+#which helps us to visualize the performance of a facial recognition model as its discrimination threshold changes.
+#ROC depicts the probability of Genuine Accept (GAR) of the system, expressed as 1-FRR, vs False Accept Rate (FAR) variation.
+def verificationROC():
+    gallery_data = np.load("npy_db/gallery_data.npy")
+    gallery_target = np.load("npy_db/gallery_target.npy")
+    pg_data = np.load("npy_db/pg_data.npy")
+    pg_target = np.load("npy_db/pg_target.npy")
+    pn_data = np.load("npy_db/pn_data.npy")
+
+    Y = [0]*(len(pg_data)+(len(pn_data)*len(np.unique(gallery_target))))
+    Y_pred = [0]*(len(pg_data)+(len(pn_data)*len(np.unique(gallery_target))))
+
+    for i in range(len(pg_data)):
+        Y[i] = 1
+        val = topMatch(pg_data[i],pg_target[i],gallery_data,gallery_target)
+        if val >= threshold:
+            Y_pred[i] = 1
         else:
-            print("L'dentità dichiarata", pg_identity, "non è stata accettata")
-            print("La vera identità però è:", pn_identity)
-            print("Il valore di similarity ottenuto è:", gx)
-    print("Il numero di identità errate accettate è:", P)
-    print("FAR:", P / len(pn_data))
+            Y_pred[i] = 0
+
+    for j in range(len(pn_data)):
+        for t in range(len(np.unique(gallery_target))):
+            Y[len(pg_data)+((j+1)*t)] = 0
+            val = topMatch(pn_data[j], gallery_target[t], gallery_data, gallery_target)
+            if val >= threshold:
+                Y_pred[len(pg_data)+((j+1)*t)] = 1
+            else:
+                Y_pred[len(pg_data)+((j+1)*t)] = 0
+
+    FPR, TPR, t = roc_curve(np.array(Y), np.array(Y_pred))
+    auc = roc_auc_score(np.array(Y), np.array(Y_pred))
+
+    FNR = 1 - TPR
+    EER = FPR[np.nanargmin(np.absolute((FNR - FPR)))]
+    print("EER:",EER)
+
+    #Plot ROC curve
+    plt.plot(FPR, TPR, label='ROC curve (area = %0.2f)' % auc)
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.0])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic')
+    plt.legend(loc="lower right")
+    plt.show()
 
     return
 
@@ -223,41 +220,7 @@ def topMatch(probe, identity, gallery_data, gallery_target):
         print("L'utente",identity,"non è nella gallery")
     return max
 
-def main():
-    pg_target = np.load("npy_db/pg_target.npy")
-    pg_data = np.load("npy_db/pg_data.npy")
-    pn_data = np.load("npy_db/pn_data.npy")
-
-    print("Il template utilizzato è quello dell'utente, quindi la verificazione dovrebbe risultare positiva")
-    testRecognition(pg_target[0], pg_data[0])
-    print("Il template utilizzato non è quello dell'utente, quindi la verificazione dovrebbe risultare negativa")
-    testRecognition(pg_target[0], pn_data[0])
-
 if __name__ == '__main__':
-    #main()
     #verificationFRR()
     #verificationFAR()
-    cf = "NTHKRN91B30G259C"
-    crop = None
-    video_capture = cv2.VideoCapture(0)
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-    while True:
-        ret, frame = video_capture.read()
-        dets = detector(frame, 1)
-        for i, d in enumerate(dets):
-            landmark = predictor(frame, d)
-            top = landmark.part(19).y
-            left = landmark.part(0).x
-            right = landmark.part(16).x
-            bottom = landmark.part(8).y
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 3)
-        cv2.imshow('Frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            crop = frame[top:bottom, left:right]
-            crop = cv2.resize(crop, (64, 64))
-            crop = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
-            break
-    video_capture.release()
-    cv2.destroyAllWindows()
-    identify(cf, crop)
+    verificationROC()

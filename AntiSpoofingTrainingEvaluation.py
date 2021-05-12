@@ -24,12 +24,9 @@ class ModelSVM:
         #TODO: TOGLIERE QUESTA RIGA DI CODICE
         y_train_score = svm.decision_function(self.X_train)
 
-
-
         y_test_score = svm.predict(self.X_test)
+
         return svm, y_train_score, y_test_score
-
-
 
 #Plot della RocCurve
 def plot_roc_curve(y_test, y_test_score):
@@ -53,8 +50,6 @@ def plot_roc_curve(y_test, y_test_score):
         plt.legend(loc="lower right")
         plt.show()
         sns.set()
-
-
 
 def licit_scenario(y_test,y_test_score,index):
 
