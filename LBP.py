@@ -22,25 +22,25 @@ class Local_Binary_Pattern:
             count+=1
             for j in range(10-self.radius, 10+self.radius+1):
                 matrix[count].append(self.img[i][j])
-        print(matrix)
-        pixels = self.find_neighbors(10, 10)
-        # for i in range(0, self.img.shape[0]):
-        #     for j in range(0, self.img.shape[1]):
+        #print(matrix)
+        #pixels = self.find_neighbors(10, 10)
+        for i in range(0, self.img.shape[0]):
+            for j in range(0, self.img.shape[1]):
         #         # print("----------------")
         #         # print("i;j:", i, j)
         #         # print("value:", self.img[i][j])
         #         # print("neighborhood:")
         #         # print(self.img[i - self.radius: i + self.radius + 1, j - self.radius: j + self.radius + 1])
-        #         pixels = self.find_neighbors(i, j)
+                pixels = self.find_neighbors(i, j)
         #         # print("PIXELS",pixels)
-        #         pattern = np.where(pixels > self.img[i][j], 1, 0)
+                pattern = np.where(pixels > self.img[i][j], 1, 0)
         #         # print("PATTERN:",pattern)
-        #         value = 0
-        #         count = 0
-        #         for k in pattern:
-        #             value += k * 2 ** count
-        #             count += 1
-        #         new_img[i - self.radius][j - self.radius] = value % 256
+                value = 0
+                count = 0
+                for k in pattern:
+                    value += k * 2 ** count
+                    count += 1
+                new_img[i - self.radius][j - self.radius] = value % 256
         #         # print("new value:", value)
         #         # print("----------------")
         # # print("NEW IMG", new_img)
@@ -79,10 +79,10 @@ class Local_Binary_Pattern:
                 y_c = np.ceil(y).astype(int)
                 x_f = np.floor(x).astype(int)
                 y_f = np.floor(y).astype(int)
-                print(x,y)
-                print(x_c,y_c)
-                print(x_f,y_f)
-                print("--------------")
+                #print(x,y)
+                #print(x_c,y_c)
+                #print(x_f,y_f)
+                #print("--------------")
                 if x_c == 0:
                     x1 = x_c
                     x2 = x_f
@@ -193,12 +193,12 @@ if __name__ == '__main__':
     for i, d in enumerate(dets):
        crop = data[d.top() : d.bottom(), d.left() : d.right()]
        crop = cv2.resize(crop, (64, 64))
-    print(crop)
+    #print(crop)
     lbp = Local_Binary_Pattern(2, 16, crop)
     new_img = lbp.compute_lbp()
-    # hist = lbp.createHistogram(new_img)
-    # while True:
-    #     cv2.imshow('frame', lbp.img.astype(np.uint8))
-    #     cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-    #     if cv2.waitKey(1) & 0xFF == ord('q'):
-    #         break
+    hist = lbp.createHistogram(new_img)
+    while True:
+        cv2.imshow('frame', lbp.img.astype(np.uint8))
+        cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break

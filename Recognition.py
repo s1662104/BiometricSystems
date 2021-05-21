@@ -213,13 +213,22 @@ def topMatch(probe, identity, gallery_data, gallery_target):
     lbp_probe = LBP.Local_Binary_Pattern(1, 8, probe)
     new_img = lbp_probe.compute_lbp()
     hist_probe = lbp_probe.createHistogram(new_img)
-    for i in range(len(gallery_data)):
-        if gallery_target[i] == identity:
-            lbp_gallery = LBP.Local_Binary_Pattern(1, 8, gallery_data[i])
-            hist_gallley = lbp_probe.createHistogram(lbp_gallery.compute_lbp())
-            diff = compareHistogram(hist_probe, hist_gallley)
-            if diff >= max:
-                max = diff
+    index = gallery_target.tolist().index(identity)
+    for i in range(5):
+        lbp_gallery = LBP.Local_Binary_Pattern(1, 8, gallery_data[index+i])
+        hist_gallley = lbp_probe.createHistogram(lbp_gallery.compute_lbp())
+        diff = compareHistogram(hist_probe, hist_gallley)
+        if diff >= max:
+            max = diff
+
+    # for i in range(len(gallery_data)):
+    #     if gallery_target[i] == identity:
+    #         lbp_gallery = LBP.Local_Binary_Pattern(1, 8, gallery_data[i])
+    #         hist_gallley = lbp_probe.createHistogram(lbp_gallery.compute_lbp())
+    #         diff = compareHistogram(hist_probe, hist_gallley)
+    #         if diff >= max:
+    #             max = diff
+
     if max == 0:
         print("L'utente",identity,"non è nella gallery")
     return max
@@ -236,16 +245,25 @@ def evaluationIdentification():
     cf_list = users['Codice Fiscale']
     count = 0
     for i in range(len(pg_data)):
+        probe_target = pg_target[i]
+        probe_template = pg_data[i]
+        list = []
         for j in range(len(np.unique(gallery_target))):
-            pg_user = pg_target[j]
-            index = cf_list.tolist().index(pg_user)
+            cf_user = np.unique(gallery_target[j])
+            index = cf_list.tolist().index(cf_user)
             user = users.iloc[index]
             delegati = ast.literal_eval(user["Delegati"])
             #if the user has delegates
             if len(delegati) > 0:
                 count += 1
-                pg_template = pg_data[i]
-
+                max = 0
+                for t in delegati:
+                    val = topMatch(probe_template, t, gallery_data,gallery_target)
+                    if val > max:
+                        max = val
+                list.append((cf_user, max))
+        list = sorted(list, key=lambda x: x[1], reverse=True)
+        print(list)
 
     return
 
