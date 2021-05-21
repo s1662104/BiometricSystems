@@ -179,25 +179,27 @@ class Database():
         dataset = []
         # numero di utenti nella gallery
         n_user = self.num_user(self.gallery_target)
+        print(len(np.unique(self.gallery_target)))
         # per ogni  utente
         count=0
-        for user in np.unique(self.gallery_target):
-            row = []
-            # aggiungo nome
-            row.append(Olivetti_Names(count).name.replace("_"," "))
-            # genero il codice fiscale
-            row.append(user)
-            # genero la lista casuale di farmaci
-            row.append(self.generateMedicineList())
-            # definisco il numero di delegati
-            n_family = randrange(self.family_number+1)
-            family = []
-            for j in range(n_family):
-                family_member = randrange(n_user)
-                family.append(cfs[family_member])
-            row.append(family)
-            dataset.append(row)
-            count += 1
+        for user in cfs:
+            if user in np.unique(self.gallery_target):
+                row = []
+                # aggiungo nome
+                row.append(Olivetti_Names(count).name.replace("_"," "))
+                # genero il codice fiscale
+                row.append(user)
+                # genero la lista casuale di farmaci
+                row.append(self.generateMedicineList())
+                # definisco il numero di delegati
+                n_family = randrange(self.family_number+1)
+                family = []
+                for j in range(n_family):
+                    family_member = randrange(n_user)
+                    family.append(cfs[family_member])
+                row.append(family)
+                dataset.append(row)
+                count += 1
         # trasformo in np array
         dataset = np.array(dataset)
         # e' passato almeno un mese dall'ultimo prelievo di farmaci
