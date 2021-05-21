@@ -149,6 +149,9 @@ def verificationFAR():
             val = topMatch(pn_template, pg_identity, gallery_data, gallery_target)
             if val > threshold:
                 P = P + 1
+
+    #Scenario in which the impostor belongs to the gallery
+
     #print("Il numero di identità errate accettate è:", P)
     print("FAR:", P / (len(pn_data)*len(np.unique(gallery_target))))
 
@@ -204,6 +207,7 @@ def verificationROC():
 
     return
 
+#MODIFICA IN MODO DA TOGLIERE IL FOR
 def topMatch(probe, identity, gallery_data, gallery_target):
     max = 0
     lbp_probe = LBP.Local_Binary_Pattern(1, 8, probe)
@@ -220,7 +224,33 @@ def topMatch(probe, identity, gallery_data, gallery_target):
         print("L'utente",identity,"non è nella gallery")
     return max
 
+#CREARE UNA GALLERY PARALLELA IN CUI AGLI UTENTI SONO ASSOCIATI I DELEGATI
+def evaluationIdentification():
+    gallery_data = np.load("npy_db/gallery_data.npy")
+    gallery_target = np.load("npy_db/gallery_target.npy")
+    pg_data = np.load("npy_db/pg_data.npy")
+    pg_target = np.load("npy_db/pg_target.npy")
+    pn_data = np.load("npy_db/pn_data.npy")
+    pn_target = np.load("npy_db/pn_target.npy")
+    users = pd.read_csv('dataset_user.csv', index_col=[0])
+    cf_list = users['Codice Fiscale']
+    count = 0
+    for i in range(len(pg_data)):
+        for j in range(len(np.unique(gallery_target))):
+            pg_user = pg_target[j]
+            index = cf_list.tolist().index(pg_user)
+            user = users.iloc[index]
+            delegati = ast.literal_eval(user["Delegati"])
+            #if the user has delegates
+            if len(delegati) > 0:
+                count += 1
+                pg_template = pg_data[i]
+
+
+    return
+
 if __name__ == '__main__':
     #verificationFRR()
     #verificationFAR()
-    verificationROC()
+    #verificationROC()
+    evaluationIdentification()
