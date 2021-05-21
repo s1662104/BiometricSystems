@@ -586,7 +586,7 @@ def isCF(cf):
 
 def main():
     app = Page()
-    app.geometry('320x550')
+    app.geometry('300x550')
     app.mainloop()
 
 
