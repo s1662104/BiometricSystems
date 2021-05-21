@@ -249,7 +249,7 @@ def evaluationIdentification():
         probe_template = pg_data[i]
         list = []
         for j in range(len(np.unique(gallery_target))):
-            cf_user = np.unique(gallery_target[j])
+            cf_user = np.unique(gallery_target)[j]
             index = cf_list.tolist().index(cf_user)
             user = users.iloc[index]
             delegati = ast.literal_eval(user["Delegati"])
@@ -264,6 +264,7 @@ def evaluationIdentification():
                 list.append((cf_user, max))
         list = sorted(list, key=lambda x: x[1], reverse=True)
         print(list)
+
 
     return
 
