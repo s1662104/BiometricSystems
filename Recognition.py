@@ -233,7 +233,6 @@ def topMatch(probe, identity, gallery_data, gallery_target):
         print("L'utente",identity,"non è nella gallery")
     return max
 
-#CREARE UNA GALLERY PARALLELA IN CUI AGLI UTENTI SONO ASSOCIATI I DELEGATI
 def evaluationIdentification():
     gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
@@ -244,6 +243,9 @@ def evaluationIdentification():
     users = pd.read_csv('dataset_user.csv', index_col=[0])
     cf_list = users['Codice Fiscale']
     count = 0
+    di = [0]*len(np.unique(gallery_target))
+    fa = 0
+    gr = 0
     for i in range(len(pg_data)):
         probe_target = pg_target[i]
         probe_template = pg_data[i]
@@ -261,10 +263,24 @@ def evaluationIdentification():
                     val = topMatch(probe_template, t, gallery_data,gallery_target)
                     if val > max:
                         max = val
-                list.append((cf_user, max))
+                list.append((cf_user, max, delegati))
         list = sorted(list, key=lambda x: x[1], reverse=True)
         print(list)
+        if list[0][1] >= threshold:
+            if probe_target in list[0][2]:
+                di[0] += 1
+            else:
+                for v in range(1,len(list)):
+                    if probe_target in list[v][2] and list[v][1] >= threshold:
+                        di[v] += 1
+                fa += 1
+        else:
+            gr += 1
 
+    dir = [0]*len(np.unique(gallery_target))
+    dir[0] = di[0]/count
+    frr = 1 - dir[0]
+    print("FRR:",frr)
 
     return
 
