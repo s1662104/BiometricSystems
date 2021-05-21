@@ -79,7 +79,7 @@ class Database():
             np.save("npy_db/pg_data.npy", self.pg_data)
             np.save("npy_db/pg_target.npy", self.pg_target)
         else:
-            print("LOADING NEW DB")
+            print("LOADING DB")
             self.gallery_data = np.load("npy_db/gallery_data.npy")
             self.gallery_target = np.load("npy_db/gallery_target.npy")
             self.pn_data = np.load("npy_db/pn_data.npy")
@@ -181,7 +181,7 @@ class Database():
         n_user = self.num_user(self.gallery_target)
         # per ogni  utente
         count=0
-        for user in cfs:
+        for user in np.unique(self.gallery_target):
             row = []
             # aggiungo nome
             row.append(Olivetti_Names(count).name.replace("_"," "))
@@ -304,8 +304,8 @@ class Database():
 
 if __name__ == '__main__':
     db = Database(0)
-    print(db.gallery_data[0])
-    print(db.gallery_target[0])
+    # print(db.gallery_data[0])
+    # print(db.gallery_target[0])
     # img = db.get_normalized_template(0, db.gallery_data)
     # db.show_image(img)
     #
@@ -313,9 +313,9 @@ if __name__ == '__main__':
     # new_img = lbp.compute_lbp()
     # db.show_image(np.array(new_img).astype(np.uint8))
 
-    # print("gallery:", len(db.gallery_data), len(db.gallery_target), len(np.unique(db.gallery_target)))
-    # print("probe PG:", len(db.pg_data), len(db.pg_target), len(np.unique(db.pg_target)))
-    # print("probe PN:", len(db.pn_data), len(db.pn_target), len(np.unique(db.pn_target)))
+    print("gallery:", len(db.gallery_data), len(db.gallery_target), len(np.unique(db.gallery_target)))
+    print("probe PG:", len(db.pg_data), len(db.pg_target), len(np.unique(db.pg_target)))
+    print("probe PN:", len(db.pn_data), len(db.pn_target), len(np.unique(db.pn_target)))
 
     #db.csv_medicine_maker()
 

@@ -12,50 +12,49 @@ class Local_Binary_Pattern:
         if self.radius <= 0 or self.neighborhood < 4 or self.neighborhood > self.radius*8:
             raise Exception("Input error")
         self.img = img
-        # if img == None:
-        #     self.img = []
-        #     for i in range(10):
-        #         self.img.append(np.arange(10 * i, 10 * (i + 1)))
-        #     self.img = np.array(self.img).astype(np.uint8)
-        #     self.img = np.array([[10, 2, 32, 18, 81], [4, 73, 21, 10, 42], [54, 21, 17, 62, 49],
-        #     [1, 72, 8, 92, 62], [7, 77, 28, 10, 88], ], np.int32)
 
     def compute_lbp(self):
         new_img = [[0 for y in range(self.img.shape[0])] for x in range(self.img.shape[1])]
-        for i in range(0, self.img.shape[0]):
-            for j in range(0, self.img.shape[1]):
-                # print("----------------")
-                # print("i;j:", i, j)
-                # print("value:", self.img[i][j])
-                # print("neighborhood:")
-                # print(self.img[i - self.radius: i + self.radius + 1, j - self.radius: j + self.radius + 1])
-                pixels = self.find_neighbors(i, j)
-                # print("PIXELS",pixels)
-                pattern = np.where(pixels > self.img[i][j], 1, 0)
-                # print("PATTERN:",pattern)
-                value = 0
-                count = 0
-                for k in pattern:
-                    value += k * 2 ** count
-                    count += 1
-                new_img[i - self.radius][j - self.radius] = value % 256
-                # print("new value:", value)
-                # print("----------------")
-        # print("NEW IMG", new_img)
+        matrix = []
+        count=-1
+        for i in range(10-self.radius, 10+self.radius+1):
+            matrix.append([])
+            count+=1
+            for j in range(10-self.radius, 10+self.radius+1):
+                matrix[count].append(self.img[i][j])
+        print(matrix)
+        pixels = self.find_neighbors(10, 10)
+        # for i in range(0, self.img.shape[0]):
+        #     for j in range(0, self.img.shape[1]):
+        #         # print("----------------")
+        #         # print("i;j:", i, j)
+        #         # print("value:", self.img[i][j])
+        #         # print("neighborhood:")
+        #         # print(self.img[i - self.radius: i + self.radius + 1, j - self.radius: j + self.radius + 1])
+        #         pixels = self.find_neighbors(i, j)
+        #         # print("PIXELS",pixels)
+        #         pattern = np.where(pixels > self.img[i][j], 1, 0)
+        #         # print("PATTERN:",pattern)
+        #         value = 0
+        #         count = 0
+        #         for k in pattern:
+        #             value += k * 2 ** count
+        #             count += 1
+        #         new_img[i - self.radius][j - self.radius] = value % 256
+        #         # print("new value:", value)
+        #         # print("----------------")
+        # # print("NEW IMG", new_img)
         return new_img
 
     def find_neighbors(self, cx, cy):
-        # dividere un angolo di 360 in self.neighborhood parti
+        # definire il cerchio composto da self.neighborhood punti
         angles_array = 2*np.pi/self.neighborhood
-        # ottenere tutti gli angoli
         alpha = np.arange(0, 2 * np.pi, angles_array)
-        # ordiniamo i gradi in modo tale da partire dall'angolo in alto a sx e procedere verso dx
+        # ordiniamo  in modo tale da partire dall'angolo in alto a sx e procedere verso dx
         alpha = self.sort_points(alpha)
-        # print(np.degrees(alpha))
-        # calcolare coppia di seno e coseno per ogni angolo
+        # calcolare coppia di seno e coseno per ogni punto
         s_points = np.array([-np.sin(alpha), np.cos(alpha)]).transpose()
         s_points *= self.radius
-        # print(self.img[cx][cy])
         # per ogni punto
         pixels = []
         for x, y in s_points:
@@ -80,6 +79,10 @@ class Local_Binary_Pattern:
                 y_c = np.ceil(y).astype(int)
                 x_f = np.floor(x).astype(int)
                 y_f = np.floor(y).astype(int)
+                print(x,y)
+                print(x_c,y_c)
+                print(x_f,y_f)
+                print("--------------")
                 if x_c == 0:
                     x1 = x_c
                     x2 = x_f
@@ -182,33 +185,20 @@ class Spoof_Local_Binary_Pattern(Local_Binary_Pattern):
         return super().createHistogram(new_img, grid_x, grid_y)
 
 if __name__ == '__main__':
-    db_index = input("Quale database si vuole utilizzare? \n 0 - Olivetti \n 1 - LFW\n")
-    if db_index == "0":
-        db = Database.Database(0)
-
-        #Initializing Support Vector Machine and fitting the training data
-        train_data, train_target, test_data, test_target, gallery_data, gallery_target, probe_data, probe_target = db.split_data()
-
-        print("train_data\n",train_data[0])
-        print("train_target\n",train_target[0])
-        classifier = SVC(kernel='rbf', random_state=1)
-
-    elif db_index == "1":
-        db = Database.Database(1)
-        data = db.get_normalized_template(0)
-        detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-        dets = detector(data, 1)
-        for i, d in enumerate(dets):
-           crop = data[d.top() : d.bottom(), d.left() : d.right()]
-           crop = cv2.resize(crop, (64, 64))
-        lbp = Local_Binary_Pattern(1, 8, crop)
-        new_img = lbp.compute_lbp()
-        hist = lbp.createHistogram(new_img)
-        while True:
-            cv2.imshow('frame', lbp.img.astype(np.uint8))
-            cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-    else:
-        print("Valora non valido!")
+    db = Database.Database()
+    data = db.gallery_data[0]
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+    dets = detector(data, 1)
+    for i, d in enumerate(dets):
+       crop = data[d.top() : d.bottom(), d.left() : d.right()]
+       crop = cv2.resize(crop, (64, 64))
+    print(crop)
+    lbp = Local_Binary_Pattern(2, 16, crop)
+    new_img = lbp.compute_lbp()
+    # hist = lbp.createHistogram(new_img)
+    # while True:
+    #     cv2.imshow('frame', lbp.img.astype(np.uint8))
+    #     cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
+    #     if cv2.waitKey(1) & 0xFF == ord('q'):
+    #         break

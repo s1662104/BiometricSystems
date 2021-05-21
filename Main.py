@@ -29,7 +29,7 @@ spoofingMessage = "ANTISPOOFING ERROR!\n L'UTENTE NON SEMBRA ESSERE REALE!"
 
 dim_image = 64
 number_maximum_delegate = 3
-
+n_photo_x_user = 5
 
 class Page(tk.Tk):
 
@@ -226,6 +226,7 @@ class DataEnrollmentPage(DataPage):
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
+        print(img)
         self.photo = photo
 
     def addMedicines(self, nMedicine):
@@ -423,19 +424,21 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         return
     else:
         labelError.configure(fg="#f0f0f0")
-
-    crop = videoCapture()
-    print("CROP FATTO!")
+    # crop = videoCapture()
     if op == 0:
         n = 3
     else:
         n = 4
     list(controller.frames.values())[n].reset()
     if op == 0:
-        list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop,
-                                                        name)
+        cropList = multipleCapture()
+        # list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop,
+        #                                                name)
+        list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(cropList[0])),
+                                                        cropList, name)
         controller.show_frame(DataEnrollmentPage)
     else:
+        crop = videoCapture()
         ##Inizio parte antispoofing
         user = False
         nameFileCsv = 'histogram.csv'
@@ -474,13 +477,14 @@ def addUser(photo, cf, name, medicines, delegates):
     gallery_data = np.load("npy_db/gallery_data.npy").tolist()
     gallery_target = np.load("npy_db/gallery_target.npy").tolist()
     medicine_csv = pd.read_csv("dataset_user.csv", index_col=[0])
-    gallery_data.append(photo)
-    gallery_target.append(cf)
+    for i in range(n_photo_x_user):
+        gallery_data.append(photo[i])
+        gallery_target.append(cf)
     print("L'utente", name, "viene aggiunto al dataset")
     print("Il codice fiscale è", cf)
     print(len(gallery_data), len(gallery_target))
-    print(photo, gallery_data[len(gallery_data) - 1])
-    print(cf, gallery_target[len(gallery_target) - 1])
+    # print(photo, gallery_data[len(gallery_data) - 1])
+    # print(cf, gallery_target[len(gallery_target) - 1])
     medicine_csv = medicine_csv.append(
         {"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates,
          "Data": date.today().strftime("%d/%m/%Y")}, ignore_index=True)
@@ -488,10 +492,12 @@ def addUser(photo, cf, name, medicines, delegates):
     np.save("npy_db/gallery_target.npy", np.array(gallery_target))
     medicine_csv.to_csv('dataset_user.csv')
 
-
-def reset_pages():
-    pass
-
+def multipleCapture():
+    list_captures = []
+    for i in range(n_photo_x_user):
+        crop = videoCapture()
+        list_captures.append(crop)
+    return list_captures
 
 def videoCapture():
     cap = cv2.VideoCapture(0)
@@ -580,7 +586,7 @@ def isCF(cf):
 
 def main():
     app = Page()
-    app.geometry('320x550')
+    app.geometry('300x550')
     app.mainloop()
 
 
