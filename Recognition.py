@@ -294,14 +294,28 @@ def evaluationIdentificationAsMultiVer():
     pn_target = np.load("npy_db/pn_target.npy")
     users = pd.read_csv('dataset_user.csv', index_col=[0])
     cf_list = users['Codice Fiscale']
+    results1 = delegatesMatch(pg_data,pg_target,gallery_target,gallery_data,cf_list,users)
+    results2 = delegatesMatch(pn_data, pn_target, gallery_target, gallery_data, cf_list, users)
+    print("PG_DATA:",results1)
+    print("PN_DATA:", results2)
+
+    fa = results1[0] + results2[0]
+    fr = results1[1] + results2[1]
+    countTG = results1[2] + results2[2]
+    countTI = results1[3] + results2[3]
+    FRR = fr/countTG
+    FAR = fa/countTI
+    print("FRR:", FRR, countTG)
+    print("FAR:", FAR, countTI)
+
+def delegatesMatch(data, target, gallery_target, gallery_data, cf_list, users):
     countTG = 0
     countTI = 0
-    di = [0]*len(np.unique(gallery_target))
     fa = 0
     fr = 0
-    for i in range(len(pg_data)):
-        probe_target = pg_target[i]
-        probe_template = pg_data[i]
+    for i in range(len(data)):
+        probe_target = target[i]
+        probe_template = data[i]
         for j in range(len(np.unique(gallery_target))):
                 cf_user = np.unique(gallery_target)[j]
                 index = cf_list.tolist().index(cf_user)
@@ -319,16 +333,13 @@ def evaluationIdentificationAsMultiVer():
                         val = topMatch(probe_template, t, gallery_data,gallery_target)
                         if val > max:
                             max = val
-                    if val > threshold and probe_target not in delegati:
+                    if max > threshold and probe_target not in delegati:
                         fa += 1
-                    elif val <= threshold and probe_target in delegati:
+                    elif max <= threshold and probe_target in delegati:
                         fr += 1
                     # print(val, threshold, fr, fa)
-        break
-    FRR = fr/countTG
-    FAR = fa/countTI
-    print("FRR:", FRR, countTG)
-    print("FAR:", FAR, countTI)
+        print(probe_target, fr, countTG, fa, countTI)
+    return fa, fr, countTG, countTI
 
 if __name__ == '__main__':
     #verificationFRR()

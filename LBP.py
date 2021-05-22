@@ -22,28 +22,16 @@ class Local_Binary_Pattern:
             count+=1
             for j in range(10-self.radius, 10+self.radius+1):
                 matrix[count].append(self.img[i][j])
-        #print(matrix)
-        #pixels = self.find_neighbors(10, 10)
         for i in range(0, self.img.shape[0]):
             for j in range(0, self.img.shape[1]):
-        #         # print("----------------")
-        #         # print("i;j:", i, j)
-        #         # print("value:", self.img[i][j])
-        #         # print("neighborhood:")
-        #         # print(self.img[i - self.radius: i + self.radius + 1, j - self.radius: j + self.radius + 1])
                 pixels = self.find_neighbors(i, j)
-        #         # print("PIXELS",pixels)
                 pattern = np.where(pixels > self.img[i][j], 1, 0)
-        #         # print("PATTERN:",pattern)
                 value = 0
                 count = 0
                 for k in pattern:
                     value += k * 2 ** count
                     count += 1
-                new_img[i - self.radius][j - self.radius] = value % 256
-        #         # print("new value:", value)
-        #         # print("----------------")
-        # # print("NEW IMG", new_img)
+                new_img[i][j] = value % 256
         return new_img
 
     def find_neighbors(self, cx, cy):
@@ -102,6 +90,10 @@ class Local_Binary_Pattern:
                     pixels.append(np.round(value).astype(int))
         return pixels
 
+    # x1,y1 rappresentano le coordinate più piccole
+    # x2, y2 rappresentano le coordinate più grandi
+    # cx, cy rappresentano le coordinate del pixel centrale nell'immagine
+    # x, y rappresentano le coordinate del punto il cui valore è da definire
     def bilinear_interpolation(self, x1, y1, x2, y2, cx, cy, x, y):
         Q11 = self.img[cx + x1][cy + y1]
         Q21 = self.img[cx + x1][cy + y2]
