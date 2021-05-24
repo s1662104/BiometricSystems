@@ -317,7 +317,7 @@ class Database():
         len = medicines.shape[0]
         # fissa un numero randomico di farmaci
         for i in range(randrange(len)):
-            rnd = randrange(len)
+            rnd = randrange(1,len)
             m = medicines.loc[rnd]
             medicine = m['Nome'] + " " + m['Dosaggio']
             if medicine not in list:

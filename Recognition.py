@@ -248,7 +248,59 @@ def topMatch(probe, identity, gallery_data, gallery_target):
         print("L'utente",identity,"non è nella gallery")
     return max
 
-def evaluationIdentification():
+# def evaluationIdentification():
+#     gallery_data = np.load("npy_db/gallery_data.npy")
+#     gallery_target = np.load("npy_db/gallery_target.npy")
+#     pg_data = np.load("npy_db/pg_data.npy")
+#     pg_target = np.load("npy_db/pg_target.npy")
+#     pn_data = np.load("npy_db/pn_data.npy")
+#     pn_target = np.load("npy_db/pn_target.npy")
+#     users = pd.read_csv('dataset_user.csv', index_col=[0])
+#     cf_list = users['Codice Fiscale']
+#     count = 0
+#     di = [0]*len(np.unique(gallery_target))
+#     fa = 0
+#     gr = 0
+#     for i in range(len(pg_data)):
+#         probe_target = pg_target[i]
+#         probe_template = pg_data[i]
+#         list = []
+#         for j in range(len(np.unique(gallery_target))):
+#             cf_user = np.unique(gallery_target)[j]
+#             index = cf_list.tolist().index(cf_user)
+#             user = users.iloc[index]
+#             delegati = ast.literal_eval(user["Delegati"])
+#             #if the user has delegates
+#             if len(delegati) > 0:
+#                 count += 1
+#                 max = 0
+#                 for t in delegati:
+#                     val = topMatch(probe_template, t, gallery_data,gallery_target)
+#                     if val > max:
+#                         max = val
+#                 list.append((cf_user, max, delegati))
+#         list = sorted(list, key=lambda x: x[1], reverse=True)
+#         print(list)
+#         if list[0][1] >= threshold:
+#             if probe_target in list[0][2]:
+#                 di[0] += 1
+#             else:
+#                 for v in range(1,len(list)):
+#                     if probe_target in list[v][2] and list[v][1] >= threshold:
+#                         di[v] += 1
+#                 fa += 1
+#         else:
+#             gr += 1
+#
+#     dir = [0]*len(np.unique(gallery_target))
+#     dir[0] = di[0]/count
+#     frr = 1 - dir[0]
+#     print("DIR:",dir)
+#     print("FRR:",frr)
+#
+#     return
+
+def evaluationIdentificationAsMultiVer():
     gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
     pg_data = np.load("npy_db/pg_data.npy")
@@ -257,50 +309,56 @@ def evaluationIdentification():
     pn_target = np.load("npy_db/pn_target.npy")
     users = pd.read_csv('dataset_user.csv', index_col=[0])
     cf_list = users['Codice Fiscale']
-    count = 0
-    di = [0]*len(np.unique(gallery_target))
+    results1 = delegatesMatch(pg_data,pg_target,gallery_target,gallery_data,cf_list,users)
+    results2 = delegatesMatch(pn_data, pn_target, gallery_target, gallery_data, cf_list, users)
+    print("PG_DATA:",results1)
+    print("PN_DATA:", results2)
+
+    fa = results1[0] + results2[0]
+    fr = results1[1] + results2[1]
+    countTG = results1[2] + results2[2]
+    countTI = results1[3] + results2[3]
+    FRR = fr/countTG
+    FAR = fa/countTI
+    print("FRR:", FRR, countTG)
+    print("FAR:", FAR, countTI)
+
+def delegatesMatch(data, target, gallery_target, gallery_data, cf_list, users):
+    countTG = 0
+    countTI = 0
     fa = 0
-    gr = 0
-    for i in range(len(pg_data)):
-        probe_target = pg_target[i]
-        probe_template = pg_data[i]
-        list = []
+    fr = 0
+    for i in range(len(data)):
+        probe_target = target[i]
+        probe_template = data[i]
         for j in range(len(np.unique(gallery_target))):
-            cf_user = np.unique(gallery_target)[j]
-            index = cf_list.tolist().index(cf_user)
-            user = users.iloc[index]
-            delegati = ast.literal_eval(user["Delegati"])
-            #if the user has delegates
-            if len(delegati) > 0:
-                count += 1
-                max = 0
-                for t in delegati:
-                    val = topMatch(probe_template, t, gallery_data,gallery_target)
-                    if val > max:
-                        max = val
-                list.append((cf_user, max, delegati))
-        list = sorted(list, key=lambda x: x[1], reverse=True)
-        print(list)
-        if list[0][1] >= threshold:
-            if probe_target in list[0][2]:
-                di[0] += 1
-            else:
-                for v in range(1,len(list)):
-                    if probe_target in list[v][2] and list[v][1] >= threshold:
-                        di[v] += 1
-                fa += 1
-        else:
-            gr += 1
-
-    dir = [0]*len(np.unique(gallery_target))
-    dir[0] = di[0]/count
-    frr = 1 - dir[0]
-    print("FRR:",frr)
-
-    return
+                cf_user = np.unique(gallery_target)[j]
+                index = cf_list.tolist().index(cf_user)
+                user = users.iloc[index]
+                delegati = ast.literal_eval(user["Delegati"])
+                # print("PROBE:",probe_target,"PAZIENTE:", cf_user, "DELEGATI:",delegati)
+                #if the user has delegates
+                if len(delegati) > 0 and cf_user != probe_target:
+                    if probe_target in delegati:
+                        countTG += 1
+                    else:
+                        countTI += 1
+                    max = 0
+                    for t in delegati:
+                        val = topMatch(probe_template, t, gallery_data,gallery_target)
+                        if val > max:
+                            max = val
+                    if max > threshold and probe_target not in delegati:
+                        fa += 1
+                    elif max <= threshold and probe_target in delegati:
+                        fr += 1
+                    # print(val, threshold, fr, fa)
+        print(probe_target, fr, countTG, fa, countTI)
+    return fa, fr, countTG, countTI
 
 if __name__ == '__main__':
     verificationFRR()
     #verificationFAR()
     #verificationROC()
+    evaluationIdentificationAsMultiVer()
     #evaluationIdentification()
