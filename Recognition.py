@@ -360,5 +360,5 @@ if __name__ == '__main__':
     verificationFRR()
     #verificationFAR()
     #verificationROC()
-    evaluationIdentificationAsMultiVer()
+    #evaluationIdentificationAsMultiVer()
     #evaluationIdentification()
