@@ -7,6 +7,9 @@ import pandas as pd
 from random import randrange
 from datetime import date
 
+import LBP
+import Recognition
+
 class Olivetti_Names(Enum):
     Xander_Bolton = 0
     Jameson_Sierra = 1
@@ -72,8 +75,14 @@ class Database():
             self.gallery_data, self.gallery_target, self.pn_data, self.pn_target, self.pg_data, self.pg_target = \
                 self.split_gallery_probe(data, target, cfs)
             self.csv_maker(cfs)
+
+            #Creazione dei threshold adattivi
+            #self.gallery_threshold = self.adaptiveThresholds()
+            self.gallery_threshold = [0.59, 0.64, 0.66, 0.62, 0.67, 0.66, 0.71, 0.68, 0.70, 0.63, 0.64, 0.72, 0.75, 0.69, 0.69, 0.62, 0.65, 0.61, 0.68, 0.63, 0.66, 0.73, 0.68, 0.70, 0.64, 0.60, 0.75, 0.62]
+
             np.save("npy_db/gallery_data.npy",self.gallery_data)
             np.save("npy_db/gallery_target.npy",self.gallery_target)
+            np.save("npy_db/gallery_thresholds.npy", self.gallery_threshold)
             np.save("npy_db/pn_data.npy", self.pn_data)
             np.save("npy_db/pn_target.npy", self.pn_target)
             np.save("npy_db/pg_data.npy", self.pg_data)
@@ -86,6 +95,32 @@ class Database():
             self.pn_target = np.load("npy_db/pn_target.npy")
             self.pg_data = np.load("npy_db/pg_data.npy")
             self.pg_target = np.load("npy_db/pg_target.npy")
+
+    def adaptiveThresholds(self):
+        thresholds = []
+        for user in np.unique(self.gallery_target):
+            max_thd = -1
+            for i in range(len(self.gallery_data)):
+                if user != self.gallery_target[i]:
+                    new_thd = 0
+                    lbp_probe = LBP.Local_Binary_Pattern(1, 8, self.gallery_data[i])
+                    new_img = lbp_probe.compute_lbp()
+                    hist_probe = lbp_probe.createHistogram(new_img)
+                    index = self.gallery_target.index(user)
+                    for i in range(5):
+                        lbp_gallery = LBP.Local_Binary_Pattern(1, 8, self.gallery_data[index + i])
+                        hist_gallley = lbp_probe.createHistogram(lbp_gallery.compute_lbp())
+                        diff = Recognition.compareHistogram(hist_probe, hist_gallley)
+                        if diff >= new_thd:
+                            new_thd = diff
+                    if new_thd > max_thd:
+                        max_thd = new_thd
+            thresholds.append(max_thd)
+            print("Threshold per l'utente", user, ":", max_thd)
+
+        print("Thresholds:", thresholds)
+
+        return thresholds
 
     # pn = percentuale di utenti che non sono nella gallery
     # probe = percentuale di template che sono nel probe set e non nel gallery set per lo stesso utente
@@ -320,4 +355,5 @@ if __name__ == '__main__':
     print("probe PN:", len(db.pn_data), len(db.pn_target), len(np.unique(db.pn_target)))
 
     #db.csv_medicine_maker()
+
 

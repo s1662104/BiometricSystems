@@ -117,13 +117,14 @@ def verificationFRR():
     pg_data = np.load("npy_db/pg_data.npy")
     gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
+    gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
     P = 0
     for i in range(len(pg_data)):
         pg_template = pg_data[i]
         pg_identity = pg_target[i]
         #topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
         gx = topMatch(pg_template, pg_identity, gallery_data, gallery_target)
-        if gx <= threshold:
+        if gx < gallery_thresholds[int(i/5)]:
             P = P + 1
     #print("Il numero di identità rifiutate è:",P)
     print("FRR:", P/len(pg_data))
@@ -137,9 +138,11 @@ def verificationFRR():
 def verificationFAR():
     pg_target = np.load("npy_db/pg_target.npy")
     pn_data = np.load("npy_db/pn_data.npy")
+    pg_data = np.load("npy_db/pn_data.npy")
     gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
     P = 0
+    ti = 0
     #Scenario in which the impostor doesn't belong to the gallery
     for i in range(len(pn_data)):
         pn_template = pn_data[i]
@@ -147,13 +150,25 @@ def verificationFAR():
             pg_identity = pg_target[t]
             #topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
             val = topMatch(pn_template, pg_identity, gallery_data, gallery_target)
-            if val > threshold:
+            if val >= threshold:
                 P = P + 1
+            ti += 1
 
     #Scenario in which the impostor belongs to the gallery
+    for i in range(len(pg_data)):
+        pg_template = pg_data[i]
+        for t in range(len(np.unique(gallery_target))):
+            pg_identity = pg_target[t]
+            if pg_identity != pg_target[i]:
+                # topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
+                val = topMatch(pg_template, pg_identity, gallery_data, gallery_target)
+                if val >= threshold:
+                    P = P + 1
+                ti += 1
 
     #print("Il numero di identità errate accettate è:", P)
-    print("FAR:", P / (len(pn_data)*len(np.unique(gallery_target))))
+    #print("FAR:", P / (len(pn_data)*len(np.unique(gallery_target))))
+    print("FAR:", P / ti)
 
     return
 
@@ -285,7 +300,7 @@ def evaluationIdentification():
     return
 
 if __name__ == '__main__':
-    #verificationFRR()
+    verificationFRR()
     #verificationFAR()
     #verificationROC()
-    evaluationIdentification()
+    #evaluationIdentification()
