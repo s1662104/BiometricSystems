@@ -141,6 +141,7 @@ def verificationFAR():
     pg_data = np.load("npy_db/pn_data.npy")
     gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
+    gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
     P = 0
     ti = 0
     #Scenario in which the impostor doesn't belong to the gallery
@@ -150,7 +151,7 @@ def verificationFAR():
             pg_identity = pg_target[t]
             #topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
             val = topMatch(pn_template, pg_identity, gallery_data, gallery_target)
-            if val >= threshold:
+            if val >= gallery_thresholds[t]:
                 P = P + 1
             ti += 1
 
@@ -162,7 +163,7 @@ def verificationFAR():
             if pg_identity != pg_target[i]:
                 # topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
                 val = topMatch(pg_template, pg_identity, gallery_data, gallery_target)
-                if val >= threshold:
+                if val >= gallery_thresholds[t]:
                     P = P + 1
                 ti += 1
 
@@ -178,29 +179,40 @@ def verificationFAR():
 def verificationROC():
     gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
+    gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
     pg_data = np.load("npy_db/pg_data.npy")
     pg_target = np.load("npy_db/pg_target.npy")
     pn_data = np.load("npy_db/pn_data.npy")
 
-    Y = [0]*(len(pg_data)+(len(pn_data)*len(np.unique(gallery_target))))
-    Y_pred = [0]*(len(pg_data)+(len(pn_data)*len(np.unique(gallery_target))))
+    Y = []
+    Y_pred = []
 
     for i in range(len(pg_data)):
-        Y[i] = 1
+        Y.append(1)
         val = topMatch(pg_data[i],pg_target[i],gallery_data,gallery_target)
-        if val >= threshold:
-            Y_pred[i] = 1
+        if val >= gallery_thresholds[int(i/5)]:
+            Y_pred.append(1)
         else:
-            Y_pred[i] = 0
+            Y_pred.append(0)
 
     for j in range(len(pn_data)):
         for t in range(len(np.unique(gallery_target))):
-            Y[len(pg_data)+((j+1)*t)] = 0
+            Y.append(0)
             val = topMatch(pn_data[j], gallery_target[t], gallery_data, gallery_target)
-            if val >= threshold:
-                Y_pred[len(pg_data)+((j+1)*t)] = 1
+            if val >= gallery_thresholds[t]:
+                Y_pred.append(1)
             else:
-                Y_pred[len(pg_data)+((j+1)*t)] = 0
+                Y_pred.append(0)
+
+    for v in range(len(pg_data)):
+        for u in range(len(pg_data)):
+            if pg_target[v] != pg_target[u]:
+                Y.append(0)
+                val = topMatch(pg_data[v], gallery_target[u], gallery_data, gallery_target)
+                if val >= gallery_thresholds[int(u/5)]:
+                    Y_pred.append(1)
+                else:
+                    Y_pred.append(0)
 
     FPR, TPR, t = roc_curve(np.array(Y), np.array(Y_pred))
     auc = roc_auc_score(np.array(Y), np.array(Y_pred))
@@ -303,14 +315,15 @@ def topMatch(probe, identity, gallery_data, gallery_target):
 def evaluationIdentificationAsMultiVer():
     gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
+    gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
     pg_data = np.load("npy_db/pg_data.npy")
     pg_target = np.load("npy_db/pg_target.npy")
     pn_data = np.load("npy_db/pn_data.npy")
     pn_target = np.load("npy_db/pn_target.npy")
     users = pd.read_csv('dataset_user.csv', index_col=[0])
     cf_list = users['Codice Fiscale']
-    results1 = delegatesMatch(pg_data,pg_target,gallery_target,gallery_data,cf_list,users)
-    results2 = delegatesMatch(pn_data, pn_target, gallery_target, gallery_data, cf_list, users)
+    results1 = delegatesMatch(pg_data,pg_target,gallery_target,gallery_data,cf_list,users, gallery_thresholds)
+    results2 = delegatesMatch(pn_data, pn_target, gallery_target, gallery_data, cf_list, users, gallery_thresholds)
     print("PG_DATA:",results1)
     print("PN_DATA:", results2)
 
@@ -323,7 +336,7 @@ def evaluationIdentificationAsMultiVer():
     print("FRR:", FRR, countTG)
     print("FAR:", FAR, countTI)
 
-def delegatesMatch(data, target, gallery_target, gallery_data, cf_list, users):
+def delegatesMatch(data, target, gallery_target, gallery_data, cf_list, users, gallery_thresholds):
     countTG = 0
     countTI = 0
     fa = 0
@@ -344,21 +357,30 @@ def delegatesMatch(data, target, gallery_target, gallery_data, cf_list, users):
                     else:
                         countTI += 1
                     max = 0
+                    accepted = False
                     for t in delegati:
                         val = topMatch(probe_template, t, gallery_data,gallery_target)
-                        if val > max:
-                            max = val
-                    if max > threshold and probe_target not in delegati:
+                        # if val > max:
+                        #     max = val
+                        index_threshold = cf_list.tolist().index(t)
+                        if val >= gallery_thresholds[index_threshold]:
+                            accepted = True
+                            continue
+                    # if max >= threshold and probe_target not in delegati:
+                    #     fa += 1
+                    # elif max < threshold and probe_target in delegati:
+                    #     fr += 1
+                    if accepted and probe_target not in delegati:
                         fa += 1
-                    elif max <= threshold and probe_target in delegati:
+                    elif not accepted and probe_target in delegati:
                         fr += 1
                     # print(val, threshold, fr, fa)
         print(probe_target, fr, countTG, fa, countTI)
     return fa, fr, countTG, countTI
 
 if __name__ == '__main__':
-    verificationFRR()
+    #verificationFRR()
     #verificationFAR()
-    #verificationROC()
+    verificationROC()
     #evaluationIdentificationAsMultiVer()
     #evaluationIdentification()
