@@ -72,7 +72,7 @@ class Database():
             print("CREATING NEW DB")
             data, target = self.load_db()
             cfs = self.defineCFlist(target)
-            self.gallery_data, self.gallery_target, self.pn_data, self.pn_target, self.pg_data, self.pg_target = \
+            self.gallery_data, self.gallery_target, self.pn_data, self.pn_target, self.pg_data, self.pg_target, self.histogram_gallery_data, self.histogram_pg_data, self.histogram_pn_data = \
                 self.split_gallery_probe(data, target, cfs)
             self.csv_maker(cfs)
 
@@ -87,6 +87,9 @@ class Database():
             np.save("npy_db/pn_target.npy", self.pn_target)
             np.save("npy_db/pg_data.npy", self.pg_data)
             np.save("npy_db/pg_target.npy", self.pg_target)
+            np.save("npy_db/histogram_gallery_data.npy", self.histogram_gallery_data)
+            np.save("npy_db/histogram_pg_data.npy", self.histogram_pg_data)
+            np.save("npy_db/histogram_pn_data.npy", self.histogram_pn_data)
         else:
             print("LOADING DB")
             self.gallery_data = np.load("npy_db/gallery_data.npy")
@@ -103,13 +106,15 @@ class Database():
             for i in range(len(self.gallery_data)):
                 if user != self.gallery_target[i]:
                     new_thd = 0
-                    lbp_probe = LBP.Local_Binary_Pattern(1, 8, self.gallery_data[i])
-                    new_img = lbp_probe.compute_lbp()
-                    hist_probe = lbp_probe.createHistogram(new_img)
+                    #lbp_probe = LBP.Local_Binary_Pattern(1, 8, self.gallery_data[i])
+                    #new_img = lbp_probe.compute_lbp()
+                    #hist_probe = lbp_probe.createHistogram(new_img)
+                    hist_probe = self.histogram_gallery_data[i]
                     index = self.gallery_target.index(user)
                     for i in range(5):
-                        lbp_gallery = LBP.Local_Binary_Pattern(1, 8, self.gallery_data[index + i])
-                        hist_gallley = lbp_probe.createHistogram(lbp_gallery.compute_lbp())
+                        #lbp_gallery = LBP.Local_Binary_Pattern(1, 8, self.gallery_data[index + i])
+                        #hist_gallley = lbp_gallery.createHistogram(lbp_gallery.compute_lbp())
+                        hist_gallley = self.histogram_gallery_data[index + i]
                         diff = Recognition.compareHistogram(hist_probe, hist_gallley)
                         if diff >= new_thd:
                             new_thd = diff
@@ -135,7 +140,8 @@ class Database():
         countTemp = 0
         # conteggio
         countUser = 0
-        gallery_target, gallery_data, pn_data, pn_target, pg_data, pg_target = [], [], [], [], [], []
+        #gallery_target, gallery_data, pn_data, pn_target, pg_data, pg_target = [], [], [], [], [], []
+        gallery_target, gallery_data, pn_data, pn_target, pg_data, pg_target, histogram_gallery_data, histogram_pg_data, histogram_pn_data = [], [], [], [], [], [], [], [], []
         # per ogni utente
         for i, val in enumerate(target):
             # prendo il numero di template dell'utente
@@ -150,26 +156,34 @@ class Database():
             #     name = target[i]
 
             name = cfs[countUser]
+            norm_template = self.get_normalized_template(i, data)
+            lbp = LBP.Local_Binary_Pattern(1, 8, norm_template)
             # se il numero del template e' minore del numero massimo di template destinati alla gallery
             # e il numero di utenti rientra negli utenti che sono nella gallery, allora inserisco il template nella
             # gallery
             if (countTemp < occ - n_probe_temp or occ == 1) and countUser < num_user - pn_user:
-                gallery_data.append(self.get_normalized_template(i, data))
+                #gallery_data.append(self.get_normalized_template(i, data))
+                gallery_data.append(norm_template)
                 gallery_target.append(name)
+                histogram_gallery_data.append(lbp.createHistogram(lbp.compute_lbp()))
             else:
                 # se lo inserisco nel probe set, controllo se l'utente e' nella gallery o no
                 if countUser < num_user - pn_user:
-                    pg_data.append(self.get_normalized_template(i, data))
+                    #pg_data.append(self.get_normalized_template(i, data))
+                    pg_data.append(norm_template)
                     pg_target.append(name)
+                    histogram_pg_data.append(lbp.createHistogram(lbp.compute_lbp()))
                 else:
-                    pn_data.append(self.get_normalized_template(i, data))
+                    #pn_data.append(self.get_normalized_template(i, data))
+                    pn_data.append(norm_template)
                     pn_target.append(name)
+                    histogram_pn_data.append(lbp.createHistogram(lbp.compute_lbp()))
             countTemp += 1
             # se ho finito i template, passo all'utente successivo
             if countTemp == occ:
                 countTemp = 0
                 countUser += 1
-        return gallery_data, gallery_target, pn_data, pn_target, pg_data, pg_target
+        return gallery_data, gallery_target, pn_data, pn_target, pg_data, pg_target, histogram_gallery_data, histogram_pg_data, histogram_pn_data
 
     # ritorna il numero di utenti nel dataset
     def num_user(self, target):
