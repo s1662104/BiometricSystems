@@ -156,23 +156,27 @@ def verificationFAR():
     #Scenario in which the impostor doesn't belong to the gallery
     for i in range(len(pn_data)):
         pn_hist = histogram_pn_data[i]
+        index_target = 0
         for t in np.unique(gallery_target):
             #topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
             val = topMatch(t, gallery_target, histogram_gallery_data, pn_hist)
-            if val >= gallery_thresholds[t]:
+            if val >= gallery_thresholds[index_target]:
                 P = P + 1
             ti += 1
+            index_target += 1
 
     #Scenario in which the impostor belongs to the gallery
     for i in range(len(pg_data)):
         pg_hist = histogram_pg_data[i]
         for t in np.unique(gallery_target):
+            index_target = 0
             if t != pg_target[i]:
                 # topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
                 val = topMatch(t, gallery_target, histogram_gallery_data, pg_hist)
-                if val >= gallery_thresholds[t]:
+                if val >= gallery_thresholds[index_target]:
                     P = P + 1
                 ti += 1
+            index_target += 1
 
     #print("Il numero di identità errate accettate è:", P)
     #print("FAR:", P / (len(pn_data)*len(np.unique(gallery_target))))
@@ -205,23 +209,27 @@ def verificationROC():
             Y_pred.append(0)
 
     for j in range(len(pn_data)):
+        index_target = 0
         for t in np.unique(gallery_target):
             Y.append(0)
             val = topMatch(t, gallery_target, histogram_gallery_data, histogram_pn_data[j])
-            if val >= gallery_thresholds[t]:
+            if val >= gallery_thresholds[index_target]:
                 Y_pred.append(1)
             else:
                 Y_pred.append(0)
+            index_target += 1
 
     for v in range(len(pg_data)):
+        index_target = 0
         for u in np.unique(gallery_target):
             if pg_target[v] != u:
                 Y.append(0)
                 val = topMatch(u, gallery_target, histogram_gallery_data, histogram_pg_data[v])
-                if val >= gallery_thresholds[int(u/5)]:
+                if val >= gallery_thresholds[index_target]:
                     Y_pred.append(1)
                 else:
                     Y_pred.append(0)
+            index_target += 1
 
     FPR, TPR, t = roc_curve(np.array(Y), np.array(Y_pred))
     auc = roc_auc_score(np.array(Y), np.array(Y_pred))
