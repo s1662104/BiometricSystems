@@ -546,7 +546,8 @@ def updateThreshold(new_user):
     print(gallery_target)
     print(gallery_threshold)
     index = 0
-    for user in np.unique(gallery_target):
+    galley_users = list(dict.fromkeys(gallery_target))
+    for user in galley_users:
         if user != new_user:
             #index = np.unique(gallery_target).tolist().index(user)
             print(index, user)

@@ -56,7 +56,6 @@ def identify(cf, img):
 def recognize(cf, img):
 
     #upload the various datasets
-    gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target  = np.load("npy_db/gallery_target.npy")
     histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
     users = pd.read_csv('dataset_user.csv', index_col=[0])
@@ -197,6 +196,7 @@ def verificationROC():
     histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
     histogram_pg_data = np.load("npy_db/histogram_pg_data.npy")
     histogram_pn_data = np.load("npy_db/histogram_pn_data.npy")
+    galley_users = list(dict.fromkeys(gallery_target))
 
     Y = []
     Y_pred = []
@@ -211,7 +211,7 @@ def verificationROC():
 
     for j in range(len(pn_data)):
         index_target = 0
-        for t in np.unique(gallery_target):
+        for t in galley_users:
             Y.append(0)
             val = topMatch(t, gallery_target, histogram_gallery_data, histogram_pn_data[j])
             if val >= gallery_thresholds[index_target]:
@@ -222,7 +222,7 @@ def verificationROC():
 
     for v in range(len(pg_data)):
         index_target = 0
-        for u in np.unique(gallery_target):
+        for u in galley_users:
             if pg_target[v] != u:
                 Y.append(0)
                 val = topMatch(u, gallery_target, histogram_gallery_data, histogram_pg_data[v])
@@ -332,9 +332,7 @@ def evaluationIdentificationAsMultiVer():
     histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
     histogram_pg_data = np.load("npy_db/histogram_pg_data.npy")
     histogram_pn_data = np.load("npy_db/histogram_pn_data.npy")
-    pg_data = np.load("npy_db/pg_data.npy")
     pg_target = np.load("npy_db/pg_target.npy")
-    pn_data = np.load("npy_db/pn_data.npy")
     pn_target = np.load("npy_db/pn_target.npy")
     users = pd.read_csv('dataset_user.csv', index_col=[0])
     cf_list = users['Codice Fiscale']
@@ -361,13 +359,14 @@ def delegatesMatch(hist_data, target, gallery_target, gallery_data, cf_list, use
     countTI = 0
     fa = 0
     fr = 0
+    galley_users = list(dict.fromkeys(gallery_target))
     #for i in range(len(data)):
     for i in range(len(hist_data)):
         probe_target = target[i]
         #probe_template = data[i]
         hist_probe = hist_data[i]
-        for j in range(len(np.unique(gallery_target))):
-                cf_user = np.unique(gallery_target)[j]
+        for j in range(len(galley_users)):
+                cf_user = galley_users[j]
                 index = cf_list.tolist().index(cf_user)
                 user = users.iloc[index]
                 delegati = ast.literal_eval(user["Delegati"])
