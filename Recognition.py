@@ -378,7 +378,6 @@ def delegatesMatch(hist_data, target, gallery_target, gallery_data, cf_list, use
                         countTG += 1
                     else:
                         countTI += 1
-                    #max = 0
                     accepted = False
                     for t in delegati:
                         #val = topMatch(probe_template, t, gallery_data,gallery_target, histogram_gallery_data)
