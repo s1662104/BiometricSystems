@@ -408,8 +408,8 @@ def delegatesMatch(hist_data, target, gallery_target, gallery_data, cf_list, use
     return fa, fr, countTG, countTI
 
 if __name__ == '__main__':
-    verificationFRR()
+    #verificationFRR()
     #verificationFAR()
-    #verificationROC()
+    verificationROC()
     #evaluationIdentificationAsMultiVer()
     #evaluationIdentification()

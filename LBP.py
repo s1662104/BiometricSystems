@@ -177,20 +177,23 @@ class Spoof_Local_Binary_Pattern(Local_Binary_Pattern):
         return super().createHistogram(new_img, grid_x, grid_y)
 
 if __name__ == '__main__':
-    db = Database.Database()
-    data = db.gallery_data[0]
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-    dets = detector(data, 1)
-    for i, d in enumerate(dets):
-       crop = data[d.top() : d.bottom(), d.left() : d.right()]
-       crop = cv2.resize(crop, (64, 64))
-    #print(crop)
-    lbp = Local_Binary_Pattern(2, 16, crop)
-    new_img = lbp.compute_lbp()
-    hist = lbp.createHistogram(new_img)
-    while True:
-        cv2.imshow('frame', lbp.img.astype(np.uint8))
-        cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    # db = Database.Database()
+    # data = db.gallery_data[0]
+    # detector = dlib.get_frontal_face_detector()
+    # predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+    # dets = detector(data, 1)
+    # for i, d in enumerate(dets):
+    #    crop = data[d.top() : d.bottom(), d.left() : d.right()]
+    #    crop = cv2.resize(crop, (64, 64))
+    # #print(crop)
+    # lbp = Local_Binary_Pattern(2, 16, crop)
+    # new_img = lbp.compute_lbp()
+    # hist = lbp.createHistogram(new_img)
+    # while True:
+    #     cv2.imshow('frame', lbp.img.astype(np.uint8))
+    #     cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
+    #     if cv2.waitKey(1) & 0xFF == ord('q'):
+    #         break
+    print(np.round(0.672976973646892,2))
+    #print(np.floor(np.ceil(0.678976973646892,2)))
+
