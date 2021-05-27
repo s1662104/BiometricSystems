@@ -100,8 +100,11 @@ class Database():
             self.pg_target = np.load("npy_db/pg_target.npy")
 
     def adaptiveThresholds(self):
+        print("ADAPTIVE THRESHOLDS")
         thresholds = []
-        for user in np.unique(self.gallery_target):
+        galley_users = list(dict.fromkeys(self.gallery_target))
+        #for user in np.unique(self.gallery_target):
+        for user in galley_users:
             max_thd = -1
             for i in range(len(self.gallery_data)):
                 if user != self.gallery_target[i]:
@@ -114,10 +117,10 @@ class Database():
                         if diff >= new_thd:
                             new_thd = diff
                     if new_thd > max_thd:
-                        max_thd = new_thd + 0.00000000001
+                        if np.round(new_thd, 2) <= new_thd: max_thd = np.round(new_thd, 2) + 0.01
+                        else: max_thd = np.round(new_thd, 2)
             thresholds.append(max_thd)
-            #print("Threshold per l'utente", user, ":", max_thd)
-
+            print("Threshold per l'utente", user, ":", max_thd)
         print("Thresholds:", thresholds)
 
         return thresholds

@@ -153,11 +153,12 @@ def verificationFAR():
     histogram_pn_data = np.load("npy_db/histogram_pn_data.npy")
     P = 0
     ti = 0
+    galley_users = list(dict.fromkeys(gallery_target))
     #Scenario in which the impostor doesn't belong to the gallery
     for i in range(len(pn_data)):
         pn_hist = histogram_pn_data[i]
         index_target = 0
-        for t in np.unique(gallery_target):
+        for t in galley_users:
             #topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
             val = topMatch(t, gallery_target, histogram_gallery_data, pn_hist)
             if val >= gallery_thresholds[index_target]:
@@ -168,7 +169,7 @@ def verificationFAR():
     #Scenario in which the impostor belongs to the gallery
     for i in range(len(pg_data)):
         pg_hist = histogram_pg_data[i]
-        for t in np.unique(gallery_target):
+        for t in galley_users:
             index_target = 0
             if t != pg_target[i]:
                 # topMatch(p, identity) returns the best match between pj and the templates associated to the claimed identity in the gallery
@@ -254,15 +255,8 @@ def verificationROC():
 #MODIFICA IN MODO DA TOGLIERE IL FOR
 def topMatch(identity , gallery_target, histogram_gallery_data, hist):
     max = 0
-    #lbp_probe = LBP.Local_Binary_Pattern(1, 8, probe)
-    #new_img = lbp_probe.compute_lbp()
-    #hist_probe = lbp_probe.createHistogram(new_img)
     index = gallery_target.tolist().index(identity)
     for i in range(5):
-        #lbp_gallery = LBP.Local_Binary_Pattern(1, 8, gallery_data[index+i])
-        #hist_gallley = lbp_probe.createHistogram(lbp_gallery.compute_lbp())
-        #diff = compareHistogram(hist_probe, hist_gallley)
-        #diff = compareHistogram(hist_probe, histogram_gallery_data[index+i])
         diff = compareHistogram(hist, histogram_gallery_data[index + i])
         if diff >= max:
             max = diff
@@ -384,7 +378,7 @@ def delegatesMatch(hist_data, target, gallery_target, gallery_data, cf_list, use
                         countTG += 1
                     else:
                         countTI += 1
-                    max = 0
+                    #max = 0
                     accepted = False
                     for t in delegati:
                         #val = topMatch(probe_template, t, gallery_data,gallery_target, histogram_gallery_data)
@@ -409,7 +403,7 @@ def delegatesMatch(hist_data, target, gallery_target, gallery_data, cf_list, use
 
 if __name__ == '__main__':
     verificationFRR()
-    #verificationFAR()
+    verificationFAR()
     #verificationROC()
     #evaluationIdentificationAsMultiVer()
     #evaluationIdentification()
