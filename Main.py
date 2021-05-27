@@ -432,8 +432,7 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         n = 4
     list(controller.frames.values())[n].reset()
     if op == 0:
-        cropList = multipleCapture()
-        #Inizio parte antispoofing in fase di registrazione
+        # Inizio parte antispoofing in fase di registrazione
         user = False
         nameFileCsv = 'histogram.csv'
         if (EyeBlink(None).eyeBlinkStart()) == False:
@@ -443,9 +442,11 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
             user = False
         else:
             user = True
-        #Fine parte antispoofing in fase di registrazione
+        # Fine parte antispoofing in fase di registrazione
         if (user == True):
             print("USER == TRUE")
+            cropList = multipleCapture()
+
         # list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop,
         #                                                name)
             list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(cropList[0])),
