@@ -431,18 +431,21 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
     else:
         n = 4
     list(controller.frames.values())[n].reset()
+    ##Inizio parte antispoofing in fase di matching
+    user = False
+    nameFileCsv = 'histogram.csv'
+    if (EyeBlink(None).eyeBlinkStart()) == False:
+        user = False
+    elif (MicroTexture(nameFileCsv).microTextureCam() == False):
+        print("REPLAY ATTACK E' FALSE")
+        user = False
+    else:
+        user = True
+    ##Fine parte antispoofing in fase di matching
+    print("E' terminato l'anti spoofing")
     if op == 0:
         # Inizio parte antispoofing in fase di registrazione
-        user = False
-        nameFileCsv = 'histogram.csv'
-        if (EyeBlink(None).eyeBlinkStart()) == False:
-            user = False
-        elif (MicroTexture(nameFileCsv).microTextureCam() == False):
-            print("REPLAY ATTACK E' FALSE")
-            user = False
-        else:
-            user = True
-        # Fine parte antispoofing in fase di registrazione
+
         if (user == True):
             print("USER == TRUE")
             cropList = multipleCapture()
@@ -458,18 +461,7 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
 
     else:
         crop = videoCapture()
-        ##Inizio parte antispoofing in fase di matching
-        user = False
-        nameFileCsv = 'histogram.csv'
-        if (EyeBlink(None).eyeBlinkStart()) == False:
-            user = False
-        elif (MicroTexture(nameFileCsv).microTextureCam() == False):
-            print("REPLAY ATTACK E' FALSE")
-            user = False
-        else:
-            user = True
-        ##Fine parte antispoofing in fase di matching
-        print("E' terminato l'anti spoofing")
+
         if (user == True):
             print("USER == TRUE")
             list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)),
