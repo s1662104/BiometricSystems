@@ -438,9 +438,9 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         nameFileCsv = 'histogram.csv'
         if (EyeBlink(None).eyeBlinkStart()) == False:
             user = False
-        elif (MicroTexture(nameFileCsv).microTextureCam() == False):
-            print("REPLAY ATTACK E' FALSE")
-            user = False
+        #elif (MicroTexture(nameFileCsv).microTextureCam() == False):
+        #    print("REPLAY ATTACK E' FALSE")
+        #    user = False
         else:
             user = True
         #Fine parte antispoofing in fase di registrazione
@@ -501,34 +501,45 @@ def addUser(photo, cf, name, medicines, delegates):
         gallery_target.append(cf)
         lbp = Local_Binary_Pattern(1,8,photo[i])
         gallery_histograms.append(lbp.createHistogram(lbp.compute_lbp()))
-    updateThreshold(cf,gallery_target, gallery_histograms)
+    np.save("npy_db/gallery_data.npy", np.array(gallery_data))
+    np.save("npy_db/gallery_target.npy", np.array(gallery_target))
+    np.save("npy_db/histogram_gallery_data.npy", np.array(gallery_histograms))
+    #updateThreshold(cf)
     print("L'utente", name, "viene aggiunto al dataset")
     print("Il codice fiscale è", cf)
-    print(len(gallery_data), len(gallery_target))
+    print(len(gallery_data), len(gallery_target),len(gallery_histograms))
     # print(photo, gallery_data[len(gallery_data) - 1])
     # print(cf, gallery_target[len(gallery_target) - 1])
     medicine_csv = medicine_csv.append(
         {"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates,
          "Data": date.today().strftime("%d/%m/%Y")}, ignore_index=True)
-    np.save("npy_db/gallery_data.npy", np.array(gallery_data))
-    np.save("npy_db/gallery_target.npy", np.array(gallery_target))
     medicine_csv.to_csv('dataset_user.csv')
 
-def updateThreshold(new_user, gallery_target, histogram_gallery_data):
+def updateThreshold(new_user):
     gallery_threshold = np.load("npy_db/gallery_thresholds.npy")
-    new_index = gallery_target.index(new_user)
+    gallery_target = np.load("npy_db/gallery_target.npy")
+    gallery_histograms = np.load("npy_db/histogram_gallery_data.npy")
+    new_index = gallery_target.tolist().index(new_user)
     max = -1
+    print(np.unique(gallery_target))
+    print(gallery_target)
+    print(gallery_threshold)
+    index = 0
     for user in np.unique(gallery_target):
         if user != new_user:
-            index = gallery_target.index(user)
+            #index = np.unique(gallery_target).tolist().index(user)
+            print(index, user)
             for i in range(5):
-                thd = Recognition.topMatch(user, gallery_target, histogram_gallery_data,
-                                           histogram_gallery_data[new_index + i])
+                thd = Recognition.topMatch(user, gallery_target, gallery_histograms,
+                                           gallery_histograms[new_index + i])
+
                 if thd > gallery_threshold[index]:
                     gallery_threshold[index] = thd
                 if thd > max:
                     max = thd + 0.00000000001
+        index +=1
     gallery_threshold.append(max)
+    print("IL TUO THRESHOLD:",max, "N. TOTALI DI HISTOGRAM:",len(gallery_threshold))
     np.save("npy_db/gallery_threshold.npy", np.array(gallery_threshold))
 
 
