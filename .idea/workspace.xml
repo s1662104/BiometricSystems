@@ -19,9 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="Creation of histograms in Database">
+    <list default="true" id="bcfac821-fcf8-4576-ba82-ae931f8e6e3f" name="Default Changelist" comment="Correzioni">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Recognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/Recognition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dataset_user.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dataset_user.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,7 +63,7 @@
       <recent name="$PROJECT_DIR$/Olivetti_faces" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Recognition">
+  <component name="RunManager" selected="Python.Database">
     <configuration name="Database" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="BiometricSystems" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -191,8 +192,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Recognition" />
         <item itemvalue="Python.Database" />
+        <item itemvalue="Python.Recognition" />
         <item itemvalue="Python.LBP" />
         <item itemvalue="Python.ReplayAttack" />
         <item itemvalue="Python.ReplayAttackDB" />
@@ -210,13 +211,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1611051740310</updated>
-    </task>
-    <task id="LOCAL-00007" summary="probe and gallery set setup">
-      <created>1612214537566</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1612214537567</updated>
     </task>
     <task id="LOCAL-00008" summary="probe and gallery set setup">
       <created>1612214739469</created>
@@ -554,7 +548,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622047073905</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="Correzioni">
+      <created>1622052649626</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1622052649627</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -570,7 +571,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="lbp sull'intera immagine e valori normalizzati nel range [0,255]" />
     <MESSAGE value="fix" />
     <MESSAGE value="suddivisione train e test set" />
     <MESSAGE value="CSV" />
@@ -595,7 +595,8 @@
     <MESSAGE value="Evaluation Verification" />
     <MESSAGE value="Evaluation Identification" />
     <MESSAGE value="Creation of histograms in Database" />
-    <option name="LAST_COMMIT_MESSAGE" value="Creation of histograms in Database" />
+    <MESSAGE value="Correzioni" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correzioni" />
   </component>
   <component name="WindowStateProjectService">
     <state x="617" y="299" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1617467703078">
@@ -665,10 +666,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="725" y="167" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1616922887239" />
-    <state x="414" y="219" key="Vcs.Push.Dialog.v2" timestamp="1622047095081">
+    <state x="414" y="219" key="Vcs.Push.Dialog.v2" timestamp="1622052659516">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="414" y="219" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1622047095081" />
+    <state x="414" y="219" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1622052659516" />
     <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1617723552020" />
     <state x="421" y="176" width="598" height="548" key="find.popup" timestamp="1614700456410">
       <screen x="0" y="0" width="1440" height="900" />

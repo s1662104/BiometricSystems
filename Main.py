@@ -509,6 +509,21 @@ def addUser(photo, cf, name, medicines, delegates):
     np.save("npy_db/gallery_target.npy", np.array(gallery_target))
     medicine_csv.to_csv('dataset_user.csv')
 
+def updateThreshold(new_user):
+    gallery_target = np.load("npy_db/gallery_target.npy")
+    gallery_threshold = np.load("npy_db/gallery_thresholds.npy")
+    histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
+    new_index = gallery_target.index(new_user)
+    for user in np.unique(gallery_target):
+        if user != new_user:
+            index = gallery_target.index(user)
+            for i in range(5):
+                thd = Recognition.topMatch(user, gallery_target, histogram_gallery_data, histogram_gallery_data[new_index+i])
+                if thd > gallery_threshold[index]:
+                    gallery_threshold[index] = thd
+    np.save("npy_db/gallery_thresholds.npy", gallery_threshold)
+    return
+
 def multipleCapture():
     list_captures = []
     for i in range(n_photo_x_user):

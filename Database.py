@@ -77,8 +77,8 @@ class Database():
             self.csv_maker(cfs)
 
             #Creazione dei threshold adattivi
-            #self.gallery_threshold = self.adaptiveThresholds()
-            self.gallery_threshold = [0.59, 0.64, 0.66, 0.62, 0.67, 0.66, 0.71, 0.68, 0.70, 0.63, 0.64, 0.72, 0.75, 0.69, 0.69, 0.62, 0.65, 0.61, 0.68, 0.63, 0.66, 0.73, 0.68, 0.70, 0.64, 0.60, 0.75, 0.62]
+            self.gallery_threshold = self.adaptiveThresholds()
+            #self.gallery_threshold = [0.59, 0.64, 0.66, 0.62, 0.67, 0.66, 0.71, 0.68, 0.70, 0.63, 0.64, 0.72, 0.75, 0.69, 0.69, 0.62, 0.65, 0.61, 0.68, 0.63, 0.66, 0.73, 0.68, 0.70, 0.64, 0.60, 0.75, 0.62]
 
             np.save("npy_db/gallery_data.npy",self.gallery_data)
             np.save("npy_db/gallery_target.npy",self.gallery_target)
@@ -106,22 +106,17 @@ class Database():
             for i in range(len(self.gallery_data)):
                 if user != self.gallery_target[i]:
                     new_thd = 0
-                    #lbp_probe = LBP.Local_Binary_Pattern(1, 8, self.gallery_data[i])
-                    #new_img = lbp_probe.compute_lbp()
-                    #hist_probe = lbp_probe.createHistogram(new_img)
                     hist_probe = self.histogram_gallery_data[i]
                     index = self.gallery_target.index(user)
-                    for i in range(5):
-                        #lbp_gallery = LBP.Local_Binary_Pattern(1, 8, self.gallery_data[index + i])
-                        #hist_gallley = lbp_gallery.createHistogram(lbp_gallery.compute_lbp())
-                        hist_gallley = self.histogram_gallery_data[index + i]
+                    for j in range(5):
+                        hist_gallley = self.histogram_gallery_data[index + j]
                         diff = Recognition.compareHistogram(hist_probe, hist_gallley)
                         if diff >= new_thd:
                             new_thd = diff
                     if new_thd > max_thd:
-                        max_thd = new_thd
+                        max_thd = new_thd + 0.00000000001
             thresholds.append(max_thd)
-            print("Threshold per l'utente", user, ":", max_thd)
+            #print("Threshold per l'utente", user, ":", max_thd)
 
         print("Thresholds:", thresholds)
 
