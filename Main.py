@@ -516,26 +516,6 @@ def addUser(photo, cf, name, medicines, delegates):
          "Data": date.today().strftime("%d/%m/%Y")}, ignore_index=True)
     medicine_csv.to_csv('dataset_user.csv')
 
-#def updateThreshold(new_user):
-#    gallery_target = np.load("npy_db/gallery_target.npy")
-#    gallery_threshold = np.load("npy_db/gallery_thresholds.npy").tolist()
-#    histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
-#    new_index = gallery_target.index(new_user)
-#    max_thd = -1
-#    for user in np.unique(gallery_target):
-#        if user != new_user:
-#            index = gallery_target.index(user)
-#            for i in range(5):
-#                thd = Recognition.topMatch(user, gallery_target, histogram_gallery_data, histogram_gallery_data[new_index+i])
-#                val = Recognition.topMatch(new_user, gallery_target, histogram_gallery_data,histogram_gallery_data[index+i])
-#                if thd > gallery_threshold[index]:
-#                    gallery_threshold[index] = np.round(thd,2)
-#                if val > max_thd:
-#                    max_thd = np.round(val,2)
-#    gallery_threshold.append(max_thd)
-#    np.save("npy_db/gallery_thresholds.npy", gallery_threshold)
-#    return
-
 def updateThreshold(new_user):
     gallery_threshold = np.load("npy_db/gallery_thresholds.npy").tolist()
     gallery_target = np.load("npy_db/gallery_target.npy")
@@ -543,6 +523,7 @@ def updateThreshold(new_user):
     new_index = gallery_target.tolist().index(new_user)
     max = -1
     galley_users = list(dict.fromkeys(gallery_target))
+    print("AGGIORNAMENTO DEI THRESHOLDS...")
     for user in galley_users:
         if user != new_user:
             index = galley_users.index(user)
