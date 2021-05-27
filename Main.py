@@ -542,12 +542,10 @@ def updateThreshold(new_user):
     gallery_histograms = np.load("npy_db/histogram_gallery_data.npy")
     new_index = gallery_target.tolist().index(new_user)
     max = -1
-    print(gallery_threshold)
     galley_users = list(dict.fromkeys(gallery_target))
     for user in galley_users:
         if user != new_user:
             index = galley_users.index(user)
-            print(index, user)
             for i in range(5):
                 thd = Recognition.topMatch(user, gallery_target, gallery_histograms,
                                            gallery_histograms[new_index + i])
