@@ -437,9 +437,9 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         nameFileCsv = 'histogram.csv'
         if (EyeBlink(None).eyeBlinkStart()) == False:
             user = False
-        #elif (MicroTexture(nameFileCsv).microTextureCam() == False):
-        #    print("REPLAY ATTACK E' FALSE")
-        #    user = False
+        elif (MicroTexture(nameFileCsv).microTextureCam() == False):
+            print("REPLAY ATTACK E' FALSE")
+            user = False
         else:
             user = True
         # Fine parte antispoofing in fase di registrazione
@@ -463,9 +463,9 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
         nameFileCsv = 'histogram.csv'
         if (EyeBlink(None).eyeBlinkStart()) == False:
             user = False
-        #elif (MicroTexture(nameFileCsv).microTextureCam() == False):
-        #    print("REPLAY ATTACK E' FALSE")
-        #    user = False
+        elif (MicroTexture(nameFileCsv).microTextureCam() == False):
+            print("REPLAY ATTACK E' FALSE")
+            user = False
         else:
             user = True
         ##Fine parte antispoofing in fase di matching
