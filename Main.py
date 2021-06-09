@@ -558,7 +558,10 @@ def updateThreshold(new_user):
                 if thd > gallery_threshold[index]:
                     gallery_threshold[index] = thd
                 if thd > max:
-                    max = thd + 0.00000000001
+                    if np.round(thd, 2) <= thd:
+                        max = np.round(thd, 2) + 0.01
+                    else:
+                        max = np.round(thd, 2)
         index +=1
     gallery_threshold.append(max)
     print("IL TUO THRESHOLD:",max, "N. TOTALI DI HISTOGRAM:",len(gallery_threshold))

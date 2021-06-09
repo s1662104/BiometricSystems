@@ -134,8 +134,6 @@ class Local_Binary_Pattern:
         #The LBPHFaceRecognizer uses Extended Local Binary Patterns
         #(it's probably configurable with other operators at a later
         #point), and has the following default values for radius = 1 and neighbors = 8
-        # grid_x = 8
-        # grid_y = 8
 
         #Get the size (width and height) of each region
         gridWidth = int(w / grid_x)
@@ -162,6 +160,7 @@ class Local_Binary_Pattern:
 
                 #Concatenate two slices
                 histogram = np.concatenate((histogram, regionHistogram), axis=None)
+        #Normalize histogram
         cv2.normalize(histogram, histogram)
         return histogram
 

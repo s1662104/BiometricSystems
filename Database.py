@@ -77,8 +77,7 @@ class Database():
             self.csv_maker(cfs)
 
             #Creazione dei threshold adattivi
-            #self.gallery_threshold = self.adaptiveThresholds()
-            self.gallery_threshold = [0.59, 0.64, 0.66, 0.62, 0.67, 0.66, 0.71, 0.68, 0.70, 0.63, 0.64, 0.72, 0.75, 0.69, 0.69, 0.62, 0.65, 0.61, 0.68, 0.63, 0.66, 0.73, 0.68, 0.70, 0.64, 0.60, 0.75, 0.62]
+            self.gallery_threshold = self.adaptiveThresholds()
 
             np.save("npy_db/gallery_data.npy",self.gallery_data)
             np.save("npy_db/gallery_target.npy",self.gallery_target)
@@ -160,19 +159,16 @@ class Database():
             # e il numero di utenti rientra negli utenti che sono nella gallery, allora inserisco il template nella
             # gallery
             if (countTemp < occ - n_probe_temp or occ == 1) and countUser < num_user - pn_user:
-                #gallery_data.append(self.get_normalized_template(i, data))
                 gallery_data.append(norm_template)
                 gallery_target.append(name)
                 histogram_gallery_data.append(lbp.createHistogram(lbp.compute_lbp()))
             else:
                 # se lo inserisco nel probe set, controllo se l'utente e' nella gallery o no
                 if countUser < num_user - pn_user:
-                    #pg_data.append(self.get_normalized_template(i, data))
                     pg_data.append(norm_template)
                     pg_target.append(name)
                     histogram_pg_data.append(lbp.createHistogram(lbp.compute_lbp()))
                 else:
-                    #pn_data.append(self.get_normalized_template(i, data))
                     pn_data.append(norm_template)
                     pn_target.append(name)
                     histogram_pn_data.append(lbp.createHistogram(lbp.compute_lbp()))
