@@ -431,18 +431,21 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
     else:
         n = 4
     list(controller.frames.values())[n].reset()
+    ##Inizio parte antispoofing in fase di matching
+    user = False
+    nameFileCsv = 'histogram.csv'
+    if (EyeBlink(None).eyeBlinkStart()) == False:
+        user = False
+    elif (MicroTexture(nameFileCsv).microTextureCam() == False):
+        print("REPLAY ATTACK E' FALSE")
+        user = False
+    else:
+        user = True
+    ##Fine parte antispoofing in fase di matching
+    print("E' terminato l'anti spoofing")
     if op == 0:
         # Inizio parte antispoofing in fase di registrazione
-        user = False
-        nameFileCsv = 'histogram.csv'
-        if (EyeBlink(None).eyeBlinkStart()) == False:
-            user = False
-        elif (MicroTexture(nameFileCsv).microTextureCam() == False):
-            print("REPLAY ATTACK E' FALSE")
-            user = False
-        else:
-            user = True
-        # Fine parte antispoofing in fase di registrazione
+
         if (user == True):
             print("USER == TRUE")
             cropList = multipleCapture()
@@ -458,18 +461,7 @@ def check_input(controller, cf, labelError, op, role=None, name=None):
 
     else:
         crop = videoCapture()
-        ##Inizio parte antispoofing in fase di matching
-        user = False
-        nameFileCsv = 'histogram.csv'
-        if (EyeBlink(None).eyeBlinkStart()) == False:
-            user = False
-        elif (MicroTexture(nameFileCsv).microTextureCam() == False):
-            print("REPLAY ATTACK E' FALSE")
-            user = False
-        else:
-            user = True
-        ##Fine parte antispoofing in fase di matching
-        print("E' terminato l'anti spoofing")
+
         if (user == True):
             print("USER == TRUE")
             list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)),
@@ -505,7 +497,7 @@ def addUser(photo, cf, name, medicines, delegates):
     np.save("npy_db/gallery_data.npy", np.array(gallery_data))
     np.save("npy_db/gallery_target.npy", np.array(gallery_target))
     np.save("npy_db/histogram_gallery_data.npy", np.array(gallery_histograms))
-    #updateThreshold(cf)
+    updateThreshold(cf)
     print("L'utente", name, "viene aggiunto al dataset")
     print("Il codice fiscale è", cf)
     print(len(gallery_data), len(gallery_target),len(gallery_histograms))
@@ -537,20 +529,16 @@ def addUser(photo, cf, name, medicines, delegates):
 #    return
 
 def updateThreshold(new_user):
-    gallery_threshold = np.load("npy_db/gallery_thresholds.npy")
+    gallery_threshold = np.load("npy_db/gallery_thresholds.npy").tolist()
     gallery_target = np.load("npy_db/gallery_target.npy")
     gallery_histograms = np.load("npy_db/histogram_gallery_data.npy")
     new_index = gallery_target.tolist().index(new_user)
     max = -1
-    print(np.unique(gallery_target))
-    print(gallery_target)
-    print(gallery_threshold)
-    index = 0
     galley_users = list(dict.fromkeys(gallery_target))
+    print("AGGIORNAMENTO DEI THRESHOLDS...")
     for user in galley_users:
         if user != new_user:
-            #index = np.unique(gallery_target).tolist().index(user)
-            print(index, user)
+            index = galley_users.index(user)
             for i in range(5):
                 thd = Recognition.topMatch(user, gallery_target, gallery_histograms,
                                            gallery_histograms[new_index + i])
@@ -562,7 +550,6 @@ def updateThreshold(new_user):
                         max = np.round(thd, 2) + 0.01
                     else:
                         max = np.round(thd, 2)
-        index +=1
     gallery_threshold.append(max)
     print("IL TUO THRESHOLD:",max, "N. TOTALI DI HISTOGRAM:",len(gallery_threshold))
     np.save("npy_db/gallery_threshold.npy", np.array(gallery_threshold))
