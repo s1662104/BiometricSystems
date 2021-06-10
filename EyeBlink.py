@@ -207,62 +207,61 @@ class EyeBlink():
         (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-
-
         for det in dets:
             shape = predictor(gray, det)
             shape = face_utils.shape_to_np(shape)
             ###
             (x, y, w, h) = face_utils.rect_to_bb(det)
-            cv2.rectangle(rect, (x, y), (x + w, y + h), (0, 255, 0), 2)  # vis-->rect
-            cv2.putText(rect, "Face", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)  # vis-->rect
-            ###
-            leftEye = shape[left_s:left_e]
-            rightEye = shape[right_s:right_e]
-            left_eye_EAR = self.eye_aspect_ratio(leftEye)
-            right_eye_EAR = self.eye_aspect_ratio(rightEye)
-            ear = (left_eye_EAR + right_eye_EAR) / 2.0
+            crop = gray[y:y + h, x:x + w]
+            try:
+                crop = cv2.resize(crop, (500, 500))
+            except Exception as e:
+                print(str(e))
+                break
 
 
-            # visualize each of the eyes
-            leftEyeHull = cv2.convexHull(leftEye)
-            rightEyeHull = cv2.convexHull(rightEye)
-            cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
-            cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
-            ear_threshold = (ear_top * 2)/3
-            print("Ear_th", ear_threshold)
-            print("EAR TOP", ear_top)
-            for (x, y) in shape:
-                cv2.circle(rect, (x, y), 1, (0, 0, 255), -1)
+            dets = detector(crop, 1)
+            for det in dets:
+                shape = predictor(crop, det)
+                shape = face_utils.shape_to_np(shape)
 
-            if ear_top != 0:
-                ear_threshold = (ear_top * 2) / 3
-                print("Ear_th", ear_threshold)
-                print("EAR TOP", ear_top)
+                #cv2.rectangle(rect, (x, y), (x + w, y + h), (0, 255, 0), 2)  # vis-->rect
+                #cv2.putText(rect, "Face", (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)  # vis-->rect
+                ###
+                leftEye = shape[left_s:left_e]
+                rightEye = shape[right_s:right_e]
+                left_eye_EAR = self.eye_aspect_ratio(leftEye)
+                right_eye_EAR = self.eye_aspect_ratio(rightEye)
+                ear = (left_eye_EAR + right_eye_EAR) / 2.0
 
-                if ear < ear_threshold:
+                if ear_top != 0:
+                    ear_threshold = (ear_top * 2) / 3
+                    print("Ear_th", ear_threshold)
+                    print("EAR TOP", ear_top)
 
-                    eyes_detect = '1'
-                    COUNTER +=1
-                else:
-                    eyes_detect = '0'
+                    if ear < ear_threshold:
 
-                    if COUNTER >= ear_threshold:
-                        TOTAL += 1
+                        eyes_detect = '1'
+                        COUNTER +=1
+                    else:
+                        eyes_detect = '0'
 
-
-
-                    COUNTER = 0
+                        if COUNTER >= ear_threshold:
+                            TOTAL += 1
 
 
 
-            cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                        COUNTER = 0
 
-            if ear > ear_top:
-                ear_top = ear
+
+
+                cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
+                if ear > ear_top:
+                    ear_top = ear
 
         #cv2.imshow('Frame', frame)
         #cv2.waitKey(1)
