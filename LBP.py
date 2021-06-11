@@ -131,10 +131,6 @@ class Local_Binary_Pattern:
         h = len(new_img)
         w = len(new_img[0])
 
-        #The LBPHFaceRecognizer uses Extended Local Binary Patterns
-        #(it's probably configurable with other operators at a later
-        #point), and has the following default values for radius = 1 and neighbors = 8
-
         #Get the size (width and height) of each region
         gridWidth = int(w / grid_x)
         gridHeight = int(h / grid_y)
