@@ -127,6 +127,76 @@ class EyeBlinkEvaluation:
         return list2
 
 
+
+    def createDataSetEyeBlinkFixedTh(self, real, fake):
+        root_dir = 'Data/EyeBlink/'
+        current_real = 'Real/'
+        current_fake = 'Fake/'
+
+        ###Real Part
+        src_real = root_dir + current_real
+
+        realFileNames = os.listdir(src_real)
+
+        realFileNames = [src_real + name for name in realFileNames]
+
+        print('REAL')
+        print('Total video Real: ', len(realFileNames))
+
+        ###Fake Part
+        src_fake = root_dir + current_fake
+
+        fakeFileNames = os.listdir(src_fake)
+
+        fakeFileNames = [src_fake + name for name in fakeFileNames]
+
+        print('FAKE')
+        print('Total video Fake: ', len(fakeFileNames))
+
+        ## FIXED TH
+        fr = []
+        fa = []
+        for threshold in np.arange(0.10, 0.30, 0.01):
+            fr.append(0)
+            fa.append(0)
+        ##
+        if real == True:
+            for name in realFileNames:
+                print(name)
+                ear_th = EyeBlink.EyeBlink(name).eyeBlinkStartThFixed()
+                print(ear_th)
+                count = 0
+                for val in ear_th:
+                    if val == 0:
+                        fr[count] += 1
+                    count += 1
+
+
+                    # if var:
+                    #     val = 1
+                    # else:
+                    #     val = 0
+                    #
+                    # self.writeEyeBlinkCsv(list, val)
+        if fake == True:
+            for name in fakeFileNames:
+                print(name)
+                ear_th = EyeBlink.Eyeblink(name).eyeBlinkStartThFixed()
+                print(ear_th)
+                count = 0
+                for val in ear_th:
+                    if val == 1:
+                        fa[count] += 1
+                    count += 1
+
+                    # if var:
+                #     val = 1
+                # else:
+                #     val = 0
+                #
+                # self.writeEyeBlinkCsv(list, val)
+
+
     #qui viene effettuata l'evaluation per eyeBlink
     def evaluation(self,nameFileCsv):
         data = pd.read_csv(nameFileCsv, sep=';', header=None)
@@ -152,8 +222,8 @@ class EyeBlinkEvaluation:
 
 
 def main():
-    EyeBlinkEvaluation().createDataSetEyeBlink(True, True)
-    EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblinkFixedTh.csv')
+    EyeBlinkEvaluation().createDataSetEyeBlinkFixedTh(True, True)
+    #EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblinkFixedTh.csv')
 
 
 
