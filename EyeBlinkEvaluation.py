@@ -27,7 +27,11 @@ class EyeBlinkEvaluation:
             list.append(val_array)
         list.append(val)
 
-        with open('eyeblink.csv', 'a+') as cvsfile:
+        # with open('eyeblink.csv', 'a+') as cvsfile:
+        #     writer = csv.writer(cvsfile, delimiter=';')
+        #     writer.writerow(list)
+
+        with open('eyeblinkFixedTh.csv', 'a+') as cvsfile:
             writer = csv.writer(cvsfile, delimiter=';')
             writer.writerow(list)
 
@@ -107,10 +111,15 @@ class EyeBlinkEvaluation:
 
     def readEyeBlinkCsv(self, val):
         list2 = []
-        with open("eyeblink.csv", 'r') as f:
-            csv_reader = csv.reader(f, delimiter=';')
-            for row in csv_reader:
-                list2.append(row[val])
+        # with open("eyeblink.csv", 'r') as f:
+        #     csv_reader = csv.reader(f, delimiter=';')
+        #     for row in csv_reader:
+        #         list2.append(row[val])
+
+        with open("eyeblinkFixedTh.csv", 'r') as f:
+           csv_reader = csv.reader(f, delimiter=';')
+           for row in csv_reader:
+               list2.append(row[val])
         return list2
 
 
@@ -139,8 +148,8 @@ class EyeBlinkEvaluation:
 
 
 def main():
-    #EyeBlinkEvaluation().createDataSetEyeBlink(False, False)
-    EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblink.csv')
+    EyeBlinkEvaluation().createDataSetEyeBlink(True, True)
+    EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblinkFixedTh.csv')
 
 
 

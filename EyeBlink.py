@@ -92,8 +92,13 @@ class EyeBlink():
 
                 frame = np.dstack([frame, frame, frame])
 
-                eyesdetect, COUNTER, TOTAL, ear_top = self.eye_blink_video(frame, detector, predictor,
-                                            COUNTER, TOTAL, ear_top)
+                # eyesdetect, COUNTER, TOTAL, ear_top = self.eye_blink_video(frame, detector, predictor,
+                #                             COUNTER, TOTAL, ear_top)
+                try:
+                    eyesdetect, COUNTER, TOTAL = self.eye_blink_video_fixedTh(frame, detector, predictor, COUNTER, TOTAL)
+                except Exception as e:
+                    print(str(e))
+                    break
                 history += eyesdetect
                 if TOTAL > 0:
                     var = True
@@ -275,54 +280,133 @@ class EyeBlink():
         (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
+        for rect in rects:
+            shape = predictor(frame, rect)
+            shape = face_utils.shape_to_np(shape)
+            ###
+            (x, y, w, h) = face_utils.rect_to_bb(rect)
+            crop = rect[y:y + h, x:x + w]
+            try:
+                crop = cv2.resize(crop, (500, 500))
+            except Exception as e:
+                print(str(e))
+                break
 
+
+            rects = detector(crop, 1)
+
+            for rect in rects:
+                shape = predictor(crop, rect)
+                shape = face_utils.shape_to_np(shape)
+
+                leftEye = shape[left_s:left_e]
+                rightEye = shape[right_s:right_e]
+                left_eye_EAR = self.eye_aspect_ratio(leftEye)
+                right_eye_EAR = self.eye_aspect_ratio(rightEye)
+                ear = (left_eye_EAR + right_eye_EAR) / 2.0
+
+
+                leftEyeHull = cv2.convexHull(leftEye)
+                rightEyeHull = cv2.convexHull(rightEye)
+                cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+                cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+                if ear_top != 0:
+                    ear_threshold = (ear_top * 2) / 3
+                    print("Ear_th", ear_threshold)
+                    print("EAR TOP", ear_top)
+
+
+                    if ear < ear_threshold:
+                        COUNTER += 1
+                        print(COUNTER)
+                        eyes_detect = '1'
+                    else:
+                        eyes_detect = '0'
+                        if COUNTER >= ear_threshold:
+
+                            TOTAL += 1
+
+                        COUNTER = 0
+
+
+
+                cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
+                if ear > ear_top:
+                    ear_top = ear
+
+            cv2.imshow('Frame', frame)
+            cv2.waitKey(1)
+            return eyes_detect, COUNTER, TOTAL, ear_top
+
+
+
+    def eye_blink_video_fixedTh(self,frame, detector, predictor, COUNTER, TOTAL):
+        eyes_detect = ''
+
+        rects = detector(frame, 1)  # Detect the faces in the image
+        (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+        (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
         for rect in rects:
             shape = predictor(frame, rect)
             shape = face_utils.shape_to_np(shape)
+            ###
+            (x, y, w, h) = face_utils.rect_to_bb(rect)
+            crop = frame[y:y + h, x:x + w]
+            try:
+                crop = cv2.resize(crop, (500, 500))
+            except Exception as e:
+                print(str(e))
+                break
 
-            leftEye = shape[left_s:left_e]
-            rightEye = shape[right_s:right_e]
-            left_eye_EAR = self.eye_aspect_ratio(leftEye)
-            right_eye_EAR = self.eye_aspect_ratio(rightEye)
-            ear = (left_eye_EAR + right_eye_EAR) / 2.0
+            rects = detector(crop, 1)
 
+            for rect in rects:
+                shape = predictor(crop, rect)
+                shape = face_utils.shape_to_np(shape)
 
-            leftEyeHull = cv2.convexHull(leftEye)
-            rightEyeHull = cv2.convexHull(rightEye)
-            cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
-            cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
-            if ear_top != 0:
-                ear_threshold = (ear_top * 2) / 3
-                print("Ear_th", ear_threshold)
-                print("EAR TOP", ear_top)
+                leftEye = shape[left_s:left_e]
+                rightEye = shape[right_s:right_e]
+                left_eye_EAR = self.eye_aspect_ratio(leftEye)
+                right_eye_EAR = self.eye_aspect_ratio(rightEye)
+                ear = (left_eye_EAR + right_eye_EAR) / 2.0
 
+                leftEyeHull = cv2.convexHull(leftEye)
+                rightEyeHull = cv2.convexHull(rightEye)
+                cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+                cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+                # if ear_top != 0:
+                #     ear_threshold = (ear_top * 2) / 3
+                #     print("Ear_th", ear_threshold)
+                #     print("EAR TOP", ear_top)
 
-                if ear < ear_threshold:
+                if ear < EYE_AR_THRESH:
                     COUNTER += 1
                     print(COUNTER)
                     eyes_detect = '1'
                 else:
                     eyes_detect = '0'
-                    if COUNTER >= ear_threshold:
-
+                    if COUNTER >= EYE_AR_THRESH:
                         TOTAL += 1
 
                     COUNTER = 0
 
+                cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
+                # if ear > ear_top:
+                #     ear_top = ear
 
-            cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            cv2.imshow('Frame', frame)
+            cv2.waitKey(1)
+            return eyes_detect, COUNTER, TOTAL
 
-            if ear > ear_top:
-                ear_top = ear
-
-        cv2.imshow('Frame', frame)
-        cv2.waitKey(1)
-        return eyes_detect, COUNTER, TOTAL, ear_top
 
 
 def main():
