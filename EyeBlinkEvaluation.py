@@ -71,6 +71,10 @@ class EyeBlinkEvaluation:
             print(str(e))
         print(black_list)
         print()
+        ## FIXED TH
+        fr = []
+        fa = []
+        ##
         if real == True:
             for name in realFileNames:
                 if name in black_list:
