@@ -43,8 +43,8 @@ class EyeBlink():
         inputType = self.inputType
         COUNTER = 0
         TOTAL = 0
-
         if inputType is not None:
+
 
 
             ear_top = 0
@@ -59,6 +59,8 @@ class EyeBlink():
             time.sleep(1.0)
             fps = FPS().start()
 
+
+
             fileStream = True
 
             while fvs.more():
@@ -67,20 +69,20 @@ class EyeBlink():
 
                 try:
                     frame = imutils.resize(frame, width=300)
-
+                ### rimuovere la parte if len
                 except Exception as e:
                     print(str(e))
-                    if (len(history) > 1):
-                        print(history)
-                        result = self.isBlinking(history, 3)
-                        if (result):
-                            cv2.destroyAllWindows()
-                            fvs.stop()
-                            return True
-                        else:
-                            cv2.destroyAllWindows()
-                            fvs.stop()
-                            return False
+                    # if (len(history) > 1):
+                    #     print(history)
+                    #     result = self.isBlinking(history, 3)
+                    #     if (result):
+                    #         cv2.destroyAllWindows()
+                    #         fvs.stop()
+                    #         return True
+                    #     else:
+                    #         cv2.destroyAllWindows()
+                    #         fvs.stop()
+                    #         return False
                 try:
                     vis = frame.copy()
 
@@ -91,13 +93,10 @@ class EyeBlink():
 
                 frame = np.dstack([frame, frame, frame])
 
-                # eyesdetect, COUNTER, TOTAL, ear_top = self.eye_blink_video(frame, detector, predictor,
-                #                             COUNTER, TOTAL, ear_top)
-                try:
-                    eyesdetect, COUNTER, TOTAL = self.eye_blink_video_fixedTh(frame, detector, predictor, COUNTER, TOTAL)
-                except Exception as e:
-                    print(str(e))
-                    break
+                eyesdetect, COUNTER, TOTAL, ear_top = self.eye_blink_video(frame, detector, predictor,
+                                             COUNTER, TOTAL, ear_top)
+
+
                 history += eyesdetect
                 if TOTAL > 0:
                     var = True
@@ -212,8 +211,8 @@ class EyeBlink():
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
         for det in dets:
-            shape = predictor(gray, det)
-            shape = face_utils.shape_to_np(shape)
+            # shape = predictor(gray, det)
+            # shape = face_utils.shape_to_np(shape)
             ###
             (x, y, w, h) = face_utils.rect_to_bb(det)
             crop = gray[y:y + h, x:x + w]
@@ -224,8 +223,8 @@ class EyeBlink():
                 break
 
 
-            dets = detector(crop, 1)
-            for det in dets:
+            dets1 = detector(crop, 1)
+            for det in dets1:
                 shape = predictor(crop, det)
                 shape = face_utils.shape_to_np(shape)
 
@@ -291,9 +290,10 @@ class EyeBlink():
                 print(str(e))
                 break
 
-            rects = detector(crop, 1)
 
-            for rect in rects:
+            rects1 = detector(crop, 1)
+
+            for rect in rects1:
                 shape = predictor(crop, rect)
                 shape = face_utils.shape_to_np(shape)
 
@@ -326,6 +326,8 @@ class EyeBlink():
 
                         COUNTER = 0
 
+
+
                 cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                 cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
@@ -338,7 +340,64 @@ class EyeBlink():
             cv2.waitKey(1)
             return eyes_detect, COUNTER, TOTAL, ear_top
 
-    def eye_blink_video_fixedTh(self,frame, detector, predictor, COUNTER, TOTAL):
+
+
+    def eyeBlinkStartThFixed(self):
+        inputType = self.inputType
+        COUNTER = 0
+        TOTAL = 0
+
+        ear_th = []
+        for threshold in np.arange(0.10, 0.30, 0.01):
+            ear_th.append(0)
+
+        history = ' '
+        print(inputType)
+        detector = dlib.get_frontal_face_detector()
+        predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+
+        fvs = FileVideoStream(inputType).start()
+        time.sleep(1.0)
+        fps = FPS().start()
+
+        fileStream = True
+
+        while fvs.more():
+            crop = None
+            frame = fvs.read()
+
+            try:
+                frame = imutils.resize(frame, width=300)
+            ### rimuovere la parte if len
+            except Exception as e:
+                print(str(e))
+
+            try:
+                vis = frame.copy()
+
+            except Exception as e:
+                print(str(e))
+                break
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            frame = np.dstack([frame, frame, frame])
+
+            eyesdetect, COUNTER, _ , ear_th  = self.eye_blink_video_fixedTh(frame, detector,
+                                                                               predictor, COUNTER, TOTAL, ear_th)
+
+            #print(ear_th)
+
+            history += eyesdetect
+            fps.stop()
+            print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+            print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+
+        cv2.destroyAllWindows()
+        fvs.stop()
+        return ear_th
+
+
+    def eye_blink_video_fixedTh(self, frame, detector, predictor, COUNTER, TOTAL, ear_th):
         eyes_detect = ''
 
         rects = detector(frame, 1)  # Detect the faces in the image
@@ -351,6 +410,7 @@ class EyeBlink():
             ###
             (x, y, w, h) = face_utils.rect_to_bb(rect)
             crop = frame[y:y + h, x:x + w]
+
             try:
                 crop = cv2.resize(crop, (500, 500))
             except Exception as e:
@@ -378,28 +438,33 @@ class EyeBlink():
                 #     print("Ear_th", ear_threshold)
                 #     print("EAR TOP", ear_top)
 
-                if ear < EYE_AR_THRESH:
-                    COUNTER += 1
-                    print(COUNTER)
-                    eyes_detect = '1'
-                else:
-                    eyes_detect = '0'
-                    if COUNTER >= EYE_AR_THRESH:
-                        TOTAL += 1
+                count = 0
+                for threshold in np.arange (0.10, 0.30, 0.01):
+                    # Fix the threshold
+                    th = np.round(threshold, 2)
+                    if ear < th:
+                        COUNTER += 1
+                        eyes_detect = '1'
+                        ear_th[count] = 1
+                    else:
+                        eyes_detect = '0'
 
-                    COUNTER = 0
+                        COUNTER = 0
+                    count += 1
+                    #print(count)
 
-                cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
                 # if ear > ear_top:
                 #     ear_top = ear
 
             cv2.imshow('Frame', frame)
             cv2.waitKey(1)
-            return eyes_detect, COUNTER, TOTAL
+            return eyes_detect, COUNTER, TOTAL, ear_th
+
 
 
 
