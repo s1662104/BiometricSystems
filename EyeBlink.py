@@ -43,6 +43,7 @@ class EyeBlink():
         inputType = self.inputType
         COUNTER = 0
         TOTAL = 0
+
         if inputType is not None:
 
 
@@ -57,8 +58,6 @@ class EyeBlink():
             fvs = FileVideoStream(inputType).start()
             time.sleep(1.0)
             fps = FPS().start()
-
-
 
             fileStream = True
 
@@ -292,7 +291,6 @@ class EyeBlink():
                 print(str(e))
                 break
 
-
             rects = detector(crop, 1)
 
             for rect in rects:
@@ -328,8 +326,6 @@ class EyeBlink():
 
                         COUNTER = 0
 
-
-
                 cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                 cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
@@ -341,8 +337,6 @@ class EyeBlink():
             cv2.imshow('Frame', frame)
             cv2.waitKey(1)
             return eyes_detect, COUNTER, TOTAL, ear_top
-
-
 
     def eye_blink_video_fixedTh(self,frame, detector, predictor, COUNTER, TOTAL):
         eyes_detect = ''
