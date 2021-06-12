@@ -11,17 +11,16 @@ from sklearn.metrics import roc_curve, roc_auc_score
 def identify(cf, img):
 
     #upload the various datasets
-    gallery_data = np.load("npy_db/gallery_data.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
     histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
     users = pd.read_csv('dataset_user.csv', index_col=[0])
+    gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
+    galley_users = list(dict.fromkeys(gallery_target))
 
     #find the user linked to the cf
     cf_list = users['Codice Fiscale']
     index = cf_list.tolist().index(cf)
     user = users.iloc[index]
-    print(user)
-    print(user["Delegati"])
 
     # check if the user is registered
     if cf_list.tolist().__contains__(cf):
@@ -32,7 +31,6 @@ def identify(cf, img):
 
     #find the user's delegates
     delegati = ast.literal_eval(user["Delegati"])
-    print(delegati)
 
     #if the user doesn't have delegates
     if len(delegati) == 0:
@@ -51,8 +49,8 @@ def identify(cf, img):
     for d in delegati:
         #the best value obtained by comparing the input image with the delegate images in the gallery
         val = topMatch(d, gallery_target, histogram_gallery_data, hist)
-
-        if val > max  and val > 0.55:
+        th_index = galley_users.index(d)
+        if val > max  and val >= gallery_thresholds[th_index]:
             max = val
             identity = d    #the identity of the delegate who gets the best value for the moment
 
@@ -61,8 +59,9 @@ def identify(cf, img):
     if identity is not None:
         indexd = cf_list.tolist().index(identity)
         recUser = users.iloc[indexd]
-
-    return user, index, recUser
+        return user, index, recUser
+    else:
+        return None, 0, None
 
 #face verification (or 1:1 face recognition) consists in checking if a face corresponds to a given identity.
 def recognize(cf, img):
@@ -151,6 +150,7 @@ def verificationFRR():
         #topMatch returns the best match between pg_hist and the templates associated to the claimed identity in the gallery
         gx = topMatch(pg_identity, gallery_target, histogram_gallery_data, pg_hist)
         index = galley_users.index(pg_identity)
+
         #If the maximum similarity is lower than the threshold, increase the number of False Reject
         if gx < gallery_thresholds[index]:
             fr = fr + 1
@@ -295,18 +295,22 @@ def evaluationIdentificationAsMultiVer():
     pn_target = np.load("npy_db/pn_target.npy")
     users = pd.read_csv('dataset_user.csv', index_col=[0])
     cf_list = users['Codice Fiscale']
+
     results1 = delegatesMatch(histogram_pg_data,pg_target,gallery_target,cf_list,users, gallery_thresholds, histogram_gallery_data)
     results2 = delegatesMatch(histogram_pn_data, pn_target, gallery_target, cf_list, users, gallery_thresholds, histogram_gallery_data)
 
     print("PG_DATA:",results1)
     print("PN_DATA:", results2)
+    print()
 
     fa = results1[0] + results2[0]
     fr = results1[1] + results2[1]
     countTG = results1[2] + results2[2]
     countTI = results1[3] + results2[3]
+
     FRR = fr/countTG
     FAR = fa/countTI
+
     print("FRR:", FRR, countTG)
     print("FAR:", FAR, countTI)
 
@@ -354,22 +358,21 @@ def evaluationVerification():
     histogram_pn_data = np.load("npy_db/histogram_pn_data.npy")
     galley_identities = list(dict.fromkeys(gallery_target))
 
-    # similarity_matrix = np.zeros((len(histogram_pg_data)+len(histogram_pn_data), len(galley_identities)))
-    #
-    # for x in range(len(histogram_pg_data)+len(histogram_pn_data)):
-    #     # Select the histogram probe
-    #     if x < len(histogram_pg_data):
-    #         hist_probe = histogram_pg_data[x]
-    #     else:
-    #         hist_probe = histogram_pn_data[x-len(histogram_pg_data)]
-    #
-    #     # Sign for each identity the max similarity against probe
-    #     for y in range(len(galley_identities)):
-    #         claimed_identity = galley_identities[y]
-    #         similarity_matrix[x][y] = topMatch(claimed_identity, gallery_target, histogram_gallery_data, hist_probe)
-    #
-    # np.save("similarity_matrix.npy", similarity_matrix)
-    # print(similarity_matrix)
+    similarity_matrix = np.zeros((len(histogram_pg_data)+len(histogram_pn_data), len(galley_identities)))
+
+    for x in range(len(histogram_pg_data)+len(histogram_pn_data)):
+        # Select the histogram probe
+        if x < len(histogram_pg_data):
+            hist_probe = histogram_pg_data[x]
+        else:
+            hist_probe = histogram_pn_data[x-len(histogram_pg_data)]
+
+        # Sign for each identity the max similarity against probe
+        for y in range(len(galley_identities)):
+            claimed_identity = galley_identities[y]
+            similarity_matrix[x][y] = topMatch(claimed_identity, gallery_target, histogram_gallery_data, hist_probe)
+
+    np.save("similarity_matrix.npy", similarity_matrix)
 
     similarity_matrix = np.load("similarity_matrix.npy")
 
@@ -386,23 +389,28 @@ def evaluationVerification():
     thresholds = []
 
     for threshold in np.arange(0.0, 1.01, 0.01):
+
         # Fix the threshold
         th = np.round(threshold, 2)
+
         # Reset all variables
         ga = 0
         fa = 0
         fr = 0
         gr = 0
+
         # For each probe we take the real identity of the probe and its histogram
         for x in range(similarity_matrix.shape[0]):
             if x < len(histogram_pg_data):
                 real_identity = pg_target[x]
             else:
                 real_identity = pn_target[x-len(histogram_pg_data)]
+
             # We claim every identity enrolled in the gallery
             for y in range(similarity_matrix.shape[1]):
                 claim_identity = galley_identities[y]
                 similarity = similarity_matrix[x][y]
+
                 # If the max similarity is above the threshold:
                 if similarity >= th:
                     # If the claimed identity is truw, we increase the GA
@@ -435,9 +443,11 @@ def evaluationVerification():
     eer_1 = np.array(far)[np.nanargmin(np.absolute((np.array(frr) - np.array(far))))]
     eer_2 = np.array(frr)[np.nanargmin(np.absolute((np.array(frr) - np.array(far))))]
     eer = (eer_1 + eer_2) / 2
+
     print("EER:", eer)
 
     eer_threshold = np.array(thresholds)[np.nanargmin(np.absolute((np.array(frr) - np.array(far))))]
+
     print("EER Threshold:", eer_threshold)
     print()
     print("Thresholds:", thresholds)
@@ -498,13 +508,13 @@ if __name__ == '__main__':
     #verificationFRR()
     #verificationFAR()
     #verificationROC()
-    #evaluationIdentificationAsMultiVer()
+    evaluationIdentificationAsMultiVer()
     #verificationAdaptive()
     #evaluationVerification()
 
-    frr = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.007142857142857143, 0.007142857142857143, 0.007142857142857143, 0.007142857142857143, 0.007142857142857143, 0.02142857142857143, 0.02142857142857143, 0.02142857142857143, 0.02142857142857143, 0.02857142857142857, 0.02857142857142857, 0.04285714285714286, 0.05, 0.06428571428571428, 0.07142857142857142, 0.09285714285714286, 0.12857142857142856, 0.15, 0.17142857142857143, 0.17857142857142858, 0.20714285714285716, 0.24285714285714285, 0.2785714285714286, 0.3, 0.34285714285714286, 0.38571428571428573, 0.45, 0.5357142857142857, 0.5785714285714286, 0.6285714285714286, 0.6714285714285714, 0.75, 0.8, 0.8428571428571429, 0.8785714285714286, 0.9214285714285714, 0.9428571428571428, 0.9571428571428572, 0.9857142857142858, 0.9857142857142858, 0.9928571428571429, 0.9928571428571429, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-    far = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9997198879551821, 0.9997198879551821, 0.9991596638655462, 0.9984593837535014, 0.9974789915966387, 0.9957983193277311, 0.9928571428571429, 0.9882352941176471, 0.9831932773109243, 0.9746498599439776, 0.9644257703081233, 0.9511204481792717, 0.9329131652661065, 0.9119047619047619, 0.8813725490196078, 0.846078431372549, 0.8081232492997199, 0.7675070028011205, 0.7177871148459384, 0.6668067226890756, 0.6095238095238096, 0.5497198879551821, 0.49089635854341734, 0.426750700280112, 0.3680672268907563, 0.315266106442577, 0.26554621848739496, 0.22198879551820727, 0.18207282913165265, 0.14523809523809525, 0.11708683473389356, 0.09243697478991597, 0.07226890756302522, 0.05742296918767507, 0.044677871148459385, 0.033473389355742296, 0.025070028011204483, 0.018067226890756304, 0.012324929971988795, 0.008963585434173669, 0.0056022408963585435, 0.0036414565826330533, 0.0021008403361344537, 0.0016806722689075631, 0.0014005602240896359, 0.0004201680672268908, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    thresholds = [0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.3, 0.31, 0.32, 0.33, 0.34, 0.35, 0.36, 0.37, 0.38, 0.39, 0.4, 0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.5, 0.51, 0.52, 0.53, 0.54, 0.55, 0.56, 0.57, 0.58, 0.59, 0.6, 0.61, 0.62, 0.63, 0.64, 0.65, 0.66, 0.67, 0.68, 0.69, 0.7, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76, 0.77, 0.78, 0.79, 0.8, 0.81, 0.82, 0.83, 0.84, 0.85, 0.86, 0.87, 0.88, 0.89, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0]
+    #frr = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.007142857142857143, 0.007142857142857143, 0.007142857142857143, 0.007142857142857143, 0.007142857142857143, 0.02142857142857143, 0.02142857142857143, 0.02142857142857143, 0.02142857142857143, 0.02857142857142857, 0.02857142857142857, 0.04285714285714286, 0.05, 0.06428571428571428, 0.07142857142857142, 0.09285714285714286, 0.12857142857142856, 0.15, 0.17142857142857143, 0.17857142857142858, 0.20714285714285716, 0.24285714285714285, 0.2785714285714286, 0.3, 0.34285714285714286, 0.38571428571428573, 0.45, 0.5357142857142857, 0.5785714285714286, 0.6285714285714286, 0.6714285714285714, 0.75, 0.8, 0.8428571428571429, 0.8785714285714286, 0.9214285714285714, 0.9428571428571428, 0.9571428571428572, 0.9857142857142858, 0.9857142857142858, 0.9928571428571429, 0.9928571428571429, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    #far = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9997198879551821, 0.9997198879551821, 0.9991596638655462, 0.9984593837535014, 0.9974789915966387, 0.9957983193277311, 0.9928571428571429, 0.9882352941176471, 0.9831932773109243, 0.9746498599439776, 0.9644257703081233, 0.9511204481792717, 0.9329131652661065, 0.9119047619047619, 0.8813725490196078, 0.846078431372549, 0.8081232492997199, 0.7675070028011205, 0.7177871148459384, 0.6668067226890756, 0.6095238095238096, 0.5497198879551821, 0.49089635854341734, 0.426750700280112, 0.3680672268907563, 0.315266106442577, 0.26554621848739496, 0.22198879551820727, 0.18207282913165265, 0.14523809523809525, 0.11708683473389356, 0.09243697478991597, 0.07226890756302522, 0.05742296918767507, 0.044677871148459385, 0.033473389355742296, 0.025070028011204483, 0.018067226890756304, 0.012324929971988795, 0.008963585434173669, 0.0056022408963585435, 0.0036414565826330533, 0.0021008403361344537, 0.0016806722689075631, 0.0014005602240896359, 0.0004201680672268908, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    #thresholds = [0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.3, 0.31, 0.32, 0.33, 0.34, 0.35, 0.36, 0.37, 0.38, 0.39, 0.4, 0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.5, 0.51, 0.52, 0.53, 0.54, 0.55, 0.56, 0.57, 0.58, 0.59, 0.6, 0.61, 0.62, 0.63, 0.64, 0.65, 0.66, 0.67, 0.68, 0.69, 0.7, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76, 0.77, 0.78, 0.79, 0.8, 0.81, 0.82, 0.83, 0.84, 0.85, 0.86, 0.87, 0.88, 0.89, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0]
 
     # index = thresholds.index(0.62)
     # print("Valori ottenuti utilizzando il eer_threshold = 0.62")
