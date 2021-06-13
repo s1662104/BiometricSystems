@@ -534,6 +534,7 @@ def updateThreshold(new_user):
     gallery_histograms = np.load("npy_db/histogram_gallery_data.npy")
     new_index = gallery_target.tolist().index(new_user)
     max = -1
+    # ritorna la lista di utenti unici. Si usa il dizionario perche' cosi' l'ordine tra gallery users e gallery thresholds sia lo stesso
     galley_users = list(dict.fromkeys(gallery_target))
     print("AGGIORNAMENTO DEI THRESHOLDS...")
     for user in galley_users:
