@@ -361,8 +361,8 @@ class EyeBlink():
         fps = FPS().start()
 
         fileStream = True
-
-        while fvs.more():
+        num_frames = 0
+        while (fvs.more() and num_frames < 150 ):
             crop = None
             frame = fvs.read()
 
@@ -381,16 +381,21 @@ class EyeBlink():
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             frame = np.dstack([frame, frame, frame])
-
-            eyesdetect, COUNTER, _ , ear_th  = self.eye_blink_video_fixedTh(frame, detector,
+            try:
+                eyesdetect, COUNTER, _ , ear_th  = self.eye_blink_video_fixedTh(frame, detector,
                                                                                predictor, COUNTER, TOTAL, ear_th)
+            except Exception as e:
+                print(str(e))
+                continue
 
             #print(ear_th)
 
             history += eyesdetect
+            fps.update()
             fps.stop()
             print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
             print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+            num_frames += 1
 
         cv2.destroyAllWindows()
         fvs.stop()
@@ -412,7 +417,7 @@ class EyeBlink():
             crop = frame[y:y + h, x:x + w]
 
             try:
-                crop = cv2.resize(crop, (500, 500))
+                crop = cv2.resize(crop, (200, 200))
             except Exception as e:
                 print(str(e))
                 break
