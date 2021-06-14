@@ -30,14 +30,13 @@ class EyeBlink():
 
 
 
-    #Il metodo sottostante va a prendere un frame per volta dal video
-    # (se è stato passato un input alla classe) oppure utilizza come
-    # sorgente la webcam e passa i frame ai relativi metodi "eye_blink_video"(se si tratta di un video)
-    # o "eye_blink_cam" se la sorgente è una webcam tali metodi andranno ad analizzare i singoli frame e ritornano
+    #Il metodo sottostante va a prendere un frame per volta dal video (se è stato passato un input alla classe) oppure
+    # utilizza come sorgente la webcam e passa i frame ai relativi metodi "eye_blink_video"(se si tratta di un video)
+    # o "eye_blink_cam" se la sorgente è una webcam, tali metodi andranno ad analizzare i singoli frame e ritornano
     # dei parametri come l'EAR_TOP ( che è Eye_aspect_ratio più alto che si incontra durante l'analisi dei frame
-    # di uno streaming video), il conteggio di blinking e l'eventuale history se abbiamo ottenuto almeno un eyeblink
-    # ritorniamo True altrimenti continuiamo fino alla fine del video e se non è stato mai rilevato un eyeblinking
-    # torna False
+    # di uno streaming video). Durante il conteggio dei blinking se si verifica almeno un eye-blink
+    # ritorna True, altrimenti continua e se non è stato mai rilevato un eye-blinking torna False.
+    # In questo caso viene utilizzato un threshold adattivo
 
     def eyeBlinkStart(self):
         inputType = self.inputType
@@ -62,40 +61,32 @@ class EyeBlink():
 
 
             fileStream = True
-
-            while fvs.more():
+            num_frames = 0
+            while fvs.more() and num_frames < 150:
                 crop = None
                 frame = fvs.read()
 
                 try:
                     frame = imutils.resize(frame, width=300)
-                ### rimuovere la parte if len
                 except Exception as e:
                     print(str(e))
-                    # if (len(history) > 1):
-                    #     print(history)
-                    #     result = self.isBlinking(history, 3)
-                    #     if (result):
-                    #         cv2.destroyAllWindows()
-                    #         fvs.stop()
-                    #         return True
-                    #     else:
-                    #         cv2.destroyAllWindows()
-                    #         fvs.stop()
-                    #         return False
+
                 try:
                     vis = frame.copy()
 
                 except Exception as e:
                     print(str(e))
                     break
+
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
                 frame = np.dstack([frame, frame, frame])
-
-                eyesdetect, COUNTER, TOTAL, ear_top = self.eye_blink_video(frame, detector, predictor,
+                try:
+                    eyesdetect, COUNTER, TOTAL, ear_top = self.eye_blink_video(frame, detector, predictor,
                                              COUNTER, TOTAL, ear_top)
-
+                except Exception as e:
+                    print(str(e))
+                    continue
 
                 history += eyesdetect
                 if TOTAL > 0:
@@ -107,26 +98,27 @@ class EyeBlink():
                     var = False
                 fps.update()
                 # print(len(history))
-                if (len(history) > 250):
-
-                    print(history)
-                    result = self.isBlinking(history, 3)
-                    print(result)
-                    if (result and var == False):
-                        cv2.destroyAllWindows()
-                        fvs.stop()
-                        # cv2.putText(vis, "Real", (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
-                        return True
-                    else:
-                        cv2.destroyAllWindows()
-                        fvs.stop()
-                        # cv2.putText(vis, "Fake", (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
-                        return False
+                # if (len(history) > 250):
+                #
+                #     print(history)
+                #     result = self.isBlinking(history, 3)
+                #     print(result)
+                #     if (result and var == False):
+                #         cv2.destroyAllWindows()
+                #         fvs.stop()
+                #         # cv2.putText(vis, "Real", (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
+                #         return True
+                #     else:
+                #         cv2.destroyAllWindows()
+                #         fvs.stop()
+                #         # cv2.putText(vis, "Fake", (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
+                #         return False
 
 
                 fps.stop()
                 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
                 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+                num_frames +=1
 
             cv2.destroyAllWindows()
             fvs.stop()
@@ -172,7 +164,7 @@ class EyeBlink():
                             return False
                         #cv2.imshow('Face', vis)
                 else:
-                  cv2.putText(frame, "Check...", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 165, 255), 3, cv2.LINE_AA)
+                  cv2.putText(frame, "Checking...", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 165, 255), 3, cv2.LINE_AA)
 
                 cv2.imshow("Frame", frame)
                 cv2.waitKey(1)
@@ -217,7 +209,7 @@ class EyeBlink():
             (x, y, w, h) = face_utils.rect_to_bb(det)
             crop = gray[y:y + h, x:x + w]
             try:
-                crop = cv2.resize(crop, (500, 500))
+                crop = cv2.resize(crop, (250, 250))
             except Exception as e:
                 print(str(e))
                 break
@@ -249,7 +241,7 @@ class EyeBlink():
                     else:
                         eyes_detect = '0'
 
-                        if COUNTER >= ear_threshold:
+                        if COUNTER >= CONSEC_FRAMES_NUMBER:
                             TOTAL += 1
 
 
@@ -279,13 +271,13 @@ class EyeBlink():
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
         for rect in rects:
-            shape = predictor(frame, rect)
-            shape = face_utils.shape_to_np(shape)
+            # shape = predictor(frame, rect)
+            # shape = face_utils.shape_to_np(shape)
             ###
             (x, y, w, h) = face_utils.rect_to_bb(rect)
-            crop = rect[y:y + h, x:x + w]
+            crop = frame[y:y + h, x:x + w]
             try:
-                crop = cv2.resize(crop, (500, 500))
+                crop = cv2.resize(crop, (200, 200))
             except Exception as e:
                 print(str(e))
                 break
@@ -320,7 +312,7 @@ class EyeBlink():
                         eyes_detect = '1'
                     else:
                         eyes_detect = '0'
-                        if COUNTER >= ear_threshold:
+                        if COUNTER >= CONSEC_FRAMES_NUMBER:
 
                             TOTAL += 1
 
@@ -340,7 +332,12 @@ class EyeBlink():
             cv2.waitKey(1)
             return eyes_detect, COUNTER, TOTAL, ear_top
 
-
+    # Il metodo sottostante viene utilizzato con i vari thresholds fissi variabili.
+    # Si va a prendere un frame per volta dal video; e ciascun frame viene passato al metodo "eye_blink_video_fixedTh"
+    # che andrà ad analizzare i singoli frame, confrontando l'eye_aspect_ratio del frame corrente con i vari threshold.
+    # In questo caso si analizzano un certo numero di frame e non tutto il video e viene, infine, tornata la lista dei
+    # valori che abbiamo ottenuto in base al threshold: se EAR < 'valore_del_threshold_x' avremo th_x = 1 in corrispondenza del
+    # threshold 'x' nella lista.
 
     def eyeBlinkStartThFixed(self):
         inputType = self.inputType
@@ -361,8 +358,8 @@ class EyeBlink():
         fps = FPS().start()
 
         fileStream = True
-
-        while fvs.more():
+        num_frames = 0
+        while (fvs.more() and num_frames < 150 ):
             crop = None
             frame = fvs.read()
 
@@ -381,16 +378,21 @@ class EyeBlink():
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             frame = np.dstack([frame, frame, frame])
-
-            eyesdetect, COUNTER, _ , ear_th  = self.eye_blink_video_fixedTh(frame, detector,
+            try:
+                eyesdetect, COUNTER, _ , ear_th  = self.eye_blink_video_fixedTh(frame, detector,
                                                                                predictor, COUNTER, TOTAL, ear_th)
+            except Exception as e:
+                print(str(e))
+                continue
 
             #print(ear_th)
 
             history += eyesdetect
+            fps.update()
             fps.stop()
             print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
             print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+            num_frames += 1
 
         cv2.destroyAllWindows()
         fvs.stop()
@@ -412,14 +414,14 @@ class EyeBlink():
             crop = frame[y:y + h, x:x + w]
 
             try:
-                crop = cv2.resize(crop, (500, 500))
+                crop = cv2.resize(crop, (200, 200))
             except Exception as e:
                 print(str(e))
                 break
 
-            rects = detector(crop, 1)
+            rects1 = detector(crop, 1)
 
-            for rect in rects:
+            for rect in rects1:
                 shape = predictor(crop, rect)
                 shape = face_utils.shape_to_np(shape)
 

@@ -192,20 +192,22 @@ class AntiSpoofingOverallEvaluation():
     def antispoofingEvaluation(self):
         data = pd.read_csv(self.nomeFileCsv, sep=';', header=None)
         y_test, y_test_score = data.iloc[:, 1], data.iloc[:, -1]
-        print("###y_test###")
-        print(y_test)
-        print("##############")
-        print("###y_score###")
-        print(y_test_score)
-        print("##############")
+        # print("###y_test###")
+        # print(y_test)
+        # print("##############")
+        # print("###y_score###")
+        # print(y_test_score)
+        # print("##############")
         print("###SPOOFING SCENARIO###")
         FRR, SFAR = evaluation.spoofing_scenario(y_test, y_test_score, index=0)
+        print()
         print("FRR", FRR)
         print("SFAR", SFAR)
-        print("##############")
+        print()
+        print("#######################")
 
-        print("ROC CURVE:")
-        evaluation.plot_roc_curve(y_test, y_test_score)
+        # print("ROC CURVE:")
+        # evaluation.plot_roc_curve(y_test, y_test_score)
 
 
 
@@ -213,19 +215,19 @@ class AntiSpoofingOverallEvaluation():
 def main():
     nameFileCsv = 'antispoofingCascade.csv'
     AntiSpoofingOverallEvaluation(nameFileCsv).evaluationCascade()
-    # nameFileCsv = 'antispoofingAND.csv'
-    # AntiSpoofingOverallEvaluation(nameFileCsv).evaluationAND()
-    # nameFileCsv = 'antispoofingOR.csv'
-    # AntiSpoofingOverallEvaluation(nameFileCsv).evaluationOR()
+    nameFileCsv = 'antispoofingAND.csv'
+    AntiSpoofingOverallEvaluation(nameFileCsv).evaluationAND()
+    nameFileCsv = 'antispoofingOR.csv'
+    AntiSpoofingOverallEvaluation(nameFileCsv).evaluationOR()
     print("CASCADE")
     nameFileCsv = 'antispoofingCascade.csv'
     AntiSpoofingOverallEvaluation(nameFileCsv).antispoofingEvaluation()
-    # print("AND")
-    # nameFileCsv = 'antispoofingAND.csv'
-    # AntiSpoofingOverallEvaluation(nameFileCsv).antispoofingEvaluation()
-    # print("OR")
-    # nameFileCsv = 'antispoofingOR.csv'
-    # AntiSpoofingOverallEvaluation(nameFileCsv).antispoofingEvaluation()
+    print("AND")
+    nameFileCsv = 'antispoofingAND.csv'
+    AntiSpoofingOverallEvaluation(nameFileCsv).antispoofingEvaluation()
+    print("OR")
+    nameFileCsv = 'antispoofingOR.csv'
+    AntiSpoofingOverallEvaluation(nameFileCsv).antispoofingEvaluation()
 
 
 
