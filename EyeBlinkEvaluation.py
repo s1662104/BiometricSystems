@@ -21,18 +21,14 @@ class EyeBlinkEvaluation:
 
 
     #viene creato il file csv e scritti i valori al suo interno
-    def writeEyeBlinkCsv(self, eyeblink, val):
+    def writeEyeBlinkCsv(self,nameFileCsv, eyeblink, val):
         print(eyeblink)
         list = []
         for val_array in eyeblink:
             list.append(val_array)
         list.append(val)
 
-        # with open('eyeblink.csv', 'a+') as cvsfile:
-        #     writer = csv.writer(cvsfile, delimiter=';')
-        #     writer.writerow(list)
-
-        with open('eyeblinkFixedTh.csv', 'a+') as cvsfile:
+        with open(nameFileCsv, 'a+') as cvsfile:
             writer = csv.writer(cvsfile, delimiter=';')
             writer.writerow(list)
 
@@ -41,7 +37,7 @@ class EyeBlinkEvaluation:
 
 
      #vengono letti i video dalle rispettive directory EyeBlink e valutati inserendo le informazioni nel csv.
-    def createDataSetEyeBlink(self, real, fake):
+    def createDataSetEyeBlink(self, real, fake, nameFileCsv):
         root_dir = 'Data/EyeBlink/'
         current_real = 'Real/'
         current_fake = 'Fake/'
@@ -67,15 +63,12 @@ class EyeBlinkEvaluation:
         print('Total video Fake: ', len(fakeFileNames))
         black_list = []
         try:
-            black_list = self.readEyeBlinkCsv(0)
+            black_list = self.readEyeBlinkCsv(nameFileCsv,0)
         except Exception as e:
             print(str(e))
         print(black_list)
         print()
-        ## FIXED TH
-        fr = []
-        fa = []
-        ##
+
         if real == True:
             for name in realFileNames:
                 if name in black_list:
@@ -92,7 +85,7 @@ class EyeBlinkEvaluation:
                     else:
                         val = 0
 
-                    self.writeEyeBlinkCsv(list, val)
+                    self.writeEyeBlinkCsv(nameFileCsv,list, val)
         if fake == True:
             for name in fakeFileNames:
                 if name in black_list:
@@ -110,26 +103,22 @@ class EyeBlinkEvaluation:
                 else:
                     val = 0
 
-                self.writeEyeBlinkCsv(list, val)
+                self.writeEyeBlinkCsv(nameFileCsv,list, val)
 
 
 
-    def readEyeBlinkCsv(self, val):
+    def readEyeBlinkCsv(self,nameFileCsv,val):
         list2 = []
-        # with open("eyeblink.csv", 'r') as f:
-        #     csv_reader = csv.reader(f, delimiter=';')
-        #     for row in csv_reader:
-        #         list2.append(row[val])
 
-        with open("eyeblinkFixedTh.csv", 'r') as f:
+        with open(nameFileCsv, 'r') as f:
            csv_reader = csv.reader(f, delimiter=';')
            for row in csv_reader:
                list2.append(row[val])
         return list2
 
-
-
-    def createDataSetEyeBlinkFixedTh(self, real, fake):
+    # vengono letti i video dalle rispettive directory EyeBlink e valutati inserendo le informazioni nel
+    # csv, in questo caso viene utilizzato Eye-blink con threshold fissa variabile
+    def createDataSetEyeBlinkFixedTh(self,nameFileCsv, real, fake):
         root_dir = 'Data/EyeBlink/'
         current_real = 'Real/'
         current_fake = 'Fake/'
@@ -181,7 +170,7 @@ class EyeBlinkEvaluation:
                     # else:
                     #     val = 0
                     #
-                self.writeEyeBlinkCsv(list, ear_th)
+                self.writeEyeBlinkCsv(nameFileCsv,list, ear_th)
         if fake == True:
             for name in fakeFileNames:
                 list = []
@@ -201,7 +190,7 @@ class EyeBlinkEvaluation:
                 # else:
                 #     val = 0
                 #
-                self.writeEyeBlinkCsv(list, ear_th)
+                self.writeEyeBlinkCsv(nameFileCsv,list, ear_th)
 
                     # if var:
                 #     val = 1
@@ -215,31 +204,22 @@ class EyeBlinkEvaluation:
     def evaluation(self,nameFileCsv):
         data = pd.read_csv(nameFileCsv, sep=';', header=None)
         y_test, y_test_score = data.iloc[:, 1], data.iloc[:, -1]
-        print("###y_test###")
-        print(y_test)
-        print("##############")
-        print("###y_score###")
-        print(y_test_score)
-        print("##############")
+        # print("###y_test###")
+        # print(y_test)
+        # print("##############")
+        # print("###y_score###")
+        # print(y_test_score)
+        # print("##############")
         print("###SPOOFING SCENARIO###")
+        print()
         FRR, SFAR = evaluation.spoofing_scenario(y_test, y_test_score, index=0)
         print("FRR", FRR)
         print("SFAR", SFAR)
-        print("##############")
+        print()
+        print("########################")
         
 
-        # print("ROC CURVE:")
-        # evaluation.plot_roc_curve(y_test, y_test_score)
-
-        # print("DET CURVE")
-        # evaluation.plot_det_curve(y_test, y_test_score)
-    # def readEyeBlinkFixedThCsv(self,nameCsv,val):
-    #     list2 = []
-    #     with open(nameCsv, 'r') as f:
-    #         csv_reader = csv.reader(f, delimiter=';')
-    #         for row in csv_reader:
-    #             list2.append(row[val])
-    #     return list2
+    # calcolo dei risultati con relative rappresentazioni utilizzando i thresholds fissi variabili.
     def evaluationFixedThreshold(self,nameFileCsv):
          data = pd.read_csv(nameFileCsv, sep=';', header = None)
          y_test, y_test_score = data.iloc[:, 1], data.iloc[:, -1]
@@ -344,9 +324,9 @@ class EyeBlinkEvaluation:
 
 
 def main():
-    EyeBlinkEvaluation().evaluationFixedThreshold(nameFileCsv='eyeblinkFixedTh.csv')
-    #EyeBlinkEvaluation().createDataSetEyeBlinkFixedTh(False, False)
-    #EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblinkFixedTh.csv')
+    #EyeBlinkEvaluation().evaluationFixedThreshold(nameFileCsv='eyeblinkFixedTh.csv')
+    EyeBlinkEvaluation().createDataSetEyeBlink(False, False, nameFileCsv='eyeblinkAdaptiveTh.csv')
+    EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblinkAdaptiveTh.csv')
 
 
 
