@@ -1,4 +1,5 @@
 import dlib
+from enum import Enum
 import cv2
 import Recognition
 import tkinter as tk
@@ -27,28 +28,41 @@ messageRecognition = "Chi sei?"
 recognitionChoice1 = "Paziente"
 recognitionChoice2 = "Delegato"
 spoofingMessage = "ANTISPOOFING ERROR!\n L'UTENTE NON SEMBRA ESSERE REALE!"
+messageMedicineError = "Inserisci i farmaci"
+messageDelegateError = "Inserisci i codici fiscali corretti dei tuoi delegati"
 
 dim_image = 64
 number_maximum_delegate = 3
 n_photo_x_user = 5
+pages = Enum("pages", [])
+radius = 1
+neighborhood = 8
+
 
 class Page(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        global pages
         container = tk.Frame(self)
 
         container.pack(side="top", fill="both", expand=True)
 
         self.frames = {}
+        pageNames = []
 
         for F in (StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage,
                   InformationPage, UserPage, RecognitionChoicePage):
             frame = F(container, self)
 
             self.frames[F] = frame
+            pageNames.append(F.__name__)
 
             frame.grid(row=0, column=0, sticky="nsew")
+
+        # utilizzo gli enum per indicizzare in modo piu' leggibile alle pagine. Quindi piuttosto che puntare alla
+        # pagina n, si indicizza a pages.NOME_PAGINA.value - 1 (-1 perche' gli indici partono da 1)
+        pages = Enum("pages", pageNames)
 
         self.show_frame(StartPage)
 
@@ -57,6 +71,7 @@ class Page(tk.Tk):
         frame.tkraise()
 
 
+# Pagina iniziale dove si presentano le due scelte: registrazione oppure prelievo farmaci
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -70,13 +85,16 @@ class StartPage(tk.Frame):
         button2.pack(pady=1)
 
         def goToEnroll():
-            list(controller.frames.values())[1].reset()
+            # resetto la pagina da eventuali dati inseriti da un altro utente. Non lo faccio dopo essere passati
+            # da questa alla pagina successiva perche' l'utente potrebbe sempre tornare indietro a correggere i dati
+            list(controller.frames.values())[pages.EnrollmentPage.value - 1].reset()
             controller.show_frame(EnrollmentPage)
 
         def goToRecognize():
             controller.show_frame(RecognitionChoicePage)
 
 
+# pagina di registrazione
 class EnrollmentPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -97,13 +115,11 @@ class EnrollmentPage(tk.Frame):
         labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
-        # tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-        #           command=lambda: back(controller, self.entryCF, labelError, self.entryName)).place(y=400,x=2)
-
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: back(controller, self.entryCF, labelError, self.entryName)).pack(side="left",
                                                                                                    pady=300)
 
+    # reset dei campi della pagina
     def reset(self):
         self.entryCF.delete(0, tk.END)
         self.entryCF.insert(0, messageCF)
@@ -111,6 +127,7 @@ class EnrollmentPage(tk.Frame):
         self.entryName.insert(0, messageN)
 
 
+# Qui l'utente deve scegliere se essere riconosciuto paziente o come delegato
 class RecognitionChoicePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -126,12 +143,14 @@ class RecognitionChoicePage(tk.Frame):
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: controller.show_frame(StartPage)).place(y=520, x=2)
 
+        # resetto la pagina e aggiorno il ruolo dell'utente (paziente o delegato)
         def confirm(role):
-            list(controller.frames.values())[2].reset()
-            list(controller.frames.values())[2].update_data(role)
+            list(controller.frames.values())[pages.RecognitionPage.value - 1].reset()
+            list(controller.frames.values())[pages.RecognitionPage.value - 1].update_data(role)
             controller.show_frame(RecognitionPage)
 
 
+# pagina per il riconoscimento dell'utente
 class RecognitionPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -153,14 +172,17 @@ class RecognitionPage(tk.Frame):
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: back(controller, self.entryCF, labelError)).pack(side="left", pady=385)
 
+    # reset della pagina
     def reset(self):
         self.entryCF.delete(0, tk.END)
         self.entryCF.insert(0, messageCF)
 
-    def update_data(self,role):
+    # aggiornamento della pagina
+    def update_data(self, role):
         self.role = role
 
 
+# La pagina serve per mostrare i dati dell'utente in caso di registrazione o di riconoscimento.
 class DataPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -181,7 +203,7 @@ class DataPage(tk.Frame):
         self.cf.pack()
 
 
-
+# Dati dell'utente nella fase di registrazione
 class DataEnrollmentPage(DataPage):
     def __init__(self, parent, controller):
         DataPage.__init__(self, parent, controller)
@@ -213,6 +235,7 @@ class DataEnrollmentPage(DataPage):
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
 
+    # resetta la pagina
     def reset(self):
         self.entryNMedicine.delete(0, tk.END)
         self.entryNMedicine.insert(0, "")
@@ -221,20 +244,20 @@ class DataEnrollmentPage(DataPage):
             self.delegateEntry[i].delete(0, tk.END)
             self.delegateEntry[i].insert(0, "")
 
+    # aggiorna i dati della pagina
     def update_data(self, cf, img, photo, name):
-        print(name)
         self.name.config(text="NOME: " + name)
         self.cf.config(text="CODICE FISCALE: " + cf)
         self.panel.config(image=img)
         self.panel.image = img
-        print(img)
         self.photo = photo
 
-    def addMedicines(self, nMedicine):
-        if not nMedicine.isdigit():
+    # aggiunge i campi compilabili in base al numero di farmaci indicato
+    def addMedicines(self, n_medicine):
+        if not n_medicine.isdigit():
             self.bell()
         else:
-            n = int(nMedicine)
+            n = int(n_medicine)
             actualN = len(self.medicineEntry)
             if n > actualN:
                 n = n - actualN
@@ -250,41 +273,53 @@ class DataEnrollmentPage(DataPage):
                     entryMedicine.destroy()
                     self.medicineEntry.pop()
 
+    # ritorna alla pagina precedente, ma non resetta perche' potrebbe essere che l'utente abbia sbagliato i dati
+    # compilati
     def back(self, controller):
         controller.show_frame(EnrollmentPage)
 
+    # conferma le scelte dell'utente
     def confirm(self, controller):
         medicineError = False
+        # se non sono stati inseriti farmaci
         if len(self.medicineEntry) == 0:
             medicineError = True
         else:
+            # se un campo e' vuoto
             for medicine in self.medicineEntry:
                 if medicine.get() == "":
                     medicineError = True
                     break
+        # allora mostra un messaggio di errore
         if medicineError:
-            messagebox.showerror(title="Errore", message="Inserisci i farmaci")
+            messagebox.showerror(title="Errore", message=messageMedicineError)
         else:
             delegatesError = False
             delegates = []
+            # controlla i delegati
             for delegate in self.delegateEntry:
                 if delegate.get() != "":
+                    # controlla se il codice fiscale e' valido
                     if not isCF(delegate.get()):
                         delegatesError = True
                         break
                     else:
                         delegates.append(delegate.get())
+            # altrimenti mostra un messaggio d'errore
             if delegatesError:
-                messagebox.showerror(title="Errore", message="Inserisci i codici fiscali dei tuoi delegati")
+                messagebox.showerror(title="Errore", message=messageDelegateError)
             else:
                 medicines = []
+                # ottiene la lista delle medicine
                 for medicine in self.medicineEntry:
                     medicines.append(medicine.get())
+                # aggiunge l'utente al sistema
                 addUser(self.photo, self.cf.cget("text")[16:], self.name.cget("text")[6:], medicines, delegates)
-                list(controller.frames.values())[5].update_data(enrollmentCompleted)
+                list(controller.frames.values())[pages.InformationPage.value - 1].update_data(enrollmentCompleted)
                 controller.show_frame(InformationPage)
 
 
+# Mostra i dati dell'utente prossimo al riconoscimento
 class DataRecognitionPage(DataPage):
     def __init__(self, parent, controller):
         DataPage.__init__(self, parent, controller)
@@ -299,9 +334,11 @@ class DataRecognitionPage(DataPage):
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
 
+    # reset della pagina
     def reset(self):
         pass
 
+    # aggiornamento della pagina
     def update_data(self, cf, img, photo, role, name=None):
         self.role = role
         self.cf.config(text="CODICE FISCALE: " + cf)
@@ -309,29 +346,35 @@ class DataRecognitionPage(DataPage):
         self.panel.image = img
         self.photo = photo
 
+    # si passa alla pagina successiva
     def confirm(self, controller):
-        print("role", self.role)
+        # se si tratta di Verifica del paziente
         if self.role == 0:
-            print("REC")
-            user, index, patient = Recognition.recognize(self.cf.cget("text")[16:], self.photo)
+            print("Verifica del paziente")
+            patient, index, user = Recognition.recognize(self.cf.cget("text")[16:], self.photo)
+        # se si tratta di Verifica del delegato
         else:
-            print("IDE")
-            user, index, patient = Recognition.identify(self.cf.cget("text")[16:], self.photo)
-        print(user)
+            print("Verifica del delegato")
+            patient, index, user = Recognition.identify(self.cf.cget("text")[16:], self.photo)
+        print("Il paziente e':", patient, "L'utente riconosciuto e':", user)
         if user is not None:
-            list(controller.frames.values())[6].reset()
-            list(controller.frames.values())[6].update_data(index, user["User"], patient["User"], user["Codice Fiscale"],
-                                                            user["Delegati"], user["Farmaci"], user["Data"],
-                                                            self.panel.image)
+            list(controller.frames.values())[pages.UserPage.value - 1].reset()
+            list(controller.frames.values())[pages.UserPage.value - 1].update_data(index, user["User"], patient["User"],
+                                                                                   patient["Codice Fiscale"],
+                                                                                   patient["Delegati"], patient["Farmaci"],
+                                                                                   patient["Data"],
+                                                                                   self.panel.image)
             controller.show_frame(UserPage)
         else:
-            list(controller.frames.values())[5].update_data(recognitionRejected)
+            list(controller.frames.values())[pages.InformationPage.value - 1].update_data(recognitionRejected)
             controller.show_frame(InformationPage)
 
+    # ritorna alla pagina precedente
     def back(self, controller):
         controller.show_frame(RecognitionPage)
 
 
+# pagina che mostra delle informazioni,ad esempio se il riconoscimento o il test anti-spoofing non e' andato a buno fine
 class InformationPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -345,6 +388,7 @@ class InformationPage(tk.Frame):
         self.label.config(text=info)
 
 
+# pagina in cui vengono mostrati i dati del paziente
 class UserPage(DataPage):
     def __init__(self, parent, controller):
         DataPage.__init__(self, parent, controller)
@@ -359,118 +403,125 @@ class UserPage(DataPage):
         medicineLabel = tk.Label(self, text="FARMACI:")
         medicineLabel.pack()
 
-
         self.entries = []
 
         tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
                   command=lambda: controller.show_frame(StartPage)).place(y=520, x=110)
 
+    # resetta la pagina
     def reset(self):
         for i, label in enumerate(self.delegatesLabels):
             self.delegatesLabels[i].config(text="-")
         for entry in self.entries:
             entry.destroy()
 
-    def update_data(self, index, name, patient, cf, delegates, medicines, last_date, photo):
+    # aggiorna i dati
+    def update_data(self, index, rec_user, patient, cf, delegates, medicines, last_date, photo):
         self.cf.config(text="CODICE FISCALE: " + cf)
-        self.name.config(text="UTENTE RICONOSCIUTO: " + patient)
-        self.patient.config(text="PAZIENTE: " + name)
+        self.name.config(text="UTENTE RICONOSCIUTO: " + rec_user)
+        self.patient.config(text="PAZIENTE: " + patient)
         self.panel.config(image=photo)
         self.panel.image = photo
+        # aggiorna la lista dei delegati
         delegates = ast.literal_eval(delegates)
         for i, label in enumerate(self.delegatesLabels):
             if i < len(delegates):
                 self.delegatesLabels[i].config(text=delegates[i])
             else:
                 self.delegatesLabels[i].config(text="-")
+        # aggiorna la lista dei farmaci
         medicines = ast.literal_eval(medicines)
         for medicine in medicines:
             label = tk.Label(self, text=medicine)
             label.pack()
             self.entries.append(label)
+        # indica la lista dei farmaci prelevati
         label = tk.Label(self, text="FARMACI PRELEVATI:")
         label.pack()
         self.entries.append(label)
         self.obtainable_medicines(last_date, medicines)
+        # aggiorna la data dell'ultimo prelievo
         csv = pd.read_csv("dataset_user.csv", index_col=[0])
         csv.iloc[index]["Data"] = date.today().strftime("%d/%m/%Y")
         csv.to_csv('dataset_user.csv')
 
+    # calcola la lista dei farmaci prelevabili
     def obtainable_medicines(self, d: str, medicines):
         dmy = d.split("/")
+        # ottengo la data
         last_date = date(int(dmy[2]), int(dmy[1]), int(dmy[0]))
+        # prendo la data di oggi
         today = date.today()
+        # calcolo il numero di giorni che sono passati
         days = (today - last_date).days
         medicine_dataset = pd.read_csv("dataset_medicine.csv")
         for row in medicine_dataset.iterrows():
             for medicine in medicines:
+                # poiche' le medicine sono nel formato "Prefolic 15 mg", si divide il nome dal dosaggio
                 s = medicine.split(" ")
-                name = ""
-                for i, val in enumerate(s):
-                    if i < len(s) - 2:
-                        name += s[i]
+                # gli ultimi due elementi sono il dosaggio ("15 mg")
+                indices = len(s) - 2
+                # si fa il join di tutti gli elementi dell'array, eccetto gli ultimi due
+                name = " ".join([s[i] for i in range(indices)])
+                # si prendono gli ultimi due elementi
                 dose = s[len(s) - 2] + " " + s[len(s) - 1]
+                # se il nome e il dosaggio combaciano
                 if row[1]["Nome"] == name and row[1]["Dosaggio"] == dose:
+                    # estraggo i dati
                     n = row[1]["Numero Pasticche"]
                     dose_x_day = row[1]["Dose x giorno"]
+                    # calcolo il numero di scatole in base al pasticche in una confezione e alle dosi assunte in un
+                    # giorno
                     box = int(days / n) * dose_x_day
                     label = tk.Label(self, text=medicine + " x " + str(box))
                     label.pack()
                     self.entries.append(label)
 
 
-def check_input(controller, cf, labelError, op, role=None, name=None):
-    if len(cf) != 16 or cf == messageCF or (name is not None and name == messageN):
-        labelError.configure(fg="red")
+# funziona chiamata da EnrollmentPage e RecognitionPage per verificare se l'input fornito e' corretto
+def check_input(controller, cf, label_error, op, role=None, name=None):
+    if not isCF(cf) or cf == messageCF or (name is not None and name == messageN):
+        print("? Errore")
+        label_error.configure(fg="red")
         return
     else:
-        labelError.configure(fg="#f0f0f0")
-    # crop = videoCapture()
+        label_error.configure(fg="#f0f0f0")
     if op == 0:
-        n = 3
+        n = pages.DataEnrollmentPage.value - 1
     else:
-        n = 4
+        n = pages.DataRecognitionPage.value - 1
     list(controller.frames.values())[n].reset()
-    ##Inizio parte antispoofing in fase di matching
-    user = False
+    # Inizio parte antispoofing in fase di matching
     nameFileCsv = 'histogram.csv'
-    if (EyeBlink(None).eyeBlinkStart()) == False:
+    # l'utente deve passare entrambi i test di anti-spoofing
+    if not EyeBlink(None).eyeBlinkStart():
         user = False
-    elif (MicroTexture(nameFileCsv).microTextureCam() == False):
-        print("REPLAY ATTACK E' FALSE")
+    elif not MicroTexture(nameFileCsv).microTextureCam():
         user = False
     else:
         user = True
-    ##Fine parte antispoofing in fase di matching
-    print("E' terminato l'anti spoofing")
-    if op == 0:
-        # Inizio parte antispoofing in fase di registrazione
-
-        if (user == True):
-            print("USER == TRUE")
+    # Fine parte antispoofing in fase di matching
+    # registrazione
+    if user:
+        if op == 0:
             cropList = multipleCapture()
-
-        # list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop,
-        #                                                name)
+            # list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)), crop,
+            #                                                name)
+            # si passa una solo immagine, come immagine rappresentativa dell'utente
             list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(cropList[0])),
-                                                        cropList, name)
+                                                            cropList, name)
             controller.show_frame(DataEnrollmentPage)
         else:
-            list(controller.frames.values())[5].update_data(spoofingMessage)
-            controller.show_frame(InformationPage)
-
-    else:
-        crop = videoCapture()
-
-        if (user == True):
-            print("USER == TRUE")
+            crop = videoCapture()
             list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)),
                                                             crop, role)
             controller.show_frame(DataRecognitionPage)
-        else:
-            list(controller.frames.values())[5].update_data(spoofingMessage)
-            controller.show_frame(InformationPage)
+    else:
+        list(controller.frames.values())[pages.InformationPage.value - 1].update_data(spoofingMessage)
+        controller.show_frame(InformationPage)
 
+
+# ritorna alla pagina precedente
 def back(controller, entryCF, labelError, entryName=None):
     entryCF.delete(0, tk.END)
     entryCF.insert(0, messageCF)
@@ -484,66 +535,55 @@ def back(controller, entryCF, labelError, entryName=None):
         controller.show_frame(RecognitionChoicePage)
 
 
+# aggiunge l'utente al sistema
 def addUser(photo, cf, name, medicines, delegates):
+    # carica i dataset
     gallery_data = np.load("npy_db/gallery_data.npy").tolist()
     gallery_target = np.load("npy_db/gallery_target.npy").tolist()
     gallery_histograms = np.load("npy_db/histogram_gallery_data.npy").tolist()
     medicine_csv = pd.read_csv("dataset_user.csv", index_col=[0])
+    # per ogni foto, si genera l'immagine LBP, si genera l'histogram associato e si appende al set predefinito
     for i in range(n_photo_x_user):
         gallery_data.append(photo[i])
         gallery_target.append(cf)
-        lbp = Local_Binary_Pattern(1,8,photo[i])
+        lbp = Local_Binary_Pattern(radius, neighborhood, photo[i])
         gallery_histograms.append(lbp.createHistogram(lbp.compute_lbp()))
+    # si salvano i dataset
     np.save("npy_db/gallery_data.npy", np.array(gallery_data))
     np.save("npy_db/gallery_target.npy", np.array(gallery_target))
     np.save("npy_db/histogram_gallery_data.npy", np.array(gallery_histograms))
+    # si aggiornano i thresholds
     updateThreshold(cf)
     print("L'utente", name, "viene aggiunto al dataset")
     print("Il codice fiscale è", cf)
-    print(len(gallery_data), len(gallery_target),len(gallery_histograms))
-    # print(photo, gallery_data[len(gallery_data) - 1])
-    # print(cf, gallery_target[len(gallery_target) - 1])
+    print(len(gallery_data), len(gallery_target), len(gallery_histograms))
+    # si aggiornano i dati dell'utente
     medicine_csv = medicine_csv.append(
         {"User": name, "Codice Fiscale": cf, "Farmaci": medicines, "Delegati": delegates,
          "Data": date.today().strftime("%d/%m/%Y")}, ignore_index=True)
     medicine_csv.to_csv('dataset_user.csv')
 
-#def updateThreshold(new_user):
-#    gallery_target = np.load("npy_db/gallery_target.npy")
-#    gallery_threshold = np.load("npy_db/gallery_thresholds.npy").tolist()
-#    histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
-#    new_index = gallery_target.index(new_user)
-#    max_thd = -1
-#    for user in np.unique(gallery_target):
-#        if user != new_user:
-#            index = gallery_target.index(user)
-#            for i in range(5):
-#                thd = Recognition.topMatch(user, gallery_target, histogram_gallery_data, histogram_gallery_data[new_index+i])
-#                val = Recognition.topMatch(new_user, gallery_target, histogram_gallery_data,histogram_gallery_data[index+i])
-#                if thd > gallery_threshold[index]:
-#                    gallery_threshold[index] = np.round(thd,2)
-#                if val > max_thd:
-#                    max_thd = np.round(val,2)
-#    gallery_threshold.append(max_thd)
-#    np.save("npy_db/gallery_thresholds.npy", gallery_threshold)
-#    return
 
+# si aggiornano i tresholds
 def updateThreshold(new_user):
     gallery_threshold = np.load("npy_db/gallery_thresholds.npy").tolist()
     gallery_target = np.load("npy_db/gallery_target.npy")
     gallery_histograms = np.load("npy_db/histogram_gallery_data.npy")
     new_index = gallery_target.tolist().index(new_user)
     max = -1
-    # ritorna la lista di utenti unici. Si usa il dizionario perche' cosi' l'ordine tra gallery users e gallery thresholds sia lo stesso
+    # ritorna la lista di utenti unici. Si usa il dizionario perche' cosi' l'ordine tra gallery users e gallery
+    # thresholds e' lo stesso
     galley_users = list(dict.fromkeys(gallery_target))
     print("AGGIORNAMENTO DEI THRESHOLDS...")
     for user in galley_users:
+        # confrontiamo un utente con tutti gli utenti della gallery ma non con se stesso
         if user != new_user:
             index = galley_users.index(user)
-            for i in range(5):
+            # per ogni template dell'utente
+            for i in range(n_photo_x_user):
                 thd = Recognition.topMatch(user, gallery_target, gallery_histograms,
                                            gallery_histograms[new_index + i])
-
+                # prendo il threshold massimo e lo arrotondo
                 if thd > gallery_threshold[index]:
                     gallery_threshold[index] = thd
                 if thd > max:
@@ -551,12 +591,16 @@ def updateThreshold(new_user):
                         max = np.round(thd, 2) + 0.01
                     else:
                         max = np.round(thd, 2)
+    # l'ultimo max fa riferimento all'ultimo utente appena iscritto, questo proprio perche' si segue l'ordine di
+    # gallery_users, che mantiene a sua volta l'ordine di gallery_target
     gallery_threshold.append(max)
-    print("IL TUO THRESHOLD:",max, "N. TOTALI DI HISTOGRAM:",len(gallery_threshold))
+    print("IL TUO THRESHOLD:", max, "N. TOTALI DI HISTOGRAM:", len(gallery_threshold))
     np.save("npy_db/gallery_threshold.npy", np.array(gallery_threshold))
     np.save("npy_db/gallery_thresholds.npy", gallery_threshold)
     return
 
+
+# catture multiple
 def multipleCapture():
     list_captures = []
     for i in range(n_photo_x_user):
@@ -564,6 +608,8 @@ def multipleCapture():
         list_captures.append(crop)
     return list_captures
 
+
+# funzione che cattura la camera e inquadra l'utente finche' questo non scatta una foto
 def videoCapture():
     cap = cv2.VideoCapture(0)
     detector = dlib.get_frontal_face_detector()
@@ -594,35 +640,11 @@ def videoCapture():
     return gray
 
 
-# def videoCapture():
-#     cap = cv2.VideoCapture(0)
-#     # while (True):
-#     # Capture frame-by-frame
-#     ret, frame = cap.read()
-#     vis = frame.copy()
-#
-#     # Our operations on the frame come here
-#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-#     crop = None
-#     while crop is None:
-#         print("CROP NON FATTO!")
-#         crop = detect_face(gray, vis)
-
-# # # Display the resulting frame
-# # cv2.imshow('frame', vis)
-# # if cv2.waitKey(1) & 0xFF == ord('q'):
-# #     break
-#
-# # When everything done, release the capture
-# cap.release()
-# cv2.destroyAllWindows()
-# return crop
-
-
+# funzione usata all'esterno di questa classe
 def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-    dets = detector(img, 1)  # Detect the faces in the image
+    dets = detector(img, 1)
     for i, d in enumerate(dets):
         landmark = predictor(img, d)
         top = landmark.part(19).y
@@ -643,12 +665,14 @@ def detect_face(img, vis, crop=None):
     return crop
 
 
+# controlla se il codice fiscale e' correttto
 def isCF(cf):
     if len(cf) != 16:
         return False
     return any(i.isdigit() for i in cf)
 
 
+# main
 def main():
     app = Page()
     app.geometry('300x550')

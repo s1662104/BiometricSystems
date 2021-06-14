@@ -19,8 +19,6 @@ def identify(cf, img):
 
     #find the user linked to the cf
     cf_list = users['Codice Fiscale']
-    index = cf_list.tolist().index(cf)
-    user = users.iloc[index]
 
     # check if the user is registered
     if cf_list.tolist().__contains__(cf):
@@ -28,6 +26,9 @@ def identify(cf, img):
     else:
         print("UTENTE NON PRESENTE! Il codice fiscale inserito è:", cf)
         return None, 0, None
+
+    index = cf_list.tolist().index(cf)
+    user = users.iloc[index]
 
     #find the user's delegates
     delegati = ast.literal_eval(user["Delegati"])
@@ -320,6 +321,7 @@ def delegatesMatch(hist_data, target, gallery_target, cf_list, users, gallery_th
     fa = 0
     fr = 0
     galley_users = list(dict.fromkeys(gallery_target))
+    print(cf_list[0])
     for i in range(len(hist_data)):
         probe_target = target[i]
         hist_probe = hist_data[i]

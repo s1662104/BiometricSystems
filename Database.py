@@ -53,6 +53,12 @@ class Olivetti_Names(Enum):
     Martyn_Mays = 39
 
 
+# percentuale di template nel probe set
+probe = 50
+# percentuale di utenti in PN
+pn = 30
+
+
 class Database:
 
     def __init__(self, create: bool):
@@ -68,7 +74,7 @@ class Database:
             self.n_template_x_user = 0
             # si splitta
             self.gallery_data, self.gallery_target, self.pn_data, self.pn_target, self.pg_data, self.pg_target, \
-                self.histogram_gallery_data, self.histogram_pg_data, self.histogram_pn_data = \
+            self.histogram_gallery_data, self.histogram_pg_data, self.histogram_pn_data = \
                 self.split_gallery_probe(data, target, cfs)
             self.csv_maker(cfs)
             # Creazione dei threshold adattivi
@@ -95,6 +101,9 @@ class Database:
             self.histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
             self.histogram_pg_data = np.load("npy_db/histogram_pg_data.npy")
             self.histogram_pn_data = np.load("npy_db/histogram_pn_data.npy")
+            unique, counts = np.unique(self.gallery_target, return_counts=True)
+            self.n_template_x_user = counts[0]
+
 
     def adaptiveThresholds(self):
         print("ADAPTIVE THRESHOLDS")
@@ -132,7 +141,7 @@ class Database:
 
     # pn = percentuale di utenti che non sono nella gallery
     # probe = percentuale di template che sono nel probe set e non nel gallery set per lo stesso utente
-    def split_gallery_probe(self, data, target, cfs, pn=30, probe=50):
+    def split_gallery_probe(self, data, target, cfs):
         num_user = self.num_user(target)
         # calcola il numero di template per utente
         unique, counts = np.unique(target, return_counts=True)
@@ -145,7 +154,7 @@ class Database:
         countUser = 0
         # gallery_target, gallery_data, pn_data, pn_target, pg_data, pg_target = [], [], [], [], [], []
         gallery_target, gallery_data, pn_data, pn_target, pg_data, pg_target, histogram_gallery_data, \
-            histogram_pg_data, histogram_pn_data = [], [], [], [], [], [], [], [], []
+        histogram_pg_data, histogram_pn_data = [], [], [], [], [], [], [], [], []
         # prendo il numero di template dell'utente. si parte dal presupposto che tutti gli utenti
         # hanno lo stesso numero di template
         occ = occurrences[target[0]]
