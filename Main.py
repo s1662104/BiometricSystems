@@ -529,20 +529,23 @@ def addUser(photo, cf, name, medicines, delegates):
 #    return
 
 def updateThreshold(new_user):
+
     gallery_threshold = np.load("npy_db/gallery_thresholds.npy").tolist()
     gallery_target = np.load("npy_db/gallery_target.npy")
     gallery_histograms = np.load("npy_db/histogram_gallery_data.npy")
+
     new_index = gallery_target.tolist().index(new_user)
     max = -1
     galley_users = list(dict.fromkeys(gallery_target))
+
     print("AGGIORNAMENTO DEI THRESHOLDS...")
+
     for user in galley_users:
         if user != new_user:
             index = galley_users.index(user)
             for i in range(5):
                 thd = Recognition.topMatch(user, gallery_target, gallery_histograms,
                                            gallery_histograms[new_index + i])
-
                 if thd > gallery_threshold[index]:
                     gallery_threshold[index] = thd
                 if thd > max:
@@ -552,7 +555,6 @@ def updateThreshold(new_user):
                         max = np.round(thd, 2)
     gallery_threshold.append(max)
     print("IL TUO THRESHOLD:",max, "N. TOTALI DI HISTOGRAM:",len(gallery_threshold))
-    np.save("npy_db/gallery_threshold.npy", np.array(gallery_threshold))
     np.save("npy_db/gallery_thresholds.npy", gallery_threshold)
     return
 
