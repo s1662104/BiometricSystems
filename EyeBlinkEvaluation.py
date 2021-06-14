@@ -280,7 +280,7 @@ class EyeBlinkEvaluation:
          plt.plot(sfar, gar)
          plt.plot([0, 1], [0, 1], 'k--')
          plt.ylabel("Genuine Acceptance Rate")
-         plt.xlabel("False Acceptance Rate")
+         plt.xlabel("Spoofing False Acceptance Rate")
          plt.title('Receiver Operating Characteristic')
          plt.xlim([0.0, 1.0])
          plt.ylim([0.0, 1.0])
@@ -324,9 +324,9 @@ class EyeBlinkEvaluation:
 
 
 def main():
-    #EyeBlinkEvaluation().evaluationFixedThreshold(nameFileCsv='eyeblinkFixedTh.csv')
-    EyeBlinkEvaluation().createDataSetEyeBlink(False, False, nameFileCsv='eyeblinkAdaptiveTh.csv')
-    EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblinkAdaptiveTh.csv')
+    EyeBlinkEvaluation().evaluationFixedThreshold(nameFileCsv='eyeblinkFixedTh.csv')
+    #EyeBlinkEvaluation().createDataSetEyeBlink(False, False, nameFileCsv='eyeblinkAdaptiveTh.csv')
+    #EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblinkAdaptiveTh.csv')
 
 
 
