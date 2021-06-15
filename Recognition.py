@@ -7,132 +7,121 @@ import ast
 from matplotlib import pyplot as plt
 from sklearn.metrics import roc_curve, roc_auc_score
 
-#face identification (or 1:N face recognition) consists in finding the identity corresponding to a given face.
+# restituisce i dati del delegato e del cliente cf utilizzando img per il confronto
 def identify(cf, img):
 
-    #upload the various datasets
+    # caricamento dei vari dataset
     gallery_target = np.load("npy_db/gallery_target.npy")
     histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
     users = pd.read_csv('dataset_user.csv', index_col=[0])
     gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
     galley_users = list(dict.fromkeys(gallery_target))
-
-    #find the user linked to the cf
     cf_list = users['Codice Fiscale']
+
+    # informazioni del paziente utilizzando cf
     index = cf_list.tolist().index(cf)
     user = users.iloc[index]
 
-    # check if the user is registered
-    if cf_list.tolist().__contains__(cf):
-        print("UTENTE PRESENTE")
-    else:
-        print("UTENTE NON PRESENTE! Il codice fiscale inserito è:", cf)
-        return None, 0, None
-
-    #find the user's delegates
+    # lista dei delegati del paziente
     delegati = ast.literal_eval(user["Delegati"])
 
-    #if the user doesn't have delegates
+    # se il paziente non ha nessun delegato, allora termina l'operazione
     if len(delegati) == 0:
         print("L'utente non ha delegati!")
         return None, 0, None
 
-    #we begin to find out which delegate is trying to access to the system
+    # si inizializzano le variabili per la similarity e l'identità del delegato
     max = 0
     identity = None
 
+    # l'immagine in input viene normalizzata per poter utilizzare LBP e ottenerne l'istogramma relativo
     norm_image = cv2.normalize(img, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     norm_image = norm_image.astype(np.uint8)
     lbp = LBP.Local_Binary_Pattern(1, 8, norm_image)
     hist = lbp.createHistogram(lbp.compute_lbp())
 
+    # per ogni delegato
     for d in delegati:
-        #the best value obtained by comparing the input image with the delegate images in the gallery
+        # ottengo il miglior valore ottenuto confrontando l'istograma con quelli del delegato nella galleria
         val = topMatch(d, gallery_target, histogram_gallery_data, hist)
         th_index = galley_users.index(d)
+        # confrontiamo la similarity con quella massimo ottenuta finora e con il threshold del delegato
+        # se la similarity supera quella massima e il threshold, allora aggiorniamo le variabili
         if val > max  and val >= gallery_thresholds[th_index]:
-            max = val
-            identity = d    #the identity of the delegate who gets the best value for the moment
+            max = val       # il più alto valore di similarity attuale
+            identity = d    # identità del delegato che ha ottenuto il miglior valore per il momento
 
-    print("L'identità del delegato è:",identity)
-
+    # se c'è stato un riconoscimento tra i delegati
     if identity is not None:
         indexd = cf_list.tolist().index(identity)
         recUser = users.iloc[indexd]
+        # ritorna i dati del paziente, l'indice in cui si trova in dataset_user e le informazioni del delegato
         return user, index, recUser
     else:
+        # altrimenti ritorna None come paziente, 0 come indice e None come delegato
         return None, 0, None
 
-#face verification (or 1:1 face recognition) consists in checking if a face corresponds to a given identity.
+# restituisce l'identità del paziente cf se img dà un riscontro positivo
 def recognize(cf, img):
 
-    #upload the various datasets
+    # caricamento dei vari dataset
     gallery_target  = np.load("npy_db/gallery_target.npy")
     histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
     gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
     users = pd.read_csv('dataset_user.csv', index_col=[0])
-
-    #find the user linked to the cf
     cf_list = users['Codice Fiscale']
+
+    # inizializzazione delle variabili che conterranno i dati del paziente e l'indice in cui si trova in dataset_user
     user = None
-    index = 0
-
-    #check if the user is registered
-    if cf_list.tolist().__contains__(cf):
-        print("UTENTE PRESENTE")
-    else:
-        print("UTENTE NON PRESENTE! Il codice fiscale inserito è:",cf)
-        return user, index, user
-
     index = cf_list.tolist().index(cf)
 
-    #normalize the input image
+    # l'immagine in input viene normalizzata per poter utilizzare LBP e ottenerne l'istogramma relativo
     norm_image = cv2.normalize(img, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     norm_image = norm_image.astype(np.uint8)
     lbp = LBP.Local_Binary_Pattern(1, 8, norm_image)
     hist = lbp.createHistogram(lbp.compute_lbp())
 
-    #calculates the maximum match between the image taken in input and the images in the user's gallery
+    # calcola la corrispondenza massima tra l'istogramma dell'immagine in input e quelli delle immagini nella galleria dell'utente
     val = topMatch(cf, gallery_target, histogram_gallery_data, hist)
 
-    print("val:",val)
-
-    #if the maximum match is greater than or equal to the adaptive threshold, then the identity is verified
+    # se la similairtà massima è maggiore o uguale alla soglia adattativa del paziente, l'identità viene verificata
     if val >= gallery_thresholds[index]:
         user = users.iloc[index]
 
+    # ritorna le informazioni del paziente e l'indice in cui si trova in dataset_user
     return user, index, user
 
+# ritorna il valore di similarity tra i due istogrammi presi in input
 def compareHistogram(H1, H2):
 
-    #in order to make the difference between the two histograms, we must be sure that their length is the same
+    # per fare la differenza tra i due istogrammi, dobbiamo essere sicuri che la loro lunghezza sia la stessa
     if len(H1) != len(H2):
         print("LA LUNGHEZZA DEI DUE ISTOGRAMMI NON E' LA STESSA")
         return
 
-    #calculate the average of the values in the two histograms
+    # calcolare la media dei valori nei due istogrammi
     avg_H1 = sum(H1) / len(H1)
     avg_H2 = sum(H2) / len(H2)
 
+    # inizializzazione delle variabili
     sum1 = 0
     sum_H1 = 0
     sum_H2 = 0
+
     for i in range(0, len(H1)):
         sum1 = sum1 + ((H1[i]-avg_H1)*(H2[i]-avg_H2))
         sum_H1 = sum_H1 + pow(H1[i]-avg_H1, 2)
         sum_H2 = sum_H2 + pow(H2[i]-avg_H2, 2)
 
-    #calculate the similarity using the correlation method
+    # calcolare la somiglianza utilizzando il metodo di correlazione
     sim = sum1 / math.sqrt(sum_H1*sum_H2)
 
     return sim
 
-#False Rejection Rate - FRR
-#The FRR is defined as the percentage of identification instances in which false rejection occurs.
-#This can be expressed as a probability. For example, if the FRR is 0.05 percent, it means that on the average,
-#one out of every 2000 authorized persons attempting to access the system will not be recognized by that system.
+# calcola il False Rejection Rate nel caso in cui si utilizzano i threshold adattivi
 def verificationFRR():
 
+    # caricamento dei vari dataset
     pg_target = np.load("npy_db/pg_target.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
     gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
@@ -140,18 +129,19 @@ def verificationFRR():
     histogram_pg_data =  np.load("npy_db/histogram_pg_data.npy")
     galley_users = list(dict.fromkeys(gallery_target))
 
+    # inizializzazione della variabile dei False Rejections
     fr = 0
 
+
     for i in range(len(pg_target)):
+        pg_identity = pg_target[i]      # identità dell'utente a cui appartiene l'istogramma da controntare
+        pg_hist = histogram_pg_data[i]      # istogramma dell'utente
 
-        pg_identity = pg_target[i]
-        pg_hist = histogram_pg_data[i]
-
-        #topMatch returns the best match between pg_hist and the templates associated to the claimed identity in the gallery
+        # restituisce la migliore corrispondenza tra pg_hist e gli istogrammi dell'utente nella galleria
         gx = topMatch(pg_identity, gallery_target, histogram_gallery_data, pg_hist)
         index = galley_users.index(pg_identity)
 
-        #If the maximum similarity is lower than the threshold, increase the number of False Reject
+        # se la somiglianza massima è inferiore alla soglia dell'utente, aumenta il numero di False Reject
         if gx < gallery_thresholds[index]:
             fr = fr + 1
 
@@ -161,42 +151,48 @@ def verificationFRR():
 
     return
 
-#False Acceptance Rate - FAR
-#The FAR is defined as the percentage of identification instances in which false acceptance occurs.
-#This can be expressed as a probability. For example, if the FAR is 0.1 percent, it means that on the average, one out of every 1000
-#impostors attempting to breach the system will be successful. Stated another way, it means that the probability of an unauthorized person being identified as
-#an authorized person is 0.1 percent.
+# calcola il False Acceptance Rate nel caso in cui si utilizzano i threshold adattivi
 def verificationFAR():
+
+    # caricamento dei vari dataset
     pg_target = np.load("npy_db/pg_target.npy")
     gallery_target = np.load("npy_db/gallery_target.npy")
     gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
     histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
     histogram_pg_data = np.load("npy_db/histogram_pg_data.npy")
     histogram_pn_data = np.load("npy_db/histogram_pn_data.npy")
-    fa = 0
-    ti = 0
     galley_users = list(dict.fromkeys(gallery_target))
 
-    #Scenario in which the impostor doesn't belong to the gallery
+    # inizializzazione della variabile dei False Accept e True Impostor
+    fa = 0
+    ti = 0
+
+    # scenario in cui l'impostore non appartiene alla galleria
     for i in range(len(histogram_pn_data)):
-        pn_hist = histogram_pn_data[i]
+        pn_hist = histogram_pn_data[i]      # istogramma appartenente ad un impostore
         index_target = 0
+        # per ogni utente nella gallery
         for t in galley_users:
-            #topMatch returns the best match between pg_hist and the templates associated to the claimed identity in the gallery
+            # restituisce la migliore corrispondenza tra pn_hist e gli istogrammi dell'utente nella galleria
             val = topMatch(t, gallery_target, histogram_gallery_data, pn_hist)
+
+            # se il valore è mmaggiore della soglia adattive di un utente, allora si incrementa il False Accept
             if val >= gallery_thresholds[index_target]:
                 fa += 1
             ti += 1
             index_target += 1
 
-    #Scenario in which the impostor belongs to the gallery
+    # scenario in cui l'impostore appartiene alla galleria
     for i in range(len(histogram_pg_data)):
-        pg_hist = histogram_pg_data[i]
+        pg_hist = histogram_pg_data[i]      # istogramma appartenente ad un utente che dichiara un'altra identità
         index_target = 0
+        # per ogni utente nella gallery
         for t in galley_users:
             if t != pg_target[i]:
-                # topMatch returns the best match between pg_hist and the templates associated to the claimed identity in the gallery
+                # restituisce la migliore corrispondenza tra pg_hist e gli istogrammi dell'utente nella galleria
                 val = topMatch(t, gallery_target, histogram_gallery_data, pg_hist)
+
+                # se il valore è mmaggiore della soglia adattive di un utente, allora si incrementa il False Accept
                 if val >= gallery_thresholds[index_target]:
                     fa += 1
                 ti += 1
@@ -208,84 +204,25 @@ def verificationFAR():
 
     return
 
-#The Receiver Operating Characteristics (ROC) curve is an evaluation metric for a binary classifier,
-#which helps us to visualize the performance of a facial recognition model as its discrimination threshold changes.
-#ROC depicts the probability of Genuine Accept (GAR) of the system, expressed as 1-FRR, vs False Accept Rate (FAR) variation.
-def verificationROC():
-    gallery_target = np.load("npy_db/gallery_target.npy")
-    gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
-    pg_target = np.load("npy_db/pg_target.npy")
-    histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
-    histogram_pg_data = np.load("npy_db/histogram_pg_data.npy")
-    histogram_pn_data = np.load("npy_db/histogram_pn_data.npy")
-    galley_users = list(dict.fromkeys(gallery_target))
-
-    Y = []
-    Y_pred = []
-
-    for i in range(len(histogram_pg_data)):
-        Y.append(1)
-        index = galley_users.index(pg_target[i])
-        val = topMatch(pg_target[i], gallery_target, histogram_gallery_data, histogram_pg_data[i])
-        if val >= gallery_thresholds[index]:
-            Y_pred.append(1)
-        else:
-            Y_pred.append(0)
-
-    for j in range(len(histogram_pn_data)):
-        index_target = 0
-        for t in galley_users:
-            Y.append(0)
-            val = topMatch(t, gallery_target, histogram_gallery_data, histogram_pn_data[j])
-            if val >= gallery_thresholds[index_target]:
-                Y_pred.append(1)
-            else:
-                Y_pred.append(0)
-            index_target += 1
-
-    for v in range(len(histogram_pg_data)):
-        index_target = 0
-        for u in galley_users:
-            if pg_target[v] != u:
-                Y.append(0)
-                val = topMatch(u, gallery_target, histogram_gallery_data, histogram_pg_data[v])
-                if val >= gallery_thresholds[index_target]:
-                    Y_pred.append(1)
-                else:
-                    Y_pred.append(0)
-            index_target += 1
-
-    FPR, TPR, t = roc_curve(np.array(Y), np.array(Y_pred))
-    auc = roc_auc_score(np.array(Y), np.array(Y_pred))
-
-    FNR = 1 - TPR
-    EER = FPR[np.nanargmin(np.absolute((FNR - FPR)))]
-    print("EER:",EER)
-
-    #Plot ROC curve
-    plt.plot(FPR, TPR, label='ROC curve (area = %0.2f)' % auc)
-    plt.plot([0, 1], [0, 1], 'k--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.0])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver Operating Characteristic')
-    plt.legend(loc="lower right")
-    plt.show()
-
-    return
-
+# ritorna il massimo valore di similarity tra hist con gli istogrammi appartenenti a identity
 def topMatch(identity , gallery_target, histogram_gallery_data, hist):
+
+    # inizializzazione delle variabili che contengono il valore più alto di similarity e l'indice in cui si trova identity in gallery_target
     max = 0
     index = gallery_target.tolist().index(identity)
+
     for i in range(5):
         sim = compareHistogram(hist, histogram_gallery_data[index + i])
+        # se la similairy ottenuta è mmaggiore rispetto al valore più alto calcolato finora, allora si sovrascrive
         if sim >= max:
             max = sim
 
     return max
 
+# mostra il False Rejection Rate e il False Acceptance Rate nell'operazione di riconoscimento del delegato
 def evaluationIdentificationAsMultiVer():
+
+    # caricamento dei vari dataset
     gallery_target = np.load("npy_db/gallery_target.npy")
     gallery_thresholds = np.load("npy_db/gallery_thresholds.npy")
     histogram_gallery_data = np.load("npy_db/histogram_gallery_data.npy")
@@ -296,30 +233,35 @@ def evaluationIdentificationAsMultiVer():
     users = pd.read_csv('dataset_user.csv', index_col=[0])
     cf_list = users['Codice Fiscale']
 
-    results1 = delegatesMatch(histogram_pg_data,pg_target,gallery_target,cf_list,users, gallery_thresholds, histogram_gallery_data)
+    # ottingo i risultati dei vari fa, fr, tg, ti con gli istogrammi degli utenti e degli impostori
+    results1 = delegatesMatch(histogram_pg_data, pg_target, gallery_target, cf_list, users, gallery_thresholds, histogram_gallery_data)
     results2 = delegatesMatch(histogram_pn_data, pn_target, gallery_target, cf_list, users, gallery_thresholds, histogram_gallery_data)
 
     print("PG_DATA:",results1)
     print("PN_DATA:", results2)
     print()
 
-    fa = results1[0] + results2[0]
-    fr = results1[1] + results2[1]
-    countTG = results1[2] + results2[2]
-    countTI = results1[3] + results2[3]
+    fa = results1[0] + results2[0]          # False Accept totali
+    fr = results1[1] + results2[1]          # False Rejection totali
+    countTG = results1[2] + results2[2]     # True Genuine totali
+    countTI = results1[3] + results2[3]     # True Impostor totali
 
-    FRR = fr/countTG
-    FAR = fa/countTI
+    FRR = fr/countTG    # False Rejection Rate
+    FAR = fa/countTI    # False Acceptance Rate
 
     print("FRR:", FRR, countTG)
     print("FAR:", FAR, countTI)
 
 def delegatesMatch(hist_data, target, gallery_target, cf_list, users, gallery_thresholds, histogram_gallery_data):
+
+    # inizializzazione delle variabili
     countTG = 0
     countTI = 0
     fa = 0
     fr = 0
     galley_users = list(dict.fromkeys(gallery_target))
+
+    # per ogni istogramma
     for i in range(len(hist_data)):
         probe_target = target[i]
         hist_probe = hist_data[i]
@@ -328,7 +270,8 @@ def delegatesMatch(hist_data, target, gallery_target, cf_list, users, gallery_th
                 index = cf_list.tolist().index(cf_user)
                 user = users.iloc[index]
                 delegati = ast.literal_eval(user["Delegati"])
-                #if the user has delegates
+
+                # se l'utente ha dei delegati
                 if len(delegati) > 0 and cf_user != probe_target:
                     if probe_target in delegati:
                         countTG += 1
@@ -361,7 +304,7 @@ def evaluationVerification():
     similarity_matrix = np.zeros((len(histogram_pg_data)+len(histogram_pn_data), len(galley_identities)))
 
     for x in range(len(histogram_pg_data)+len(histogram_pn_data)):
-        # Select the histogram probe
+        # seleziona l'istogramma del probe
         if x < len(histogram_pg_data):
             hist_probe = histogram_pg_data[x]
         else:
@@ -388,18 +331,19 @@ def evaluationVerification():
     grr = []
     thresholds = []
 
+    # per ogni threshold
     for threshold in np.arange(0.0, 1.01, 0.01):
 
-        # Fix the threshold
+        # si fissa il threshold
         th = np.round(threshold, 2)
 
-        # Reset all variables
+        # si resettano le variabili
         ga = 0
         fa = 0
         fr = 0
         gr = 0
 
-        # For each probe we take the real identity of the probe and its histogram
+        # per ogni probe prendiamo l'identità reale e il suo istogramma
         for x in range(similarity_matrix.shape[0]):
             if x < len(histogram_pg_data):
                 real_identity = pg_target[x]
@@ -507,7 +451,6 @@ def verificationAdaptive():
 if __name__ == '__main__':
     #verificationFRR()
     #verificationFAR()
-    #verificationROC()
     evaluationIdentificationAsMultiVer()
     #verificationAdaptive()
     #evaluationVerification()
