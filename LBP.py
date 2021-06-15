@@ -1,33 +1,33 @@
-import dlib
 import numpy as np
 import cv2
 import Database
-from sklearn.svm import SVC
+
 
 class Local_Binary_Pattern:
 
     def __init__(self, radius, neighborhood, img):
         self.radius = radius
         self.neighborhood = neighborhood
-        if self.radius <= 0 or self.neighborhood < 4 or self.neighborhood > self.radius*8:
+        # il raggio non puo' essere minore di 1, il vicinato non puo' essere minore di 4 e deve essere una potenza di 2
+        # questo semplifica l'ordinamento dei punti, sapendo qual è in genere l'angolo in alto a sx
+        if self.radius <= 0 or self.neighborhood < 4 or (self.neighborhood & (self.neighborhood - 1)) != 0:
             raise Exception("Input error")
         self.img = img
 
+    # calcola l'immagine lbp
     def compute_lbp(self):
+        # crea la nuova immagine
         new_img = [[0 for y in range(self.img.shape[0])] for x in range(self.img.shape[1])]
-        matrix = []
-        count=-1
-        for i in range(10-self.radius, 10+self.radius+1):
-            matrix.append([])
-            count+=1
-            for j in range(10-self.radius, 10+self.radius+1):
-                matrix[count].append(self.img[i][j])
+        # per ogni pixel
         for i in range(0, self.img.shape[0]):
             for j in range(0, self.img.shape[1]):
+                # trova i pixel del vicinato
                 pixels = self.find_neighbors(i, j)
+                # definisce il pattern
                 pattern = np.where(pixels > self.img[i][j], 1, 0)
                 value = 0
                 count = 0
+                # somma pesata con le potenze di due
                 for k in pattern:
                     value += k * 2 ** count
                     count += 1
@@ -36,7 +36,7 @@ class Local_Binary_Pattern:
 
     def find_neighbors(self, cx, cy):
         # definire il cerchio composto da self.neighborhood punti
-        angles_array = 2*np.pi/self.neighborhood
+        angles_array = 2 * np.pi / self.neighborhood
         alpha = np.arange(0, 2 * np.pi, angles_array)
         # ordiniamo  in modo tale da partire dall'angolo in alto a sx e procedere verso dx
         alpha = self.sort_points(alpha)
@@ -54,23 +54,21 @@ class Local_Binary_Pattern:
             y = np.round(y, 4)
             x_fract = x - np.round(x)
             y_fract = y - np.round(y)
-            # print(x,y)
             if x_fract == 0 and y_fract == 0:
                 coorx = int(x)
                 coory = int(y)
-                if self.check_border(cx+coorx,cy+coory):
+                if self.check_border(cx + coorx, cy + coory):
                     pixels.append(0)
                 else:
-                    pixels.append(self.img[cx+coorx][cy+coory])
+                    pixels.append(self.img[cx + coorx][cy + coory])
+            # i punti seguenti non cadono al centro di un pixel
             else:
+                # si prende la parte frazionaria e si arrotonda per eccesso e per difetto
                 x_c = np.ceil(x).astype(int)
                 y_c = np.ceil(y).astype(int)
                 x_f = np.floor(x).astype(int)
                 y_f = np.floor(y).astype(int)
-                #print(x,y)
-                #print(x_c,y_c)
-                #print(x_f,y_f)
-                #print("--------------")
+                # ordino x1 e x2 in modo tale che x1 < x2 e lo stesso vale per y1 e y2
                 if x_c == 0:
                     x1 = x_c
                     x2 = x_f
@@ -83,10 +81,12 @@ class Local_Binary_Pattern:
                 else:
                     y1 = y_f
                     y2 = y_c
-                if self.check_border(cx+x1,cy+y1) or self.check_border(cx+x2,cy+y2):
+                # controllo i bordi: se il punto esce fuori dal bordo gli associo il valore 0
+                if self.check_border(cx + x1, cy + y1) or self.check_border(cx + x2, cy + y2):
                     pixels.append(0)
                 else:
                     value = self.bilinear_interpolation(x1, y1, x2, y2, cx, cy, x, y)
+                    # si arrotonda il valore
                     pixels.append(np.round(value).astype(int))
         return pixels
 
@@ -100,15 +100,22 @@ class Local_Binary_Pattern:
         Q12 = self.img[cx + x2][cy + y1]
         Q22 = self.img[cx + x2][cy + y2]
         dem = (x2 - x1) * (y2 - y1)
-        return (Q11*(x2-x)*(y2-y)/dem)+(Q21*(x-x1)*(y2-y)/dem) + \
-            (Q12 * (x2 - x) * (y - y1) / dem)+(Q22 * (x - x1) * (y - y1) / dem)
+        return (Q11 * (x2 - x) * (y2 - y) / dem) + (Q21 * (x - x1) * (y2 - y) / dem) + \
+               (Q12 * (x2 - x) * (y - y1) / dem) + (Q22 * (x - x1) * (y - y1) / dem)
 
+    # si ordinano i punti partendo dall'angolo in altro a sx e procedendo verso dx
+    # [0. 0.78539816 1.57079633 2.35619449 3.14159265 3.92699082 4.71238898 5.49778714]
+    # 2.35619449 rappresenta l'angolo di 135 gradi. S
     def sort_points(self, alpha):
+        # l'angolo in alto a sx sarà 135. se il vicinato > 4, altrimenti si parte da 90 gradi
         if self.neighborhood > 4:
             left_point = np.where(np.degrees(alpha) == 135.)[0][0]
         else:
             left_point = np.where(np.degrees(alpha) == 90.)[0][0]
         new_alpha = []
+        # parto dall'angolo in alto a sx e vado verso dx (quindi nella lista vado verso lo 0)
+        # dopo parto dalla fine della lista e vado verso il centro della lista
+        # questa tecnica nasce da una dall'analisi dei risultati ottenuti
         count = left_point
         while len(new_alpha) != self.neighborhood:
             new_alpha.append(alpha[count])
@@ -117,78 +124,60 @@ class Local_Binary_Pattern:
             count -= 1
         return new_alpha
 
-    def check_border(self,x,y):
+    # controlla se fuoriesce dal bordo dell'immagine
+    def check_border(self, x, y):
         return x < 0 or x >= self.img.shape[0] or y < 0 or y >= self.img.shape[1]
 
-    def createHistogram(self, new_img,grid_x = 8,grid_y = 8):
+    # crea l'histogram
+    def createHistogram(self, new_img, grid_x=8, grid_y=8):
         histogram = []
 
-        #Check the pixels  matrix
+        # controlla le dimensioni della immagine LBP ottenuta
         if len(new_img) == 0:
             raise Exception("Input error")
 
-        #Get the matrix dimensions
+        # Ottiene le dimensioni dell'immagine
         h = len(new_img)
         w = len(new_img[0])
 
-        #Get the size (width and height) of each region
+        # ottiene le dimensioni di ogni regione
         gridWidth = int(w / grid_x)
         gridHeight = int(h / grid_y)
 
-        #Calculates the histogram of each grid
+        # calcola l'histogram per ogni regione
         for gx in range(0, grid_x):
             for gy in range(0, grid_y):
 
-                #Create a slice with empty 256 positions
-                regionHistogram = [0]*256
+                # prepara l'histogram vuoto
+                regionHistogram = [0] * 256
 
-                #Define the start and end positions for the following loop
+                # definisce le posizioni iniziali e finale per il seguente loop
                 startPosX = gx * gridWidth
                 startPosY = gy * gridHeight
-                endPosX = (gx+1) * gridWidth
-                endPosY = (gy+1) * gridHeight
+                endPosX = (gx + 1) * gridWidth
+                endPosY = (gy + 1) * gridHeight
 
-                #Creates the histogram for the current region
+                # crea l'histogram per la regione corrente
                 for x in range(startPosX, endPosX):
                     for y in range(startPosY, endPosY):
                         if new_img[x][y] < len(regionHistogram):
                             regionHistogram[new_img[x][y]] += 1
 
-                #Concatenate two slices
+                # concatenazione
                 histogram = np.concatenate((histogram, regionHistogram), axis=None)
-        #Normalize histogram
+        # normalizzazione
         cv2.normalize(histogram, histogram)
         return histogram
 
 
-class Spoof_Local_Binary_Pattern(Local_Binary_Pattern):
-
-    def createHistogram(self, new_img, grid_x=8, grid_y=8):
-        w = len(new_img)
-        h = len(new_img[0])
-        # dividiamo la nostra immagine in 4 x 4 blocchi
-        grid_x = int(w / 16)
-        grid_y = int(h / 16)
-        return super().createHistogram(new_img, grid_x, grid_y)
-
 if __name__ == '__main__':
-    # db = Database.Database()
-    # data = db.gallery_data[0]
-    # detector = dlib.get_frontal_face_detector()
-    # predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-    # dets = detector(data, 1)
-    # for i, d in enumerate(dets):
-    #    crop = data[d.top() : d.bottom(), d.left() : d.right()]
-    #    crop = cv2.resize(crop, (64, 64))
-    # #print(crop)
-    # lbp = Local_Binary_Pattern(2, 16, crop)
-    # new_img = lbp.compute_lbp()
-    # hist = lbp.createHistogram(new_img)
-    # while True:
-    #     cv2.imshow('frame', lbp.img.astype(np.uint8))
-    #     cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
-    #     if cv2.waitKey(1) & 0xFF == ord('q'):
-    #         break
-    print(np.round(0.672976973646892,2))
-    #print(np.floor(np.ceil(0.678976973646892,2)))
-
+    db = Database.Database(False)
+    data = db.get_normalized_template(0, db.gallery_data)
+    lbp = Local_Binary_Pattern(1, 8, data)
+    new_img = lbp.compute_lbp()
+    hist = lbp.createHistogram(new_img)
+    while True:
+        cv2.imshow('frame', lbp.img.astype(np.uint8))
+        cv2.imshow('new frame', np.array(new_img).astype(np.uint8))
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
