@@ -5,9 +5,8 @@ import LBP
 import math
 import ast
 from matplotlib import pyplot as plt
-from sklearn.metrics import roc_curve, roc_auc_score
 
-#face identification (or 1:N face recognition) consists in finding the identity corresponding to a given face.
+# ritorna i dati del paziente cf e del delgato
 def identify(cf, img):
 
     # caricamento dei vari dataset
