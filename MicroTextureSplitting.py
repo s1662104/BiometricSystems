@@ -3,10 +3,11 @@ import os
 import numpy as np
 import cv2
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 import LBP
 from sklearn.model_selection import train_test_split
 
+
+# TODO commentare
 def get_normalized(image):
     norm_image = cv2.normalize(image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     norm_image = norm_image.astype(np.uint8)
@@ -14,6 +15,7 @@ def get_normalized(image):
     return norm_image
 
 
+# TODO commentare
 def column_len_csv(filecsv):
     with open(filecsv, 'r') as f:
         reader = csv.reader(f, delimiter=';')
@@ -22,10 +24,12 @@ def column_len_csv(filecsv):
 
 
 # Qui viene effettuato lo splitting del dataset nel csv per il replay-attack
-class MicroTextureSplitting():
+# TODO spiegare meglio
+class MicroTextureSplitting:
     def __init__(self, nomeFileCsv):
         self.nomeFileCsv = nomeFileCsv
 
+    # TODO commentare
     def splitting_train_test(self):
         num_columns = column_len_csv(self.nomeFileCsv)
         print(num_columns)
@@ -34,12 +38,11 @@ class MicroTextureSplitting():
 
         X, y = data.iloc[:, :-1], data.iloc[:, -1]
 
-        #X = StandardScaler().fit_transform(X)
-
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle=True)
 
         return X_train, X_test, y_train, y_test
 
+    # TODO commentare
     def writeCsv(self, histogram, val):
         print(histogram)
         list = []
@@ -52,13 +55,12 @@ class MicroTextureSplitting():
             writer.writerow(list)
             cvsfile.close()
 
+    # TODO commentare
     def convert_image_to_hist(self, image):
         print(image)
         image = cv2.imread(image)
 
         norm_image = get_normalized(image)
-
-        # myLBP = LBP.Spoof_Local_Binary_Pattern(1, 8, norm_image)
         myLBP = LBP.Local_Binary_Pattern(1, 8, norm_image)
         new_img = myLBP.compute_lbp()
 
@@ -66,11 +68,10 @@ class MicroTextureSplitting():
         return hist
 
     # viene effettuato lo splitting tra real e fake  e inserite le informazioni in un csv
+    # TODO spiegare meglio e commentare ogni passaggio
     def splitting_real_fake(self, fill_csv_real, fill_csv_fake):
         root_dir = 'MicroTextureDB'
-        # fill_csv_real = False
-        # fill_csv_fake = False
-
+        # TODO da tenere?
         # try:
         #     os.makedirs(root_dir + '/hist_real')
         # except:
@@ -83,8 +84,9 @@ class MicroTextureSplitting():
         current_real = '/Real'
         current_fake = '/Fake'
 
+        # TODO i due if sono uguali, si puo' unirli?
         # Qui andiamo ad inserire histogram in csv per ogni immagine Real
-        if fill_csv_real == True:
+        if fill_csv_real:
             src_real = "MicroTextureDB" + current_real
 
             allFileNames = os.listdir(src_real)
@@ -102,7 +104,7 @@ class MicroTextureSplitting():
             # shutil.copy(name, "Data/hist_real/")
 
         # Qui andiamo ad inserire histogram in csv per ogni immagine Fake
-        if fill_csv_fake == True:
+        if fill_csv_fake:
             src_fake = "MicroTextureDB" + current_fake
 
             allFileNames = os.listdir(src_fake)
@@ -115,7 +117,7 @@ class MicroTextureSplitting():
                 hist_real = self.convert_image_to_hist(name)
                 self.writeCsv(hist_real, 1)
 
-
+# TODO lasciare?
 # #FUNZIONE TEMPORANEA INIZIO:
 # def count_print_row(filecsv):
 #
@@ -134,7 +136,7 @@ class MicroTextureSplitting():
 
 def main():
     nameFileCsv = 'histogram.csv'
-    MicroTextureSplitting(nameFileCsv).splitting_real_fake(False,False)
+    MicroTextureSplitting(nameFileCsv).splitting_real_fake(False, False)
 
 
 if __name__ == '__main__':

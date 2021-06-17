@@ -1,12 +1,9 @@
-
-#Qui viene realizzato il modello SVM, i vari calcoli come FAR, FRR, HTER,SFAR e il plotting delle curve.
+# Qui viene realizzato il modello SVM, i vari calcoli come FAR, FRR, HTER,SFAR e il plotting delle curve.
 
 import seaborn as sns
-
 from sklearn.svm import SVC
 from sklearn.metrics import roc_curve, roc_auc_score, det_curve
 from matplotlib import pyplot as plt
-
 
 
 class ModelSVM:
@@ -16,78 +13,80 @@ class ModelSVM:
         self.X_test = X_test
         self.y_test = y_test
 
-    #Modello SVM
+    # Modello SVM
     def train_svm(self):
         model = SVC(kernel='rbf', random_state=0, gamma='scale', C=1)
 
         svm = model.fit(self.X_train, self.y_train)
-        #TODO: TOGLIERE QUESTA RIGA DI CODICE
+        # TODO: TOGLIERE QUESTA RIGA DI CODICE
         y_train_score = svm.decision_function(self.X_train)
 
         y_test_score = svm.predict(self.X_test)
 
         return svm, y_train_score, y_test_score
 
-#Plot della RocCurve
+
+# Plot della RocCurve
 def plot_roc_curve(y_test, y_test_score):
+    FPR, TPR, t = roc_curve(y_test, y_test_score)
+    print(FPR)
+    print()
+    print(TPR)
+    print()
+    print("TH:", t)
+    auc = roc_auc_score(y_test, y_test_score)
 
-        FPR, TPR, t = roc_curve(y_test, y_test_score)
-        print(FPR)
-        print()
-        print(TPR)
-        print()
-        print("TH:",t)
-        auc = roc_auc_score(y_test,y_test_score)
+    # Plot ROC curve
+    plt.plot(FPR, TPR, label='ROC curve (area = %0.2f)' % auc)
+    plt.plot([0, 1], [0, 1], 'k--')  # random predictions curve
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.0])
+    # TODO togliere FPR e TPR e mettere FAR e GAR
+    plt.xlabel('False Positive Rate or (1 - Specifity)')
+    plt.ylabel('True Positive Rate or (Sensitivity)')
+    plt.title('Receiver Operating Characteristic')
+    plt.legend(loc="lower right")
+    plt.show()
+    sns.set()
 
-        # Plot ROC curve
-        plt.plot(FPR, TPR, label='ROC curve (area = %0.2f)' % auc)
-        plt.plot([0, 1], [0, 1], 'k--')  # random predictions curve
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.0])
-        plt.xlabel('False Positive Rate or (1 - Specifity)')
-        plt.ylabel('True Positive Rate or (Sensitivity)')
-        plt.title('Receiver Operating Characteristic')
-        plt.legend(loc="lower right")
-        plt.show()
-        sns.set()
+# TODO SERVE? NON VIENE MAI USATO
+def licit_scenario(y_test, y_test_score, index):
+    FAR, FRR = calculate_FAR_FRR(y_test, y_test_score, index)
 
-def licit_scenario(y_test,y_test_score,index):
+    HTER = ((FAR + FRR) / 2)
 
-        FAR , FRR = calculate_FAR_FRR(y_test,y_test_score,index)
+    return FRR, FAR, HTER
 
-        HTER = ((FAR + FRR) / 2)
+# TODO commentare. specificare cos'e' index
+def spoofing_scenario(y_test, y_test_score, index):
+    num_fake = 0
+    count = 0
+    FAR, FRR = calculate_FAR_FRR(y_test, y_test_score, index)
 
-        return FRR, FAR, HTER
+    if index == 0:
+
+        for i in range(len(y_test)):
+            if y_test.iloc[i] == 0:
+                num_fake += 1
+                if y_test.iloc[i] != y_test_score[i]:
+                    count += 1
+
+    elif index == 1:
+        for i in range(len(y_test)):
+            if y_test.iloc[i] == 1:
+                num_fake += 1
+                if y_test.iloc[i] != y_test_score[i]:
+                    count += 1
+    else:
+        exit("WRONG INDEX")
+    SFAR = count / num_fake
+
+    return FRR, SFAR
 
 
-def spoofing_scenario(y_test,y_test_score,index):
-        num_fake = 0
-        count = 0
-        FAR, FRR = calculate_FAR_FRR(y_test,y_test_score,index)
-
-        if index == 0:
-
-            for i in range(len(y_test)):
-                if y_test.iloc[i] == 0:
-                    num_fake += 1
-                    if y_test.iloc[i] != y_test_score[i]:
-                        count+=1
-
-        elif index == 1:
-            for i in range(len(y_test)):
-                if y_test.iloc[i] == 1:
-                    num_fake += 1
-                    if y_test.iloc[i] != y_test_score[i]:
-                        count+=1
-        else:
-            exit("WRONG INDEX")
-        SFAR = count / num_fake
-
-        return FRR,SFAR
-
-#Calcolo di FAR e FRR
-def calculate_FAR_FRR(y_test,y_test_score, index):
-
+# Calcolo di FAR e FRR
+# TODO commentare ogni passaggio. Spiegare cos'e' index e perche' serve
+def calculate_FAR_FRR(y_test, y_test_score, index):
     FA = 0
     FR = 0
     num_fake = 0
@@ -96,14 +95,14 @@ def calculate_FAR_FRR(y_test,y_test_score, index):
         for i in range(len(y_test)):
 
             if y_test.iloc[i] == 0:
-                num_fake+=1
+                num_fake += 1
             if y_test.iloc[i] == 1:
-                num_real+=1
+                num_real += 1
 
         for i in range(len(y_test)):
             if y_test.iloc[i] == 1:
                 if y_test.iloc[i] != y_test_score[i]:
-                    FR+=1
+                    FR += 1
 
             if y_test.iloc[i] == 0:
                 if y_test.iloc[i] != y_test_score[i]:
@@ -113,7 +112,7 @@ def calculate_FAR_FRR(y_test,y_test_score, index):
 
             if y_test.iloc[i] == 1:
                 num_fake += 1
-            if y_test.iloc[i] == 0 :
+            if y_test.iloc[i] == 0:
                 num_real += 1
 
         for i in range(len(y_test)):
@@ -131,12 +130,14 @@ def calculate_FAR_FRR(y_test,y_test_score, index):
     FRR = FR / num_real
     return FAR, FRR
 
-#Plot della det_curve
-def plot_det_curve(y_test,y_test_score):
+
+# TODO TOGLIERE DET CURVE
+# Plot della det_curve
+def plot_det_curve(y_test, y_test_score):
     FAR, FRR, t = det_curve(y_test, y_test_score)
-    print("FAR",FAR)
-    print("FRR",FRR)
-    print("TH:",t)
+    print("FAR", FAR)
+    print("FRR", FRR)
+    print("TH:", t)
 
     plt.plot(FAR, FRR, label='DET curve')
     plt.plot([0, 1], [0, 1], 'k--')  # random predictions curve
