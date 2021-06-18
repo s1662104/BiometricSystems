@@ -227,23 +227,28 @@ class EyeBlinkEvaluation:
          fr=[]
          sfar = []
          frr = []
-         #serve per la roc curve
+         #serve per la roc curve gar
          gar = []
          thresholds = []
+
+         #inizializziamo la lista dei false rejection e dei false acceptance, con tutti
+         #i valori uguali a 0. Inizializziamo anche la lista dei thresholds che andranno da
+         #0.10 a 0.29.
          for threshold in np.arange(0.10, 0.30, 0.01):
              fr.append(0)
              fa.append(0)
              thresholds.append(round(threshold,2))
 
-         ##Fake
+
          for i in range(len(y_test)):
             #converte una stringa in una lista
             array = ast.literal_eval(y_test_score[i])
+            #Nel caso in cui abbiamo un video fake (non genuino).
             if y_test[i] == 0:
                 for num in range(len(fa)):
                     if (array[num] == 1):
                         fa[num] += 1
-         ##Real
+            #Nel caso in cui abbiamo un video real.
             elif y_test[i] == 1:
                 for num in range(len(fr)):
                     if(array[num] == 0):
