@@ -1,21 +1,19 @@
 import csv
 import os
-
-import cv2
 import numpy as np
 import pandas as pd
-import MicroTexture
-import EyeBlink
+from MicroTexture import MicroTexture
+from EyeBlink import EyeBlink
 import AntiSpoofingTrainingEvaluation as evaluation
 
-
-class AntiSpoofingOverallEvaluation():
+class AntiSpoofingOverallEvaluation:
     def __init__(self, nomeFileCsv):
         self.nomeFileCsv = nomeFileCsv
 
-
-    # va a scrivere su un file csv: nameVid:=nome del video, val:= valore aspettato, val_pred_eyeblink:= valore predetto dall'algoritmo di eyeblink,
-    # val_pred_replayattack := valore predetto dall'algoritmo di microtexture, val_pred_final := valore finale predetto.
+    # va a scrivere su un file csv: nameVid:=nome del video, val:= valore aspettato,
+    # val_pred_eyeblink:= valore predetto dall'algoritmo di eyeblink,
+    # val_pred_replayattack := valore predetto dall'algoritmo di microtexture,
+    # val_pred_final := valore finale predetto.
     def writeCsv(self, nameVid, val, val_pred_eyeblink, val_pred_microtexture, val_pred_final):
         print("Video: ", nameVid)
         list = []
@@ -25,14 +23,12 @@ class AntiSpoofingOverallEvaluation():
         list.append(val_pred_microtexture)
         list.append(val_pred_final)
 
-
-
         with open(self.nomeFileCsv, 'a+') as cvsfile:
             writer = csv.writer(cvsfile, delimiter=';')
             writer.writerow(list)
             cvsfile.close()
 
-
+    # TODO commentare
     def writeCsvAND_OR(self, nameVid, val, val_pred_final):
         print("Video: ", nameVid)
         list = []
@@ -40,14 +36,12 @@ class AntiSpoofingOverallEvaluation():
         list.append(val)
         list.append(val_pred_final)
 
-
-
         with open(self.nomeFileCsv, 'a+') as cvsfile:
             writer = csv.writer(cvsfile, delimiter=';')
             writer.writerow(list)
             cvsfile.close()
 
-
+    # TODO commentare ogni passaggio
     def evaluationCascade(self):
         current_real = 'Genuine'
         current_fake_replayattack = 'ReplayAttack'
@@ -58,16 +52,18 @@ class AntiSpoofingOverallEvaluation():
         filesName = np.array(allFileNames)
         filesNameReal = [src_real + '/' + name for name in filesName.tolist()]
 
+        #TODO SPIEGARE COSA SONO QUESTI VALORI (1,0) ED EVENTUALMENTE SCRIVERE ANCHE MEGLIO LA FUNZIONE VISTO
+        # CHE CAMBIANO SOLO I VALORI 1 E 0. SI POTREBBE SCRIVEREE TUTTO IN POCHE RIGHE DI CODICE
         for name in filesNameReal:
-            varEyeBlink = EyeBlink.EyeBlink(name).eyeBlinkStart()
+            varEyeBlink = EyeBlink(name).eyeBlinkStart()
             if varEyeBlink == 1:
-                varMicroTexture = MicroTexture.MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)
-                if varMicroTexture == True:
+                varMicroTexture = MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)
+                if varMicroTexture:
                     self.writeCsv(name, 1, 1, 1, 1)
                 else:
-                    self.writeCsv(name, 1, 1, 0 , 0)
+                    self.writeCsv(name, 1, 1, 0, 0)
             else:
-                self.writeCsv(name, 1 , 0 , 0 , 0)
+                self.writeCsv(name, 1, 0, 0, 0)
 
         src_fake = "EvaluationDataset/" + current_fake_replayattack
         allFileNames = os.listdir(src_fake)
@@ -75,15 +71,15 @@ class AntiSpoofingOverallEvaluation():
         filesNameFake = [src_fake + '/' + name for name in filesName.tolist()]
 
         for name in filesNameFake:
-            varEyeBlink = EyeBlink.EyeBlink(name).eyeBlinkStart()
+            varEyeBlink = EyeBlink(name).eyeBlinkStart()
             if varEyeBlink == 1:
-                varMicroTexture = MicroTexture.MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)
-                if varMicroTexture == True:
+                varMicroTexture = MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)
+                if varMicroTexture:
                     self.writeCsv(name, 0, 1, 1, 1)
                 else:
-                    self.writeCsv(name, 0, 1, 0 , 0)
+                    self.writeCsv(name, 0, 1, 0, 0)
             else:
-                self.writeCsv(name, 0 , 0 , 0 , 0)
+                self.writeCsv(name, 0, 0, 0, 0)
 
         src_fake = "EvaluationDataset/" + current_fake_eyeblink
         allFileNames = os.listdir(src_fake)
@@ -91,16 +87,18 @@ class AntiSpoofingOverallEvaluation():
         filesNameFake = [src_fake + '/' + name for name in filesName.tolist()]
 
         for name in filesNameFake:
-            varEyeBlink = EyeBlink.EyeBlink(name).eyeBlinkStart()
+            varEyeBlink = EyeBlink(name).eyeBlinkStart()
             if varEyeBlink == 1:
-                varMicroTexture = MicroTexture.MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)
-                if varMicroTexture == True:
+                varMicroTexture = MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)
+                if varMicroTexture:
                     self.writeCsv(name, 0, 1, 1, 1)
                 else:
                     self.writeCsv(name, 0, 1, 0, 0)
             else:
                 self.writeCsv(name, 0, 0, 0, 0)
 
+    #TODO COMMENTARE OGNI PASSAGGIO. ANCHE IN QUESTO CASO, SPIEGARE COSA SIGNIFICA 1 E 0. ANCHE QUI, SI POTREBBE
+    # SCRIVERE MEGLIO LA FUNZIONE, VISTO CHE CAMBIANO SOLO I VALORI 1 E 0
     def evaluationAND(self):
         current_real = 'Genuine'
         current_fake_replayattack = 'ReplayAttack'
@@ -112,11 +110,11 @@ class AntiSpoofingOverallEvaluation():
         filesNameReal = [src_real + '/' + name for name in filesName.tolist()]
 
         for name in filesNameReal:
-            if ((MicroTexture.MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) and (EyeBlink.EyeBlink(name).eyeBlinkStart() == 1)):
+            if ((MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) and (
+                    EyeBlink(name).eyeBlinkStart() == 1)):
                 self.writeCsvAND_OR(name, 1, 1)
             else:
-                self.writeCsvAND_OR(name,1,0)
-
+                self.writeCsvAND_OR(name, 1, 0)
 
         src_fake = "EvaluationDataset/" + current_fake_replayattack
         allFileNames = os.listdir(src_fake)
@@ -124,10 +122,11 @@ class AntiSpoofingOverallEvaluation():
         filesNameFake = [src_fake + '/' + name for name in filesName.tolist()]
 
         for name in filesNameFake:
-            if ((MicroTexture.MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) and (EyeBlink.EyeBlink(name).eyeBlinkStart() == 1)):
+            if ((MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) and (
+                    EyeBlink(name).eyeBlinkStart() == 1)):
                 self.writeCsvAND_OR(name, 0, 1)
             else:
-                self.writeCsvAND_OR(name,0,0)
+                self.writeCsvAND_OR(name, 0, 0)
 
         src_fake = "EvaluationDataset/" + current_fake_eyeblink
         allFileNames = os.listdir(src_fake)
@@ -135,12 +134,14 @@ class AntiSpoofingOverallEvaluation():
         filesNameFake = [src_fake + '/' + name for name in filesName.tolist()]
 
         for name in filesNameFake:
-            if ((MicroTexture.MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) and (EyeBlink.EyeBlink(name).eyeBlinkStart() == 1)):
+            if ((MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) and (
+                    EyeBlink(name).eyeBlinkStart() == 1)):
                 self.writeCsvAND_OR(name, 0, 1)
             else:
-                self.writeCsvAND_OR(name,0,0)
+                self.writeCsvAND_OR(name, 0, 0)
 
-
+    #TODO COMMENTARE OGNI PASSAGGIO. ANCHE IN QUESTO CASO, SPIEGARE COSA SIGNIFICA 1 E 0. ANCHE QUI, SI POTREBBE
+    # SCRIVERE MEGLIO LA FUNZIONE, VISTO CHE CAMBIANO SOLO I VALORI 1 E 0
     def evaluationOR(self):
         current_real = 'Genuine'
         current_fake_replayattack = 'ReplayAttack'
@@ -152,11 +153,11 @@ class AntiSpoofingOverallEvaluation():
         filesNameReal = [src_real + '/' + name for name in filesName.tolist()]
 
         for name in filesNameReal:
-            if ((MicroTexture.MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) or (EyeBlink.EyeBlink(name).eyeBlinkStart() == 1)):
+            if ((MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) or (
+                    EyeBlink(name).eyeBlinkStart() == 1)):
                 self.writeCsvAND_OR(name, 1, 1)
             else:
-                self.writeCsvAND_OR(name,1,0)
-
+                self.writeCsvAND_OR(name, 1, 0)
 
         src_fake = "EvaluationDataset/" + current_fake_replayattack
         allFileNames = os.listdir(src_fake)
@@ -164,10 +165,11 @@ class AntiSpoofingOverallEvaluation():
         filesNameFake = [src_fake + '/' + name for name in filesName.tolist()]
 
         for name in filesNameFake:
-            if ((MicroTexture.MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) or (EyeBlink.EyeBlink(name).eyeBlinkStart() == 1)):
+            if ((MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) or (
+                    EyeBlink(name).eyeBlinkStart() == 1)):
                 self.writeCsvAND_OR(name, 0, 1)
             else:
-                self.writeCsvAND_OR(name,0,0)
+                self.writeCsvAND_OR(name, 0, 0)
 
         src_fake = "EvaluationDataset/" + current_fake_eyeblink
         allFileNames = os.listdir(src_fake)
@@ -175,29 +177,16 @@ class AntiSpoofingOverallEvaluation():
         filesNameFake = [src_fake + '/' + name for name in filesName.tolist()]
 
         for name in filesNameFake:
-            if ((MicroTexture.MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) or (EyeBlink.EyeBlink(name).eyeBlinkStart() == 1)):
+            if ((MicroTexture(nameFileCsv='histogram.csv').microTextureVideo(name)) or (
+                    EyeBlink(name).eyeBlinkStart() == 1)):
                 self.writeCsvAND_OR(name, 0, 1)
             else:
-                self.writeCsvAND_OR(name,0,0)
+                self.writeCsvAND_OR(name, 0, 0)
 
-
-
-
-
-
-
-
-
-
+    # TODO COMMENTARE OGNI PASSAGGIO.
     def antispoofingEvaluation(self):
         data = pd.read_csv(self.nomeFileCsv, sep=';', header=None)
         y_test, y_test_score = data.iloc[:, 1], data.iloc[:, -1]
-        # print("###y_test###")
-        # print(y_test)
-        # print("##############")
-        # print("###y_score###")
-        # print(y_test_score)
-        # print("##############")
         print("###SPOOFING SCENARIO###")
         FRR, SFAR = evaluation.spoofing_scenario(y_test, y_test_score, index=0)
         print()
@@ -205,11 +194,6 @@ class AntiSpoofingOverallEvaluation():
         print("SFAR", SFAR)
         print()
         print("#######################")
-
-        # print("ROC CURVE:")
-        # evaluation.plot_roc_curve(y_test, y_test_score)
-
-
 
 
 def main():
@@ -228,9 +212,6 @@ def main():
     print("OR")
     nameFileCsv = 'antispoofingOR.csv'
     AntiSpoofingOverallEvaluation(nameFileCsv).antispoofingEvaluation()
-
-
-
 
 
 if __name__ == '__main__':

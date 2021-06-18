@@ -4,8 +4,11 @@ import dlib
 import AntiSpoofingTrainingEvaluation
 import LBP
 from MicroTextureSplitting import MicroTextureSplitting
+
 dim_image = 64
 
+
+# TODO commentare
 def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -29,28 +32,28 @@ def detect_face(img, vis, crop=None):
             print(str(e))
     return crop
 
-
+#TODO non ha senso usare nameFileCsv e in microTextureVideo passargli un altro file. A questo punto non passare in
+# input nulla alla classe e poi passi il file alla funzione
 class MicroTexture:
-    def __init__(self,nameFileCsv):
+    def __init__(self, nameFileCsv):
         self.nameFileCsv = nameFileCsv
 
-    #Viene effettuata la verifica tramite webcam se abbiamo una persona reale, oppure abbiamo davanti alla webcam
+    # Viene effettuata la verifica tramite webcam se abbiamo una persona reale, oppure abbiamo davanti alla webcam
     # un video/foto in esecuzione sul dispositivo dove la webcam sta puntando .
+    # TODO commentare ogni passaggio
     def microTextureCam(self):
         cap = cv2.VideoCapture(0)
         val = False
-        while (True):
+        while True:
             ret, frame = cap.read()
 
             vis = frame.copy()
 
-            # Our operations on the frame come here
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             crop = detect_face(gray, vis)
 
             if crop is not None:
-                # myLBP = LBP.Spoof_Local_Binary_Pattern(1, 8, crop)
                 myLBP = LBP.Local_Binary_Pattern(1, 8, crop)
             else:
                 continue
@@ -60,10 +63,7 @@ class MicroTexture:
             # Andiamo a prendere il modello trained e salvato.
             with open('modelSVM.pkl', 'rb') as f:
                 clf = pickle.load(f)
-            # nsamples = hist.shape
-            # print("nsamples",nsamples)
             hist = hist.reshape(1, -1)
-            # print(hist)
             value = (clf.predict(hist))
             print(value)
             if value == 0:
@@ -74,19 +74,15 @@ class MicroTexture:
                 print("FAKE")
                 val = False
                 break
-            # if the `q` key was pressed, break from the loop
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     break
         cap.release()
         cv2.destroyAllWindows()
         return val
 
-
-
+    # TODO commentare ogni passaggio. Le due funzioni sono molto simili
     def microTextureVideo(self, pathVid):
         cap = cv2.VideoCapture(pathVid)
         val = False
-        while (True):
+        while True:
             ret, frame = cap.read()
             try:
                 vis = frame.copy()
@@ -100,7 +96,6 @@ class MicroTexture:
             crop = detect_face(gray, vis)
 
             if crop is not None:
-                # myLBP = LBP.Spoof_Local_Binary_Pattern(1, 8, crop)
                 myLBP = LBP.Local_Binary_Pattern(1, 8, crop)
             else:
                 continue
@@ -130,6 +125,7 @@ class MicroTexture:
         cap.release()
         cv2.destroyAllWindows()
         return val
+
     # viene effettuata l'evaluation dal file csv, nel caso in cui questa funzione viene richiamata da replayAttackCam,
     # non mostra i calcoli e grafici
     def microTextureEvaluation(self):
@@ -138,7 +134,7 @@ class MicroTexture:
         svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test,
                                                                                    y_test).train_svm()
         with open('modelSVM.pkl', 'wb') as f:
-            pickle.dump(svm,f)
+            pickle.dump(svm, f)
 
         AntiSpoofingTrainingEvaluation.plot_roc_curve(y_test, y_test_score)
         FRR, SFAR = AntiSpoofingTrainingEvaluation.spoofing_scenario(y_test, y_test_score, index=1)
@@ -150,10 +146,12 @@ class MicroTexture:
 
         return svm
 
+
 def main():
     nameFileCsv = 'histogram.csv'
-    #MicroTexture(nameFileCsv).microTextureCam()
+    # MicroTexture(nameFileCsv).microTextureCam()
     MicroTexture(nameFileCsv).microTextureEvaluation()
+
 
 if __name__ == '__main__':
     main()
