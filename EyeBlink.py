@@ -17,9 +17,11 @@ import dlib
 
 CONSEC_FRAMES_NUMBER = 3
 
+
 # TODO cos'e' inputType?
 class EyeBlink:
     def __init__(self, inputType):
+        # inputType è la stringa che contiene il path per un video, oppure non contiene nulla.
         self.inputType = inputType
 
     # TODO riscrivere questo perche' non si capisce
@@ -32,10 +34,12 @@ class EyeBlink:
     # In questo caso viene utilizzato un threshold adattivo
     # TODO COMMENTARE OGNI PASSAGGIO
     def eyeBlinkStart(self):
-        # TODO SERVE?
+        # inizializzazione di counter e total, counter conta i frame consecutivi in EAR < threshold, total il numero di
+        # eyeblink
         COUNTER = 0
         TOTAL = 0
-        # TODO serve avere due if se poi si fanno piu' o meno le stesse cose?
+
+        # se inputType contiene un path per un video allora...
         if self.inputType is not None:
 
             ear_top = 0
@@ -45,67 +49,65 @@ class EyeBlink:
             detector = dlib.get_frontal_face_detector()
             predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
+            # start the file video stream thread and allow the buffer to
+            # start to fill
             fvs = FileVideoStream(self.inputType).start()
             time.sleep(1.0)
+
+            # start the FPS timer
             fps = FPS().start()
 
-            # TODO serve? e' sempre True
-            fileStream = True
+            # fileStream = True
             num_frames = 0
+            # loop over frames from the video file stream until 150 frames
             while fvs.more() and num_frames < 150:
-                # TODO serve? mai usato
-                crop = None
-                frame = fvs.read()
 
+                frame = fvs.read()
+                # resize frame with width = 300
                 try:
                     frame = imutils.resize(frame, width=300)
                 except Exception as e:
                     print(str(e))
-                # TODO non serve, togliere
-                try:
-                    vis = frame.copy()
 
-                except Exception as e:
-                    print(str(e))
-                    break
-
+                # the frame is converted into grayscale image
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                # TODO ?
-                frame = np.dstack([frame, frame, frame])
-                # TODO a che serve counter se non si usa?
+
+                # frame = np.dstack([frame, frame, frame])
+                # viene richiamata la funzione che va ad analizzare ogni singolo frame per vedere se ci è stato
+                # un eyeblink o meno
                 try:
                     eyesdetect, COUNTER, TOTAL, ear_top = self.eye_blink_video(frame, detector, predictor,
                                                                                COUNTER, TOTAL, ear_top)
                 except Exception as e:
                     print(str(e))
                     continue
-                # TODO serve?
+                # here we update the history
                 history += eyesdetect
+                # se si verifica un eyeblink ritorniamo True
                 if TOTAL > 0:
-                    # TODO serve var?
-                    var = True
                     cv2.destroyAllWindows()
                     fvs.stop()
-                    return var
-                else:
-                    # TODO serve var? non si usa MA RITORNA MAI FALSE?? NON VEDO NESSUN RETURN FALSE
-                    var = False
-                # TODO ?
+                    return True
+
+                # viene aggiornato fps e incrementato il numero di frame.
                 fps.update()
                 fps.stop()
                 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
                 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
                 num_frames += 1
 
+            # usciti dal while se non si è verificato Eyeblink ritorniamo False
             cv2.destroyAllWindows()
             fvs.stop()
-
+            if TOTAL == 0:
+                return False
+        # se inputType è vuoto significa che usiamo la webcam
         elif self.inputType is None:
+            # acquisiamo da webcam
             cap = cv2.VideoCapture(0)
-            # Write the label with this font
+
             history = ''
-            # TODO da togliere, non si usa
-            font = cv2.FONT_HERSHEY_SIMPLEX
+
 
             detector = dlib.get_frontal_face_detector()
             predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -113,44 +115,43 @@ class EyeBlink:
             while True:
 
                 ret, frame = cap.read()
-                # TODO non si usa, da togliere
-                vis = frame.copy()
-                # TODO a che serve counter se non si usa?
-                eyedetect, TOTAL, COUNTER, ear_top = self.eye_blink_cam(frame, ret, detector, predictor,
+                # viene richiamata la funzione che va ad analizzare ogni singolo per vedere se ci è stato
+                # un eyeblink o meno
+                eyedetect, TOTAL, COUNTER, ear_top = self.eye_blink_cam(self, frame, ret, detector, predictor,
                                                                         COUNTER, TOTAL, ear_top)
+                # here we update the history
                 history += eyedetect
+                # se total è maggiore di 0 significa che un eyeblink è avvenuto e ritorniamo true
                 if TOTAL >= 1:
                     cv2.putText(frame, "Real", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
                     cap.release()
                     cv2.destroyAllWindows()
                     print("EYEBLINK: REAL")
                     return True
-                # TODO perche' questo sopra non c'era? Serve?
-                elif len(history) > 100:
+                # se ciò non avviene per 200 frame ritorniamo false
+                elif len(history) > 200:
                     print(history)
                     result = self.isBlinking(history, 3)
                     print(result)
-                    # TODO ?
-                    if result:
-                        pass
-                    else:
-                        cv2.putText(frame, "Fake", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
-                        cap.release()
-                        cv2.destroyAllWindows()
-                        print("EYEBLINK: FAKE")
-                        return False
+
+                    cv2.putText(frame, "Fake", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    print("EYEBLINK: FAKE")
+                    return False
                 else:
                     cv2.putText(frame, "Checking...", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 165, 255), 3,
-                                cv2.LINE_AA)
+                            cv2.LINE_AA)
 
-                cv2.imshow("Frame", frame)
-                cv2.waitKey(1)
+            cv2.imshow("Frame", frame)
+            cv2.waitKey(1)
 
-                # if the `q` key was pressed, break from the loop
-            cap.release()
-            cv2.destroyAllWindows()
-        else:
-            exit("Il valore di inputType è errato")
+            # if the `q` key was pressed, break from the loop
+        cap.release()
+        cv2.destroyAllWindows()
+
+
+
 
     # Il metodo sottostante value l'eye_aspect_ratio in questo modo:
     # EAR = (||p2 - p6||+ ||p3 - p5||)/(2||p1-p4||)
@@ -161,7 +162,8 @@ class EyeBlink:
         EAR = (A + B) / (2.0 * C)
         return EAR
 
-    # ToDo non so se lasciare questa funzione superflua. TOGLIERE se superflua
+
+    # metodo secondario che serve per vedere se si è verificato un blinking
     def isBlinking(self, history, maxFrames):
         for i in range(maxFrames):
             pattern = '1' + '0' * (i + 1) + '1'
@@ -169,71 +171,87 @@ class EyeBlink:
                 return True
         return False
 
-    # TODO commentare ogni passaggio
+
+        # gestisce gli eyeblink della cam
     def eye_blink_cam(self, frame, rect, detector, predictor, COUNTER, TOTAL, ear_top):
+            eyes_detect = ''
 
-        eyes_detect = ''
-        frame = imutils.resize(frame, width=450)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        dets = detector(gray, 1)  # Detect the faces in the image
-        (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
-        (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+            #resize del frame a width a 450
+            frame = imutils.resize(frame, width=450)
+            #conversione in scala di grigi
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            dets = detector(gray, 1)  # Detect the faces in the image
+            (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+            (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-        for det in dets:
-            (x, y, w, h) = face_utils.rect_to_bb(det)
-            crop = gray[y:y + h, x:x + w]
-            try:
-                crop = cv2.resize(crop, (250, 250))
-            except Exception as e:
-                print(str(e))
-                break
 
-            dets1 = detector(crop, 1)
-            for det in dets1:
-                shape = predictor(crop, det)
-                shape = face_utils.shape_to_np(shape)
-                leftEye = shape[left_s:left_e]
-                rightEye = shape[right_s:right_e]
-                left_eye_EAR = self.eye_aspect_ratio(leftEye)
-                right_eye_EAR = self.eye_aspect_ratio(rightEye)
-                ear = (left_eye_EAR + right_eye_EAR) / 2.0
+            # andiamo a rilevare il rettangolo del volto e croppiamo l'immagine con 250x250
+            for det in dets:
+                (x, y, w, h) = face_utils.rect_to_bb(det)
+                crop = gray[y:y + h, x:x + w]
+                try:
+                    crop = cv2.resize(crop, (250, 250))
+                except Exception as e:
+                    print(str(e))
+                    break
 
-                if ear_top != 0:
-                    ear_threshold = (ear_top * 2) / 3
-                    print("Ear_th", ear_threshold)
-                    print("EAR TOP", ear_top)
+                dets1 = detector(crop, 1)
 
-                    if ear < ear_threshold:
+                # rilevamento degli occhi e calcolo dell'EAR di entrambe gli occhi
+                for det in dets1:
+                    shape = predictor(crop, det)
+                    shape = face_utils.shape_to_np(shape)
+                    leftEye = shape[left_s:left_e]
+                    rightEye = shape[right_s:right_e]
+                    left_eye_EAR = self.eye_aspect_ratio(leftEye)
+                    right_eye_EAR = self.eye_aspect_ratio(rightEye)
+                    ear = (left_eye_EAR + right_eye_EAR) / 2.0
 
-                        eyes_detect = '1'
-                        COUNTER += 1
-                    else:
-                        eyes_detect = '0'
-                        # TODO o togliere o spiegare
-                        if COUNTER >= CONSEC_FRAMES_NUMBER:
-                            TOTAL += 1
+                    # se ear_top è già stato assegnato allora viene calcolato il threshold
+                    if ear_top != 0:
+                        ear_threshold = (ear_top * 2) / 3
+                        print("Ear_th", ear_threshold)
+                        print("EAR TOP", ear_top)
 
-                        COUNTER = 0
 
-                cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                        # se ear < del suo threshold
+                        if ear < ear_threshold:
+                            # abbiamo lo stato di occhi chiusi e incrementiamo il contatore dei frame
+                            eyes_detect = '1'
+                            COUNTER += 1
+                        else:
+                            # quando l'occhio è aperto o di nuovo aperto andiamo a confrontare il contatore
+                            # se ha raggiunto i minimi frame consecutivi e se lo è abbiamo avuto un eyeblink
+                            # di conseguenza il contatore viene azzerato.
+                            eyes_detect = '0'
 
-                if ear > ear_top:
-                    ear_top = ear
+                            if COUNTER >= CONSEC_FRAMES_NUMBER:
+                                TOTAL += 1
 
-        return eyes_detect, TOTAL, COUNTER, ear_top
+                            COUNTER = 0
 
-    # TODO commentare ogni commento. Non e' uguale alla funzione precedente?
+                    cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    # ear è maggiore di ear_top lo sostituisce, ricordo che ear_top ad inizio video è a 0 e serve per calcolare il threshold
+                    if ear > ear_top:
+                        ear_top = ear
+
+            return eyes_detect, TOTAL, COUNTER, ear_top
+
+
+    # gestisce gli eyeblink dei video
     def eye_blink_video(self, frame, detector, predictor, COUNTER, TOTAL, ear_top):
-
         eyes_detect = ''
 
         rects = detector(frame, 1)
+
+
         (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
+        #andiamo a rilevare il rettangolo del volto e croppiamo l'immagine con 200x200
         for rect in rects:
             (x, y, w, h) = face_utils.rect_to_bb(rect)
             crop = frame[y:y + h, x:x + w]
@@ -249,6 +267,7 @@ class EyeBlink:
                 shape = predictor(crop, rect)
                 shape = face_utils.shape_to_np(shape)
 
+                #rilevamento degli occhi e calcolo dell'EAR di entrambe gli occhi
                 leftEye = shape[left_s:left_e]
                 rightEye = shape[right_s:right_e]
                 left_eye_EAR = self.eye_aspect_ratio(leftEye)
@@ -259,16 +278,21 @@ class EyeBlink:
                 rightEyeHull = cv2.convexHull(rightEye)
                 cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
                 cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+                # se ear_top è già stato assegnato allora viene calcolato il threshold
                 if ear_top != 0:
                     ear_threshold = (ear_top * 2) / 3
                     print("Ear_th", ear_threshold)
                     print("EAR TOP", ear_top)
-                    # TODO o togliere o spiegare
+
+                    # se ear < del suo threshold
                     if ear < ear_threshold:
-                        COUNTER += 1
-                        print(COUNTER)
+                        # abbiamo lo stato di occhi chiusi e incrementiamo il contatore dei frame
                         eyes_detect = '1'
+                        COUNTER += 1
                     else:
+                        # quando l'occhio è aperto o di nuovo aperto andiamo a confrontare il contatore
+                        # se ha raggiunto i minimi frame consecutivi e se lo è abbiamo avuto un eyeblink
+                        # e aumentiamo total (indica il numero di eyeblink) di conseguenza il contatore viene azzerato.
                         eyes_detect = '0'
                         if COUNTER >= CONSEC_FRAMES_NUMBER:
                             TOTAL += 1
@@ -280,6 +304,7 @@ class EyeBlink:
                 cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
+                # ear è maggiore di ear_top lo sostituisce, ricordo che ear_top ad inizio video è a 0 e serve per calcolare il threshold
                 if ear > ear_top:
                     ear_top = ear
 
@@ -287,63 +312,66 @@ class EyeBlink:
             cv2.waitKey(1)
             return eyes_detect, COUNTER, TOTAL, ear_top
 
-    # TODO spiegare perche' non e' stato analizzato tutto il video
-    # Il metodo sottostante viene utilizzato con i vari thresholds fissi variabili.
-    # Si va a prendere un frame per volta dal video; e ciascun frame viene passato al metodo "eye_blink_video_fixedTh"
-    # che andrà ad analizzare i singoli frame, confrontando l'eye_aspect_ratio del frame corrente con i vari threshold.
-    # In questo caso si analizzano un certo numero di frame e non tutto il video e viene, infine, tornata la lista dei
-    # valori che abbiamo ottenuto in base al threshold: se EAR < 'valore_del_threshold_x' avremo th_x = 1
-    # in corrispondenza del threshold 'x' nella lista.
-    # TODO commentare ogni passaggio
+
+# TODO spiegare perche' non e' stato analizzato tutto il video
+# Il metodo sottostante viene utilizzato con i vari thresholds fissi variabili.
+# Si va a prendere un frame per volta dal video; e ciascun frame viene passato al metodo "eye_blink_video_fixedTh"
+# che andrà ad analizzare i singoli frame, confrontando l'eye_aspect_ratio del frame corrente con i vari threshold.
+# In questo caso si analizzano un certo numero di frame e non tutto il video e viene, infine, tornata la lista dei
+# valori che abbiamo ottenuto in base al threshold: se EAR < 'valore_del_threshold_x' avremo th_x = 1
+# in corrispondenza del threshold 'x' nella lista.
+# TODO commentare ogni passaggio
     def eyeBlinkStartThFixed(self):
+        # inizializzazione di counter e total, counter conta i frame consecutivi in EAR < threshold, total il numero di
+        # eyeblink
         COUNTER = 0
         TOTAL = 0
-
+        # dichiarazione e inizializzazione dei threshold che vanno da 0.10 a 0.29
         ear_th = []
-        # TODO va da 0.10 a 0.29
         for threshold in np.arange(0.10, 0.30, 0.01):
             ear_th.append(0)
-        # TODO serve? Non viene usato
-        history = ' '
+
+
         print(self.inputType)
+
         detector = dlib.get_frontal_face_detector()
         predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-        # TODO serve passargli self.inputType?? Non serve per distinguere tra video e cam??
+        # inputType ha il suo interno il path + il video
+        # poi inizia il video stream.
         fvs = FileVideoStream(self.inputType).start()
         time.sleep(1.0)
+
+        # start the FPS timer
         fps = FPS().start()
-        # TODO questo non serve
-        fileStream = True
+
         num_frames = 0
+        # loop over frames from the video file stream until 150 frames (sono sufficienti per verificare
+        # se è avvenuto un eyeblink o meno)
         while fvs.more() and num_frames < 150:
-            # TODO non viene usato
-            crop = None
+
             frame = fvs.read()
 
             try:
                 frame = imutils.resize(frame, width=300)
             except Exception as e:
                 print(str(e))
-            # TODO questo non serve
-            try:
-                vis = frame.copy()
 
-            except Exception as e:
-                print(str(e))
-                break
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            # TODO cosa fa?
-            frame = np.dstack([frame, frame, frame])
+
+            # frame = np.dstack([frame, frame, frame])
+
+            # viene richiamata la funzione che va ad analizzare ogni singolo frame per vedere se ci è stato
+            # un eyeblink o meno
             try:
-                # TODO servono counter, _?
-                eyesdetect, COUNTER, _, ear_th = self.eye_blink_video_fixedTh(frame, detector,
-                                                                              predictor, COUNTER, TOTAL, ear_th)
+
+                eyesdetect, COUNTER, ear_th = self.eye_blink_video_fixedTh(frame, detector,
+                                                                              predictor, COUNTER, ear_th)
             except Exception as e:
                 print(str(e))
                 continue
 
-            history += eyesdetect
+            # viene aggiornato fps e incrementato il numero di frame.
             fps.update()
             fps.stop()
             print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
@@ -352,16 +380,20 @@ class EyeBlink:
 
         cv2.destroyAllWindows()
         fvs.stop()
+        # ritorna la lista dei valori relativi ai threshold
         return ear_th
+
 
     # TODO commentare ogni passaggio
     def eye_blink_video_fixedTh(self, frame, detector, predictor, COUNTER, TOTAL, ear_th):
+
         eyes_detect = ''
 
         rects = detector(frame, 1)  # Detect the faces in the image
         (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
+        # andiamo a rilevare il rettangolo del volto e croppiamo l'immagine con 200x200
         for rect in rects:
             (x, y, w, h) = face_utils.rect_to_bb(rect)
             crop = frame[y:y + h, x:x + w]
@@ -378,6 +410,7 @@ class EyeBlink:
                 shape = predictor(crop, rect)
                 shape = face_utils.shape_to_np(shape)
 
+                # rilevamento degli occhi e calcolo dell'EAR di entrambe gli occhi
                 leftEye = shape[left_s:left_e]
                 rightEye = shape[right_s:right_e]
                 left_eye_EAR = self.eye_aspect_ratio(leftEye)
@@ -388,8 +421,11 @@ class EyeBlink:
                 rightEyeHull = cv2.convexHull(rightEye)
                 cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
                 cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+
+                #confrontiamo EAR con i threshold che vanno da 0.10 a 0.29 e mettiamo 1 al relavito threshold se EAR è
+                #minore di esso altrimenti il valore resta a 0.
                 count = 0
-                # TODO va da 0.10 a 0.29
+
                 for threshold in np.arange(0.10, 0.30, 0.01):
                     # Fix the threshold
                     th = np.round(threshold, 2)
@@ -414,8 +450,7 @@ class EyeBlink:
 
             cv2.imshow('Frame', frame)
             cv2.waitKey(1)
-            # TODO servono counter e total?
-            return eyes_detect, COUNTER, TOTAL, ear_th
+            return eyes_detect, COUNTER, ear_th
 
 
 def main():

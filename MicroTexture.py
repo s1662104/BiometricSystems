@@ -8,7 +8,7 @@ from MicroTextureSplitting import MicroTextureSplitting
 dim_image = 64
 
 
-# TODO commentare
+# funzione che inquadra l'utente e ritaglia il volto
 def detect_face(img, vis, crop=None):
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -34,36 +34,43 @@ def detect_face(img, vis, crop=None):
 
 #TODO non ha senso usare nameFileCsv e in microTextureVideo passargli un altro file. A questo punto non passare in
 # input nulla alla classe e poi passi il file alla funzione
+#TODO response: questo non l'avevamo già risolto?
 class MicroTexture:
-    def __init__(self, nameFileCsv):
-        self.nameFileCsv = nameFileCsv
+    # def __init__(self, nameFileCsv):
+    #     self.nameFileCsv = nameFileCsv
 
     # Viene effettuata la verifica tramite webcam se abbiamo una persona reale, oppure abbiamo davanti alla webcam
     # un video/foto in esecuzione sul dispositivo dove la webcam sta puntando .
     # TODO commentare ogni passaggio
     def microTextureCam(self):
+
         cap = cv2.VideoCapture(0)
         val = False
+
+        #andiamo a prendere un frame e lo convertiamo in scala di grigi.
         while True:
             ret, frame = cap.read()
 
             vis = frame.copy()
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
+            #effettuiamo il ritaglio del viso
             crop = detect_face(gray, vis)
 
+            #qui effettuiamo la conversione dell'immagine croppata in LBP
             if crop is not None:
                 myLBP = LBP.Local_Binary_Pattern(1, 8, crop)
             else:
                 continue
             new_img = myLBP.compute_lbp()
+            #creiamo l'histogram dell'immagine calcolata in lpb
             hist = myLBP.createHistogram(new_img)
 
             # Andiamo a prendere il modello trained e salvato.
             with open('modelSVM.pkl', 'rb') as f:
                 clf = pickle.load(f)
             hist = hist.reshape(1, -1)
+            # attraverso il classificatore che abbiamo recuperato, ci facciamo dire se l'immagine è reale oppure no
             value = (clf.predict(hist))
             print(value)
             if value == 0:
@@ -78,10 +85,12 @@ class MicroTexture:
         cv2.destroyAllWindows()
         return val
 
-    # TODO commentare ogni passaggio. Le due funzioni sono molto simili
+
     def microTextureVideo(self, pathVid):
         cap = cv2.VideoCapture(pathVid)
         val = False
+
+        # andiamo a prendere un frame e lo convertiamo in scala di grigi.
         while True:
             ret, frame = cap.read()
             try:
@@ -92,23 +101,24 @@ class MicroTexture:
 
             # Our operations on the frame come here
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
+            # effettuiamo il ritaglio del viso
             crop = detect_face(gray, vis)
 
+            # qui effettuiamo la conversione dell'immagine croppata in LBP
             if crop is not None:
                 myLBP = LBP.Local_Binary_Pattern(1, 8, crop)
             else:
                 continue
             new_img = myLBP.compute_lbp()
+            # creiamo l'histogram dell'immagine calcolata in lpb
             hist = myLBP.createHistogram(new_img)
 
             # Andiamo a prendere il modello trained e salvato.
             with open('modelSVM.pkl', 'rb') as f:
                 clf = pickle.load(f)
-            # nsamples = hist.shape
-            # print("nsamples",nsamples)
+
             hist = hist.reshape(1, -1)
-            # print(hist)
+            # attraverso il classificatore che abbiamo recuperato, ci facciamo dire se l'immagine è reale oppure no
             value = (clf.predict(hist))
             print(value)
             if value == 0:
@@ -119,17 +129,15 @@ class MicroTexture:
                 print("FAKE")
                 val = False
                 break
-            # if the `q` key was pressed, break from the loop
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     break
+
         cap.release()
         cv2.destroyAllWindows()
         return val
 
     # viene effettuata l'evaluation dal file csv, nel caso in cui questa funzione viene richiamata da replayAttackCam,
     # non mostra i calcoli e grafici
-    def microTextureEvaluation(self):
-        X_train, X_test, y_train, y_test = MicroTextureSplitting(self.nameFileCsv).splitting_train_test()
+    def microTextureEvaluation(self,nameFileCsv):
+        X_train, X_test, y_train, y_test = MicroTextureSplitting(nameFileCsv).splitting_train_test()
 
         svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test,
                                                                                    y_test).train_svm()
@@ -150,7 +158,7 @@ class MicroTexture:
 def main():
     nameFileCsv = 'histogram.csv'
     # MicroTexture(nameFileCsv).microTextureCam()
-    MicroTexture(nameFileCsv).microTextureEvaluation()
+    MicroTexture().microTextureEvaluation(nameFileCsv)
 
 
 if __name__ == '__main__':
