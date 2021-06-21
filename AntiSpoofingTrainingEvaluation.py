@@ -49,6 +49,7 @@ def plot_roc_curve(y_test, y_test_score):
     plt.show()
     sns.set()
 
+
 # TODO SERVE? NON VIENE MAI USATO
 def licit_scenario(y_test, y_test_score, index):
     FAR, FRR = calculate_FAR_FRR(y_test, y_test_score, index)
@@ -56,6 +57,7 @@ def licit_scenario(y_test, y_test_score, index):
     HTER = ((FAR + FRR) / 2)
 
     return FRR, FAR, HTER
+
 
 # TODO commentare. specificare cos'e' index
 def spoofing_scenario(y_test, y_test_score, index):

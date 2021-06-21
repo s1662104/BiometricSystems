@@ -29,7 +29,7 @@ class MicroTextureSplitting:
     def __init__(self, nomeFileCsv):
         self.nomeFileCsv = nomeFileCsv
 
-    #splitting dal dataset in train e test
+    # splitting dal dataset in train e test
     def splitting_train_test(self):
         # E' solo un test per conoscere il numero di colonne
         num_columns = column_len_csv(self.nomeFileCsv)
@@ -41,7 +41,7 @@ class MicroTextureSplitting:
         # dividiamo i dati presi dal csv
         X, y = data.iloc[:, :-1], data.iloc[:, -1]
 
-        #effettuiamo lo splitting di train e test
+        # effettuiamo lo splitting di train e test
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1, shuffle=True)
 
         return X_train, X_test, y_train, y_test
@@ -74,12 +74,9 @@ class MicroTextureSplitting:
     # viene effettuato lo splitting tra real e fake  e inserite le informazioni in un csv
     def splitting_real_fake(self, fill_csv_real, fill_csv_fake):
 
-
-
         current_real = '/Real'
         current_fake = '/Fake'
 
-        # TODO i due if sono uguali, si puo' unirli?
         # Qui andiamo ad inserire histogram in csv per ogni immagine Real
         if fill_csv_real:
 
@@ -101,8 +98,6 @@ class MicroTextureSplitting:
                 hist_real = self.convert_image_to_hist(name)
                 self.writeCsv(hist_real, 0)
 
-
-
         # Qui andiamo ad inserire histogram in csv per ogni immagine Fake
         if fill_csv_fake:
             # In src_fake, abbiamo la directory con le immagini non reali (Fake)
@@ -120,8 +115,6 @@ class MicroTextureSplitting:
                 print(name)
                 hist_real = self.convert_image_to_hist(name)
                 self.writeCsv(hist_real, 1)
-
-
 
 
 def main():

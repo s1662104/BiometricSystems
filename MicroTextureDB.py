@@ -1,3 +1,4 @@
+# Classe usata per realizzare il DB realizzato da noi
 import Main
 import cv2
 
@@ -7,10 +8,13 @@ class Database:
         self.directory = 'MicroTextureDB'
 
     def main(self, real: bool, c=None):
+        # definisce se si sta catturando un utente reale o non
         if real:
             dir = self.directory + "/Real/"
         else:
             dir = self.directory + "/Fake/"
+        # count viene usato per riprendere il conteggio di immagini realizzate, in caso si spezzetti il l'operazione
+        # in piu' iterazioni
         if c is None:
             count = 0
         else:

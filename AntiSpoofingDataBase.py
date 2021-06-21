@@ -7,7 +7,7 @@ import shutil
 
 import Main
 
-
+# TODO commentare
 # vengono creati i due dataset ReplayAttack e eyeBlink. Copiando i frame per ReplayAttack in Fake e Real; e copiando
 # i video per eyeBlink.
 def createDataSet(input, val, name, replayAttack, eyeBlink):
@@ -67,7 +67,7 @@ def createDataSet(input, val, name, replayAttack, eyeBlink):
             except Exception as e:
                 print(str(e))
 
-
+# TODO commentare
 # Qui i video in "Rose - Youtube Face" vengono suddivisi tra Real e Fake
 # e viene richiamata la funzione createDataSet per creare
 # i rispettivi dataset per ReplayAttack e Eyeblink.
