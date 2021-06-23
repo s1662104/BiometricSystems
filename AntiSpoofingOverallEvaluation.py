@@ -64,7 +64,7 @@ class AntiSpoofingOverallEvaluation:
         for name in filesNameReal:
             varEyeBlink = EyeBlink(name).eyeBlinkStart()
 
-            # se il risultato è 1 allora significa che il video ha passato il contro di Eyeblink e si procede con MicroTexture
+            # se il risultato è 1 allora significa che il video ha passato il controllo di Eyeblink e si procede con MicroTexture
             if varEyeBlink == 1:
                 varMicroTexture = MicroTexture().microTextureVideo(name)
                 #se anche il video supera il contro microtexture allora scriviamo i nel csv
@@ -76,7 +76,7 @@ class AntiSpoofingOverallEvaluation:
                 #... eyeblink ok(1), microtexture no (0), quindi il valore finale è uno 0 perché viene visto come non reale
                 else:
                     self.writeCsv(name, 1, 1, 0, 0)
-                #...infine se già eyeblink ha detto no, quindi non reale, microtexture non viene fatto partire quindi 0
+                # ...infine se già eyeblink ha detto no, quindi non reale, microtexture non viene fatto partire quindi 0
                 # e si restituisce che è un fake (0)
             else:
                 self.writeCsv(name, 1, 0, 0, 0)
@@ -91,7 +91,7 @@ class AntiSpoofingOverallEvaluation:
         for name in filesNameFake:
             varEyeBlink = EyeBlink(name).eyeBlinkStart()
 
-            # se il risultato è 1 allora significa che il video ha passato il contro di Eyeblink e si procede con MicroTexture
+            # se il risultato è 1 allora significa che il video ha passato il controllo di Eyeblink e si procede con MicroTexture
             if varEyeBlink == 1:
                 varMicroTexture = MicroTexture().microTextureVideo(name)
                 # se anche il video supera il contro microtexture allora scriviamo i nel csv
@@ -118,7 +118,7 @@ class AntiSpoofingOverallEvaluation:
         for name in filesNameFake:
             varEyeBlink = EyeBlink(name).eyeBlinkStart()
 
-            # se il risultato è 1 allora significa che il video ha passato il contro di Eyeblink e si procede con MicroTexture
+            # se il risultato è 1 allora significa che il video ha passato il controllo di Eyeblink e si procede con MicroTexture
             if varEyeBlink == 1:
                 varMicroTexture = MicroTexture().microTextureVideo(name)
                 # se anche il video supera il contro microtexture allora scriviamo i nel csv
@@ -193,7 +193,6 @@ class AntiSpoofingOverallEvaluation:
             else:
                 self.writeCsvAND_OR(name, 0, 0)
 
-    # TODO COMMENTARE OGNI PASSAGGIO. SPIEGARE LA DIFFERENZA TRA I SINGOLI FOR
     def evaluationOR(self):
         current_real = 'Genuine'
         current_fake_replayattack = 'ReplayAttack'
