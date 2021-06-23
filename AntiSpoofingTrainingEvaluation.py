@@ -1,4 +1,4 @@
-# Qui viene realizzato il modello SVM, i vari calcoli come FAR, FRR, HTER,SFAR e il plotting delle curve.
+
 
 import seaborn as sns
 from sklearn.svm import SVC
@@ -58,33 +58,12 @@ def plot_roc_curve(y_test, y_test_score):
 # qui vengono calcolati i SFAR e i FRR, viene utilizzato index perché microtexture (index == 1) vede real con
 # valore 0 e i fake con valore 1, mentre eyeblink (index == 0) vede real con valore 1 e fake con valore 0.
 def spoofing_scenario(y_test, y_test_score, index):
-    num_fake = 0
-    count = 0
 
-    # andiamo a prenderci il FRR
-    _, FRR = calculate_FAR_FRR(y_test, y_test_score, index)
 
-    # per eyeblink
-    if index == 0:
-        # andiamo a calcolare i FA (false acceptance)
-        for i in range(len(y_test)):
-            if y_test.iloc[i] == 0:
-                num_fake += 1
-                if y_test.iloc[i] != y_test_score[i]:
-                    count += 1
-    # per microtexture
-    elif index == 1:
-        # andiamo a caclolare i FA (false acceptance)
-        for i in range(len(y_test)):
-            if y_test.iloc[i] == 1:
-                num_fake += 1
-                if y_test.iloc[i] != y_test_score[i]:
-                    count += 1
-    else:
-        exit("WRONG INDEX")
+    # andiamo a prenderci il SFAR e FRR richiamando questa funzione
+    SFAR, FRR = calculate_FAR_FRR(y_test, y_test_score, index)
 
-    # andiamo a calcolare lo spoof false acceptance rate (SFAR)
-    SFAR = count / num_fake
+
 
     return FRR, SFAR
 
