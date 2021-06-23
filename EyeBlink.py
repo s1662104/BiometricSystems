@@ -16,9 +16,9 @@ from imutils import face_utils
 import dlib
 
 CONSEC_FRAMES_NUMBER = 3
+DIMENSION = 200
 
 
-# TODO cos'e' inputType?
 class EyeBlink:
     def __init__(self, inputType):
         # inputType è la stringa che contiene il path per un video, oppure non contiene nulla.
@@ -46,29 +46,32 @@ class EyeBlink:
             print(self.inputType)
             detector = dlib.get_frontal_face_detector()
             predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-            # TODO scrivere i commenti tutti in italiano, da' l'idea che il codice non e' scritto da noi e non e' stato nemmeno compreso
-            # start the file video stream thread and allow the buffer to
-            # start to fill
+
+
+            # avvia il thread del video stream
+
             fvs = FileVideoStream(self.inputType).start()
             time.sleep(1.0)
 
-            # start the FPS timer
+            # avvia il timer fps
             fps = FPS().start()
 
             # fileStream = True
+
             num_frames = 0
-            # TODO spiegare perche' 150 frames
-            # loop over frames from the video file stream until 150 frames
+
+            # si cicla sui frame presi dal video stream per un massimo di 150 frame, visto che è sufficiente per capire
+            # se si è verificato o meno un eyeblink.
             while fvs.more() and num_frames < 150:
 
                 frame = fvs.read()
-                # resize frame with width = 300
+                # ridimensionamento del frame a 300 di width
                 try:
                     frame = imutils.resize(frame, width=300)
                 except Exception as e:
                     print(str(e))
 
-                # the frame is converted into grayscale image
+                # il frame viene convertito in scala di grigi
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
                 # frame = np.dstack([frame, frame, frame])
@@ -80,9 +83,11 @@ class EyeBlink:
                 except Exception as e:
                     print(str(e))
                     continue
-                # TODO spiegare a cosa serve history, visto che non viene piu' usato
-                # here we update the history
+
+                # history è una cronologia degli stati dell'occhio che vengono presi da ogni frame, può essere usata per
+                # vedere l'andamento frame-by-frame.
                 history += eyesdetect
+                print(history)
                 # se si verifica un eyeblink ritorniamo True
                 if TOTAL > 0:
                     cv2.destroyAllWindows()
@@ -118,8 +123,9 @@ class EyeBlink:
                 # un eyeblink o meno
                 eyedetect, TOTAL, COUNTER, ear_top = self.eye_blink_cam(self, frame, ret, detector, predictor,
                                                                         COUNTER, TOTAL, ear_top)
-                # TODO spiegare a cosa serve history
-                # here we update the history
+
+                # history è una cronologia degli stati dell'occhio che vengono presi da ogni frame, può essere usata per
+                # vedere l'andamento frame-by-frame.
                 history += eyedetect
                 # se total è maggiore di 0 significa che un eyeblink è avvenuto e ritorniamo true
                 if TOTAL >= 1:
@@ -160,8 +166,9 @@ class EyeBlink:
         return EAR
 
     # metodo secondario che serve per vedere se si è verificato un blinking
-    # TODO serve? commentare
     def isBlinking(self, history, maxFrames):
+        # si controlla se esiste un pattern con tot frames es. maxFrames = 3 allora avremo vari pattern 101,1001, 10001
+        # che vengono cercati nell'history per vedere se c'è stato un eyeblink.
         for i in range(maxFrames):
             pattern = '1' + '0' * (i + 1) + '1'
             if pattern in history:
@@ -181,12 +188,12 @@ class EyeBlink:
         (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-        # andiamo a rilevare il rettangolo del volto e croppiamo l'immagine con 250x250
+        # andiamo a rilevare il rettangolo del volto e croppiamo l'immagine con 200x200
         for det in dets:
             (x, y, w, h) = face_utils.rect_to_bb(det)
             crop = gray[y:y + h, x:x + w]
             try:
-                crop = cv2.resize(crop, (250, 250))
+                crop = cv2.resize(crop, (DIMENSION, DIMENSION))
             except Exception as e:
                 print(str(e))
                 break
@@ -215,7 +222,7 @@ class EyeBlink:
                         eyes_detect = '1'
                         COUNTER += 1
                     else:
-                        # quando l'occhio è aperto o di nuovo aperto andiamo a confrontare il contatore
+                        # quando l'occhio è aperto o di nuovo aperto, andiamo a confrontare il contatore
                         # se ha raggiunto i minimi frame consecutivi e se lo è abbiamo avuto un eyeblink
                         # di conseguenza il contatore viene azzerato.
                         eyes_detect = '0'
@@ -229,7 +236,8 @@ class EyeBlink:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                 cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                # ear è maggiore di ear_top lo sostituisce, ricordo che ear_top ad inizio video è a 0 e serve per calcolare il threshold
+                # ear è maggiore di ear_top lo sostituisce, ricordo che ear_top ad inizio video è a 0 e serve per
+                # calcolare il threshold
                 if ear > ear_top:
                     ear_top = ear
 
@@ -245,12 +253,13 @@ class EyeBlink:
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
         # andiamo a rilevare il rettangolo del volto e croppiamo l'immagine con 200x200
-        # TODO perche' sopra il crop e' 250 e qui 200?
+        # un crop più piccolo rispetto a quello di webcam (200x200) perché l'analisi tramite webcam era abbastanza veloce
+        # (molti fps), mentre l'analisi dei video è molto lenta e (200x200) è sufficiente per un buon eyeblink detection.
         for rect in rects:
             (x, y, w, h) = face_utils.rect_to_bb(rect)
             crop = frame[y:y + h, x:x + w]
             try:
-                crop = cv2.resize(crop, (200, 200))
+                crop = cv2.resize(crop, (DIMENSION, DIMENSION))
             except Exception as e:
                 print(str(e))
                 break
@@ -307,13 +316,15 @@ class EyeBlink:
             cv2.waitKey(1)
             return eyes_detect, COUNTER, TOTAL, ear_top
 
-    # TODO spiegare perche' non e' stato analizzato tutto il video !!!
+
     # Il metodo sottostante viene utilizzato con i vari thresholds fissi variabili.
     # Si va a prendere un frame per volta dal video; e ciascun frame viene passato al metodo "eye_blink_video_fixedTh"
     # che andrà ad analizzare i singoli frame, confrontando l'eye_aspect_ratio del frame corrente con i vari threshold.
     # In questo caso si analizzano un certo numero di frame e non tutto il video e viene, infine, tornata la lista dei
     # valori che abbiamo ottenuto in base al threshold: se EAR < 'valore_del_threshold_x' avremo th_x = 1
     # in corrispondenza del threshold 'x' nella lista.
+    # I video non vengono analizzati per intero, perché richiederebbe troppo tempo (Abbiamo 1897 video) e 150 frames bastano
+    # per verificare se avviene un eyeblink oppure no.
     def eyeBlinkStartThFixed(self):
         # inizializzazione di counter e total, counter conta i frame consecutivi in EAR < threshold, total il numero di
         # eyeblink
@@ -333,14 +344,14 @@ class EyeBlink:
         # poi inizia il video stream.
         fvs = FileVideoStream(self.inputType).start()
         time.sleep(1.0)
-        # TODO commentare tutto in italiano, vedi sopra per i motivi
-        # start the FPS timer
+
+        # avvia il timer fps
         fps = FPS().start()
 
         num_frames = 0
-        # TODO spiegare nel report perche' bastano 150 frames
-        # loop over frames from the video file stream until 150 frames (sono sufficienti per verificare
-        # se è avvenuto un eyeblink o meno)
+
+        # si cicla sui frame presi dal video stream per un massimo di 150 frame, visto che è sufficiente per capire
+        # se si è verificato o meno un eyeblink.
         while fvs.more() and num_frames < 150:
 
             frame = fvs.read()
@@ -384,14 +395,14 @@ class EyeBlink:
         (left_s, left_e) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (right_s, right_e) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-        # TODO nuovamente, perche' in alcuni casi 250x250 e in altri 200x200? in questi casi si usano delle costanti
-        # andiamo a rilevare il rettangolo del volto e croppiamo l'immagine con 200x200
+
+        # andiamo a rilevare il rettangolo del volto e croppiamo l'immagine (200x200)
         for rect in rects:
             (x, y, w, h) = face_utils.rect_to_bb(rect)
             crop = frame[y:y + h, x:x + w]
 
             try:
-                crop = cv2.resize(crop, (200, 200))
+                crop = cv2.resize(crop, (DIMENSION, DIMENSION))
             except Exception as e:
                 print(str(e))
                 break
@@ -419,7 +430,7 @@ class EyeBlink:
                 count = 0
 
                 for threshold in np.arange(0.10, 0.30, 0.01):
-                    # Fix the threshold
+
                     th = np.round(threshold, 2)
                     if ear < th:
                         COUNTER += 1
@@ -436,9 +447,7 @@ class EyeBlink:
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                     cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                # TODO questo serve? Perche' in teoria sono fissi no? quindi ear_top non serve
-                # if ear > ear_top:
-                #     ear_top = ear
+
 
             cv2.imshow('Frame', frame)
             cv2.waitKey(1)

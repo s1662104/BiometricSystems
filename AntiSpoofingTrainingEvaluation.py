@@ -15,18 +15,21 @@ class ModelSVM:
 
     # Modello SVM
     def train_svm(self):
+
+        #viene creato il modello
         model = SVC(kernel='rbf', random_state=0, gamma='scale', C=1)
 
+        #viene addestrato
         svm = model.fit(self.X_train, self.y_train)
-        # TODO: TOGLIERE QUESTA RIGA DI CODICE
-        y_train_score = svm.decision_function(self.X_train)
 
+        # ci da la sua predizione in fase test
         y_test_score = svm.predict(self.X_test)
 
-        return svm, y_train_score, y_test_score
+        #viene ritornato il classificatore addestrato e la predizione
+        return svm, y_test_score
 
 
-# Plot della RocCurve
+# Plot della Roc-Curve
 def plot_roc_curve(y_test, y_test_score):
     FPR, TPR, t = roc_curve(y_test, y_test_score)
     print(FPR)
@@ -41,39 +44,37 @@ def plot_roc_curve(y_test, y_test_score):
     plt.plot([0, 1], [0, 1], 'k--')  # random predictions curve
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.0])
-    # TODO togliere FPR e TPR e mettere FAR e GAR
-    plt.xlabel('False Positive Rate or (1 - Specifity)')
-    plt.ylabel('True Positive Rate or (Sensitivity)')
+    plt.xlabel('FAR')
+    plt.ylabel('GAR')
     plt.title('Receiver Operating Characteristic')
     plt.legend(loc="lower right")
     plt.show()
     sns.set()
 
 
-# TODO SERVE? NON VIENE MAI USATO
-def licit_scenario(y_test, y_test_score, index):
-    FAR, FRR = calculate_FAR_FRR(y_test, y_test_score, index)
-
-    HTER = ((FAR + FRR) / 2)
-
-    return FRR, FAR, HTER
 
 
-# TODO commentare. specificare cos'e' index
+
+# qui vengono calcolati i SFAR e i FRR, viene utilizzato index perché microtexture (index == 1) vede real con
+# valore 0 e i fake con valore 1, mentre eyeblink (index == 0) vede real con valore 1 e fake con valore 0.
 def spoofing_scenario(y_test, y_test_score, index):
     num_fake = 0
     count = 0
-    FAR, FRR = calculate_FAR_FRR(y_test, y_test_score, index)
 
+    # andiamo a prenderci il FRR
+    _, FRR = calculate_FAR_FRR(y_test, y_test_score, index)
+
+    # per eyeblink
     if index == 0:
-
+        # andiamo a calcolare i FA (false acceptance)
         for i in range(len(y_test)):
             if y_test.iloc[i] == 0:
                 num_fake += 1
                 if y_test.iloc[i] != y_test_score[i]:
                     count += 1
-
+    # per microtexture
     elif index == 1:
+        # andiamo a caclolare i FA (false acceptance)
         for i in range(len(y_test)):
             if y_test.iloc[i] == 1:
                 num_fake += 1
@@ -81,19 +82,25 @@ def spoofing_scenario(y_test, y_test_score, index):
                     count += 1
     else:
         exit("WRONG INDEX")
+
+    # andiamo a calcolare lo spoof false acceptance rate (SFAR)
     SFAR = count / num_fake
 
     return FRR, SFAR
 
 
 # Calcolo di FAR e FRR
-# TODO commentare ogni passaggio. Spiegare cos'e' index e perche' serve
+# qui vengono calcolato FAR e FRR, viene utilizzato index perché microtexture (index == 1) vede real con
+# valore 0 e i fake con valore 1, mentre eyeblink (index == 0) vede real con valore 1 e fake con valore 0.
 def calculate_FAR_FRR(y_test, y_test_score, index):
     FA = 0
     FR = 0
     num_fake = 0
     num_real = 0
+    # per eyeblink
     if index == 0:
+
+        #contiamo i real e i fake
         for i in range(len(y_test)):
 
             if y_test.iloc[i] == 0:
@@ -101,53 +108,41 @@ def calculate_FAR_FRR(y_test, y_test_score, index):
             if y_test.iloc[i] == 1:
                 num_real += 1
 
+        # contiamo i FR (False rejection)
         for i in range(len(y_test)):
             if y_test.iloc[i] == 1:
                 if y_test.iloc[i] != y_test_score[i]:
                     FR += 1
-
+        # contiamo i FA ( False acceptance)
             if y_test.iloc[i] == 0:
                 if y_test.iloc[i] != y_test_score[i]:
                     FA += 1
+    # per microtexture
     elif index == 1:
+
+        # contiamo i real e i fake
         for i in range(len(y_test)):
 
             if y_test.iloc[i] == 1:
                 num_fake += 1
             if y_test.iloc[i] == 0:
                 num_real += 1
-
+        # contiamo i FR (False rejection)
         for i in range(len(y_test)):
             if y_test.iloc[i] == 0:
                 if y_test.iloc[i] != y_test_score[i]:
                     FR += 1
-
+        # contiamo i FA ( False acceptance)
             if y_test.iloc[i] == 1:
                 if y_test.iloc[i] != y_test_score[i]:
                     FA += 1
     else:
         exit("WRONG INDEX")
 
+    # calcolo di FAR e FRR
     FAR = FA / num_fake
     FRR = FR / num_real
     return FAR, FRR
 
 
-# TODO TOGLIERE DET CURVE
-# Plot della det_curve
-def plot_det_curve(y_test, y_test_score):
-    FAR, FRR, t = det_curve(y_test, y_test_score)
-    print("FAR", FAR)
-    print("FRR", FRR)
-    print("TH:", t)
 
-    plt.plot(FAR, FRR, label='DET curve')
-    plt.plot([0, 1], [0, 1], 'k--')  # random predictions curve
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.0])
-    plt.xlabel('False Acceptance Rate')
-    plt.ylabel('False Rejection Rate')
-    plt.title('Detection Error Tradeoff ')
-    plt.legend(loc="lower right")
-    plt.show()
-    sns.set()

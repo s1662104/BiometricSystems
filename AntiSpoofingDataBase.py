@@ -34,7 +34,7 @@ def createDataSet(input, val):
         except Exception as e:
             print(str(e))
 
-# TODO commentare
+
 # Qui i video in "Rose - Youtube Face" vengono suddivisi tra Real e Fake e viene richiamata la funzione createDataSet
 # per creare i dataset per Eyeblink.
 class Database:

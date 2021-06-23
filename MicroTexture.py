@@ -64,7 +64,7 @@ class MicroTexture:
             # creiamo l'histogram dell'immagine calcolata in lpb
             hist = myLBP.createHistogram(new_img)
 
-            # Andiamo a prendere il modello trained e salvato.
+            # Andiamo a prendere il classificatore già addestrato e salvato.
             with open('modelSVM.pkl', 'rb') as f:
                 clf = pickle.load(f)
             hist = hist.reshape(1, -1)
@@ -136,11 +136,16 @@ class MicroTexture:
     def microTextureEvaluation(self, nameFileCsv):
         X_train, X_test, y_train, y_test = MicroTextureSplitting(nameFileCsv).splitting_train_test()
 
-        svm, y_train_score, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test,
-                                                                                   y_test).train_svm()
+
+        # viene restituito il modello SVM addestrato e i valori predetti.
+        svm, y_test_score = AntiSpoofingTrainingEvaluation.ModelSVM(X_train, y_train, X_test,
+                                                                                    y_test).train_svm()
+
+        # viene scritto il modello su file
         with open('modelSVM.pkl', 'wb') as f:
             pickle.dump(svm, f)
 
+        # viene stampata la roc-curve e i valori FRR e SFAR.
         AntiSpoofingTrainingEvaluation.plot_roc_curve(y_test, y_test_score)
         FRR, SFAR = AntiSpoofingTrainingEvaluation.spoofing_scenario(y_test, y_test_score, index=1)
         print("#######################")
