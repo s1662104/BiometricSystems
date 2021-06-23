@@ -60,9 +60,8 @@ class EyeBlink:
 
             num_frames = 0
 
-            # si cicla sui frame presi dal video stream per un massimo di 150 frame, visto che è sufficiente per capire
-            # se si è verificato o meno un eyeblink.
-            while fvs.more() and num_frames < 150:
+            # si cicla sui frame presi dal video stream
+            while fvs.more() :
 
                 frame = fvs.read()
                 # ridimensionamento del frame a 300 di width
@@ -323,8 +322,7 @@ class EyeBlink:
     # In questo caso si analizzano un certo numero di frame e non tutto il video e viene, infine, tornata la lista dei
     # valori che abbiamo ottenuto in base al threshold: se EAR < 'valore_del_threshold_x' avremo th_x = 1
     # in corrispondenza del threshold 'x' nella lista.
-    # I video non vengono analizzati per intero, perché richiederebbe troppo tempo (Abbiamo 1897 video) e 150 frames bastano
-    # per verificare se avviene un eyeblink oppure no.
+
     def eyeBlinkStartThFixed(self):
         # inizializzazione di counter e total, counter conta i frame consecutivi in EAR < threshold, total il numero di
         # eyeblink
@@ -350,17 +348,16 @@ class EyeBlink:
 
         num_frames = 0
 
-        # si cicla sui frame presi dal video stream per un massimo di 150 frame, visto che è sufficiente per capire
-        # se si è verificato o meno un eyeblink.
-        while fvs.more() and num_frames < 150:
+        # si cicla sui frame presi dal video stream
+        while fvs.more() :
 
             frame = fvs.read()
-
+            # viene effettuato un ridimensionamento del frame
             try:
                 frame = imutils.resize(frame, width=300)
             except Exception as e:
                 print(str(e))
-
+            # viene convertito il frame in scala di grigi
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             # frame = np.dstack([frame, frame, frame])
