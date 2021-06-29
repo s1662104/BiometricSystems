@@ -326,11 +326,11 @@ class EyeBlink:
     def eyeBlinkStartThFixed(self):
         # inizializzazione di counter e total, counter conta i frame consecutivi in EAR < threshold, total il numero di
         # eyeblink
+
         COUNTER = 0
-        TOTAL = 0
         # dichiarazione e inizializzazione dei threshold che vanno da 0.10 a 0.29
         ear_th = []
-        for threshold in np.arange(0.10, 0.30, 0.01):
+        for threshold in np.arange(0.00, 0.51, 0.01):
             ear_th.append(0)
 
         print(self.inputType)
@@ -346,10 +346,11 @@ class EyeBlink:
         # avvia il timer fps
         fps = FPS().start()
 
+
         num_frames = 0
 
         # si cicla sui frame presi dal video stream
-        while fvs.more() :
+        while fvs.more():
 
             frame = fvs.read()
             # viene effettuato un ridimensionamento del frame
@@ -358,9 +359,16 @@ class EyeBlink:
             except Exception as e:
                 print(str(e))
             # viene convertito il frame in scala di grigi
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            try:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            except Exception as e:
+                print(str(e))
 
-            # frame = np.dstack([frame, frame, frame])
+
+
+
+
+            #frame = np.dstack([frame, frame, frame])
 
             # viene richiamata la funzione che va ad analizzare ogni singolo frame per vedere se ci è stato
             # un eyeblink o meno
@@ -384,7 +392,7 @@ class EyeBlink:
         # ritorna la lista dei valori relativi ai threshold
         return ear_th
 
-    def eye_blink_video_fixedTh(self, frame, detector, predictor, COUNTER, TOTAL, ear_th):
+    def eye_blink_video_fixedTh(self, frame, detector, predictor, COUNTER, ear_th):
 
         eyes_detect = ''
 
@@ -399,7 +407,7 @@ class EyeBlink:
             crop = frame[y:y + h, x:x + w]
 
             try:
-                crop = cv2.resize(crop, (DIMENSION, DIMENSION))
+                crop = cv2.resize(crop, (100,100))
             except Exception as e:
                 print(str(e))
                 break
@@ -426,10 +434,11 @@ class EyeBlink:
                 # minore di esso altrimenti il valore resta a 0.
                 count = 0
 
-                for threshold in np.arange(0.10, 0.30, 0.01):
+                for threshold in np.arange(0.00, 0.51, 0.01):
 
                     th = np.round(threshold, 2)
                     if ear < th:
+
                         COUNTER += 1
                         eyes_detect = '1'
                         ear_th[count] = 1
@@ -440,8 +449,7 @@ class EyeBlink:
                     count += 1
                     # print(count)
 
-                    cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    
                     cv2.putText(frame, "EAR: {:.2f}".format(ear), (200, 30),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 

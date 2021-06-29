@@ -224,7 +224,7 @@ class EyeBlinkEvaluation:
         # inizializziamo la lista dei false rejection e dei false acceptance, con tutti
         # i valori uguali a 0. Inizializziamo anche la lista dei thresholds che andranno da
         # 0.10 a 0.29.
-        for threshold in np.arange(0.10, 0.30, 0.01):
+        for threshold in np.arange(0.00, 0.51, 0.01):
             fr.append(0)
             fa.append(0)
             thresholds.append(round(threshold, 2))
@@ -287,8 +287,8 @@ class EyeBlinkEvaluation:
         plt.ylabel("Genuine Acceptance Rate")
         plt.xlabel("Spoofing False Acceptance Rate")
         plt.title('Receiver Operating Characteristic')
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.0])
+        plt.xlim([0.0,1.0])
+        plt.ylim([0.0,1.0])
         plt.show()
 
         ### Analisi dei threshold ottenuti
@@ -322,7 +322,7 @@ class EyeBlinkEvaluation:
 
 def main():
     EyeBlinkEvaluation().evaluationFixedThreshold(nameFileCsv='eyeblinkFixedTh.csv')
-    # EyeBlinkEvaluation().createDataSetEyeBlink(False, False, nameFileCsv='eyeblinkAdaptiveTh.csv')
+    #EyeBlinkEvaluation().createDataSetEyeBlinkFixedTh(nameFileCsv='eyeblinkFixedTh.csv', real= True, fake= True)
     # EyeBlinkEvaluation().evaluation(nameFileCsv='eyeblinkAdaptiveTh.csv')
 
 
