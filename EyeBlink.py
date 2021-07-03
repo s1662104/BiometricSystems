@@ -69,6 +69,7 @@ class EyeBlink:
                     frame = imutils.resize(frame, width=300)
                 except Exception as e:
                     print(str(e))
+                    continue
 
                 # il frame viene convertito in scala di grigi
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -407,7 +408,7 @@ class EyeBlink:
             crop = frame[y:y + h, x:x + w]
 
             try:
-                crop = cv2.resize(crop, (100,100))
+                crop = cv2.resize(crop, (DIMENSION,DIMENSION))
             except Exception as e:
                 print(str(e))
                 break

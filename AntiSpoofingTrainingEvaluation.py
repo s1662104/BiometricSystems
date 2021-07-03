@@ -17,7 +17,8 @@ class ModelSVM:
     def train_svm(self):
 
         #viene creato il modello
-        model = SVC(kernel='rbf', random_state=0, gamma='scale', C=1)
+        model = SVC(kernel='rbf', gamma='scale', C=0.1)
+        #model = SVC(kernel='rbf', gamma='auto', C=1)
 
         #viene addestrato
         svm = model.fit(self.X_train, self.y_train)
@@ -44,7 +45,7 @@ def plot_roc_curve(y_test, y_test_score):
     plt.plot([0, 1], [0, 1], 'k--')  # random predictions curve
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.0])
-    plt.xlabel('FAR')
+    plt.xlabel('SFAR')
     plt.ylabel('GAR')
     plt.title('Receiver Operating Characteristic')
     plt.legend(loc="lower right")
