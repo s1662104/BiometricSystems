@@ -149,11 +149,11 @@ class EyeBlink:
                     cv2.putText(frame, "Checking...", (0, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 165, 255), 3,
                                 cv2.LINE_AA)
 
-            cv2.imshow("Frame", frame)
-            cv2.waitKey(1)
+                cv2.imshow("Frame", frame)
+                cv2.waitKey(1)
 
             # if the `q` key was pressed, break from the loop
-        cap.release()
+        # cap.release()
         cv2.destroyAllWindows()
 
     # Il metodo sottostante value l'eye_aspect_ratio in questo modo:
