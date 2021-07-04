@@ -317,8 +317,8 @@ class Database:
         medicines = pd.read_csv("dataset_medicine.csv")
         len = medicines.shape[0]
         # fissa un numero randomico di farmaci
-        for i in range(randrange(len)):
-            rnd = randrange(1, len)
+        for i in range(randrange(1,len)):
+            rnd = randrange(len)
             m = medicines.loc[rnd]
             medicine = m['Nome'] + " " + m['Dosaggio']
             if medicine not in list:
