@@ -5,6 +5,8 @@ import AntiSpoofingTrainingEvaluation
 import LBP
 from MicroTextureSplitting import MicroTextureSplitting
 
+import matplotlib.pyplot as plt
+from mlxtend.plotting import plot_decision_regions
 dim_image = 64
 
 

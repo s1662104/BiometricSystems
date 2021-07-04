@@ -121,7 +121,7 @@ class EyeBlink:
                 ret, frame = cap.read()
                 # viene richiamata la funzione che va ad analizzare ogni singolo per vedere se ci è stato
                 # un eyeblink o meno
-                eyedetect, TOTAL, COUNTER, ear_top = self.eye_blink_cam(self, frame, ret, detector, predictor,
+                eyedetect, TOTAL, COUNTER, ear_top = self.eye_blink_cam(frame, ret, detector, predictor,
                                                                         COUNTER, TOTAL, ear_top)
 
                 # history è una cronologia degli stati dell'occhio che vengono presi da ogni frame, può essere usata per
