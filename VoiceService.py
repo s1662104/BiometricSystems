@@ -43,7 +43,6 @@ class VocalPages:
         self.voice.speech_synthesis(config.choice1)
         self.voice.speech_synthesis(config.choice2)
         choice = self.voice.speech_recognize()
-        print(choice.__contains__(config.choice1))
         if choice.__contains__(config.choice1.lower()):
             print("L'UTENTE HA SCELTO:",config.choice1)
             self.page.get_pages()[Pages.StartPage].button1.invoke()
