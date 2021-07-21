@@ -5,7 +5,7 @@ import cv2
 import os
 import shutil
 
-import Main
+import Pages
 
 
 # Viene creato il dataset per eyeblink, suddividendo e copiando i video in Real e Fake.

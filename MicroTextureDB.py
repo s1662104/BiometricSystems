@@ -1,5 +1,5 @@
 # Classe usata per realizzare il DB realizzato da noi
-import Main
+import Pages
 import cv2
 
 
@@ -20,7 +20,7 @@ class Database:
         else:
             count = c
         while True:
-            crop = Main.videoCapture()
+            crop = Pages.videoCapture()
             cv2.imwrite(dir + str(count) + ".jpg", crop)
             count += 1
 

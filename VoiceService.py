@@ -2,7 +2,7 @@ import speech_recognition as sr
 import pyttsx3
 import tkinter as tk
 import config
-
+import Pages
 
 class Voice:
     def __init__(self):
@@ -16,6 +16,7 @@ class Voice:
     def speech_recognize(self):
         with sr.Microphone() as source:
             self.recognizer_instance.adjust_for_ambient_noise(source)
+            # TODO: DARE UN FEEDBACK SU QUANDO INIZIARE A PARLARE E QUANDO NON STA PIU' ASCOLTANDO
             print("Sono in ascolto... parla pure!")
             audio = self.recognizer_instance.listen(source)
             print("Ok! sto ora elaborando il messaggio!")
@@ -32,8 +33,8 @@ class Voice:
         self.synthesis.runAndWait()
 
 
-class VocalMain:
-    def __init__(self, page: tk.Tk):
+class VocalPages:
+    def __init__(self, page: Pages.Page):
         self.page = page
         self.voice = Voice()
 
@@ -45,8 +46,10 @@ class VocalMain:
         print(choice.__contains__(config.choice1))
         if choice.__contains__(config.choice1.lower()):
             print("L'UTENTE HA SCELTO:",config.choice1)
+            self.page.get_pages()[Pages.StartPage].button1.invoke()
         elif choice.__contains__(config.choice2):
             print("L'UTENTE HA SCELTO:",config.choice1)
+            self.page.get_pages()[Pages.StartPage].button2.invoke()
         else:
             print("ERRORE")
 
