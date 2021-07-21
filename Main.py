@@ -9,27 +9,13 @@ import numpy as np
 import pandas as pd
 import ast
 from datetime import date
+import threading
 from LBP import Local_Binary_Pattern
 
 from EyeBlink import EyeBlink
 from MicroTexture import MicroTexture
-
-messageCF = "Inserire codice fiscale: "
-messageError = "Input non valido"
-messageN = "Inserire nome: "
-choice1 = "Registrazione"
-choice2 = "Prelievo Farmaci"
-messageWelcome = "Benvenuto\n Che operazione desideri svolgere?"
-numberMedicines = "Quanti farmaci assumi?"
-numberDelegate = "A chi vuoi delegare il prelievo di farmaci?"
-enrollmentCompleted = "REGISTRAZIONE COMPLETATA!"
-recognitionRejected = "UTENTE NON RICONOSCIUTO"
-messageRecognition = "Chi sei?"
-recognitionChoice1 = "Paziente"
-recognitionChoice2 = "Delegato"
-spoofingMessage = "ANTISPOOFING ERROR!\n L'UTENTE NON SEMBRA ESSERE REALE!"
-messageMedicineError = "Inserisci i farmaci"
-messageDelegateError = "Inserisci i codici fiscali corretti dei tuoi delegati"
+import config
+from VoiceService import VocalMain
 
 dim_image = 64
 number_maximum_delegate = 3
@@ -75,11 +61,11 @@ class Page(tk.Tk):
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text=messageWelcome)
+        label = tk.Label(self, text=config.messageWelcome)
         label.pack(pady=10, padx=50)
-        button1 = tk.Button(self, text=choice1, width=15, height=2, bg='#1E79FA',
+        button1 = tk.Button(self, text=config.choice1, width=15, height=2, bg='#1E79FA',
                             command=lambda: goToEnroll())
-        button2 = tk.Button(self, text=choice2, width=15, height=2, bg='#1E79FA',
+        button2 = tk.Button(self, text=config.choice2, width=15, height=2, bg='#1E79FA',
                             command=lambda: goToRecognize())
         button1.pack()
         button2.pack(pady=1)
@@ -98,21 +84,21 @@ class StartPage(tk.Frame):
 class EnrollmentPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text=choice1)
+        label = tk.Label(self, text=config.choice1)
         label.pack(pady=10, padx=10)
 
         self.entryCF = tk.Entry(self)
-        self.entryCF.insert(1, messageCF)
+        self.entryCF.insert(1, config.messageCF)
         self.entryCF.pack(pady=2)
         self.entryName = tk.Entry(self)
-        self.entryName.insert(1, messageN)
+        self.entryName.insert(1, config.messageN)
         self.entryName.pack(pady=2)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
                             command=lambda: check_input(controller, self.entryCF.get(), labelError, 0, None,
                                                         self.entryName.get()))
         button2.pack()
 
-        labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
+        labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
@@ -122,20 +108,20 @@ class EnrollmentPage(tk.Frame):
     # reset dei campi della pagina
     def reset(self):
         self.entryCF.delete(0, tk.END)
-        self.entryCF.insert(0, messageCF)
+        self.entryCF.insert(0, config.messageCF)
         self.entryName.delete(0, tk.END)
-        self.entryName.insert(0, messageN)
+        self.entryName.insert(0, config.messageN)
 
 
 # Qui l'utente deve scegliere se essere riconosciuto paziente o come delegato
 class RecognitionChoicePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text=messageRecognition)
+        label = tk.Label(self, text=config.messageRecognition)
         label.pack(pady=10, padx=50)
-        button1 = tk.Button(self, text=recognitionChoice1, width=15, height=2, bg='#1E79FA',
+        button1 = tk.Button(self, text=config.recognitionChoice1, width=15, height=2, bg='#1E79FA',
                             command=lambda: confirm(0))
-        button2 = tk.Button(self, text=recognitionChoice2, width=15, height=2, bg='#1E79FA',
+        button2 = tk.Button(self, text=config.recognitionChoice2, width=15, height=2, bg='#1E79FA',
                             command=lambda: confirm(1))
         button1.pack()
         button2.pack(pady=1)
@@ -154,19 +140,19 @@ class RecognitionChoicePage(tk.Frame):
 class RecognitionPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text=choice2)
+        label = tk.Label(self, text=config.choice2)
         label.pack(pady=10, padx=10)
 
         self.role = 0
 
         self.entryCF = tk.Entry(self)
-        self.entryCF.insert(1, messageCF)
+        self.entryCF.insert(1, config.messageCF)
         self.entryCF.pack(padx=0, pady=0)
         button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
                             command=lambda: check_input(controller, self.entryCF.get(), labelError, 1, self.role))
         button2.pack()
 
-        labelError = tk.Label(self, text=messageError, fg="#f0f0f0")
+        labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
@@ -175,7 +161,7 @@ class RecognitionPage(tk.Frame):
     # reset della pagina
     def reset(self):
         self.entryCF.delete(0, tk.END)
-        self.entryCF.insert(0, messageCF)
+        self.entryCF.insert(0, config.messageCF)
 
     # aggiornamento della pagina
     def update_data(self, role):
@@ -210,7 +196,7 @@ class DataEnrollmentPage(DataPage):
 
         self.patient.destroy()
 
-        labelDelegate = tk.Label(self, text=numberDelegate)
+        labelDelegate = tk.Label(self, text=config.numberDelegate)
         labelDelegate.pack()
         self.delegateEntry = []
         for n in range(number_maximum_delegate):
@@ -220,7 +206,7 @@ class DataEnrollmentPage(DataPage):
             self.delegateEntry.append(entryDelegate)
 
         self.medicineEntry = []
-        labelNMedicine = tk.Label(self, text=numberMedicines)
+        labelNMedicine = tk.Label(self, text=config.numberMedicines)
         labelNMedicine.pack()
         self.entryNMedicine = tk.Entry(self)
         self.entryNMedicine.insert(1, "")
@@ -292,7 +278,7 @@ class DataEnrollmentPage(DataPage):
                     break
         # allora mostra un messaggio di errore
         if medicineError:
-            messagebox.showerror(title="Errore", message=messageMedicineError)
+            messagebox.showerror(title="Errore", message=config.messageMedicineError)
         else:
             delegatesError = False
             delegates = []
@@ -307,7 +293,7 @@ class DataEnrollmentPage(DataPage):
                         delegates.append(delegate.get())
             # altrimenti mostra un messaggio d'errore
             if delegatesError:
-                messagebox.showerror(title="Errore", message=messageDelegateError)
+                messagebox.showerror(title="Errore", message=config.messageDelegateError)
             else:
                 medicines = []
                 # ottiene la lista delle medicine
@@ -315,7 +301,8 @@ class DataEnrollmentPage(DataPage):
                     medicines.append(medicine.get())
                 # aggiunge l'utente al sistema
                 addUser(self.photo, self.cf.cget("text")[16:], self.name.cget("text")[6:], medicines, delegates)
-                list(controller.frames.values())[pages.InformationPage.value - 1].update_data(enrollmentCompleted)
+                list(controller.frames.values())[pages.InformationPage.value - 1].update_data(
+                    config.enrollmentCompleted)
                 controller.show_frame(InformationPage)
 
 
@@ -361,12 +348,13 @@ class DataRecognitionPage(DataPage):
             list(controller.frames.values())[pages.UserPage.value - 1].reset()
             list(controller.frames.values())[pages.UserPage.value - 1].update_data(index, user["User"], patient["User"],
                                                                                    patient["Codice Fiscale"],
-                                                                                   patient["Delegati"], patient["Farmaci"],
+                                                                                   patient["Delegati"],
+                                                                                   patient["Farmaci"],
                                                                                    patient["Data"],
                                                                                    self.panel.image)
             controller.show_frame(UserPage)
         else:
-            list(controller.frames.values())[pages.InformationPage.value - 1].update_data(recognitionRejected)
+            list(controller.frames.values())[pages.InformationPage.value - 1].update_data(config.recognitionRejected)
             controller.show_frame(InformationPage)
 
     # ritorna alla pagina precedente
@@ -480,7 +468,7 @@ class UserPage(DataPage):
 
 # funziona chiamata da EnrollmentPage e RecognitionPage per verificare se l'input fornito e' corretto
 def check_input(controller, cf, label_error, op, role=None, name=None):
-    if not isCF(cf) or cf == messageCF or (name is not None and name == messageN):
+    if not isCF(cf) or cf == config.messageCF or (name is not None and name == config.messageN):
         print("? Errore")
         label_error.configure(fg="red")
         return
@@ -516,17 +504,17 @@ def check_input(controller, cf, label_error, op, role=None, name=None):
                                                             crop, role)
             controller.show_frame(DataRecognitionPage)
     else:
-        list(controller.frames.values())[pages.InformationPage.value - 1].update_data(spoofingMessage)
+        list(controller.frames.values())[pages.InformationPage.value - 1].update_data(config.spoofingMessage)
         controller.show_frame(InformationPage)
 
 
 # ritorna alla pagina precedente
 def back(controller, entryCF, labelError, entryName=None):
     entryCF.delete(0, tk.END)
-    entryCF.insert(0, messageCF)
+    entryCF.insert(0, config.messageCF)
     if entryName is not None:
         entryName.delete(0, tk.END)
-        entryName.insert(0, messageN)
+        entryName.insert(0, config.messageN)
     labelError.configure(fg="#f0f0f0")
     if entryName is not None:
         controller.show_frame(StartPage)
@@ -670,11 +658,16 @@ def isCF(cf):
     return any(i.isdigit() for i in cf)
 
 
-# main
-def main():
-    app = Page()
-    app.geometry('300x550')
+def main(app: Page):
     app.mainloop()
 
+
+
+
 if __name__ == '__main__':
-    main()
+    app = Page()
+    app.geometry('300x550')
+    vocal_app = VocalMain(app)
+    threading.Thread(target=vocal_app.startPage).start()
+    threading.Thread(target=main(app)).start()
+

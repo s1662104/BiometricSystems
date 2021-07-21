@@ -1,5 +1,7 @@
 import speech_recognition as sr
 import pyttsx3
+import tkinter as tk
+import config
 
 
 class Voice:
@@ -17,17 +19,36 @@ class Voice:
             print("Sono in ascolto... parla pure!")
             audio = self.recognizer_instance.listen(source)
             print("Ok! sto ora elaborando il messaggio!")
+            text = None
         try:
             text = self.recognizer_instance.recognize_google(audio, language="it-IT")
             print("Google ha capito: \n", text)
-            return text
         except Exception as e:
             print(e)
-            return None
+        return text
 
     def speech_synthesis(self, text):
         self.synthesis.say(text)
         self.synthesis.runAndWait()
+
+
+class VocalMain:
+    def __init__(self, page: tk.Tk):
+        self.page = page
+        self.voice = Voice()
+
+    def startPage(self):
+        self.voice.speech_synthesis(config.messageWelcome.replace("desideri","desidéri"))
+        self.voice.speech_synthesis(config.choice1)
+        self.voice.speech_synthesis(config.choice2)
+        choice = self.voice.speech_recognize()
+        print(choice.__contains__(config.choice1))
+        if choice.__contains__(config.choice1.lower()):
+            print("L'UTENTE HA SCELTO:",config.choice1)
+        elif choice.__contains__(config.choice2):
+            print("L'UTENTE HA SCELTO:",config.choice1)
+        else:
+            print("ERRORE")
 
 
 if __name__ == '__main__':
