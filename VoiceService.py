@@ -3,8 +3,11 @@ import pyttsx3
 import tkinter as tk
 import config
 import Pages
+from difflib import SequenceMatcher
+
 
 class Voice:
+
     def __init__(self):
         self.recognizer_instance = sr.Recognizer()  # Crea una istanza del recognizer
         self.synthesis = pyttsx3.init()
@@ -12,6 +15,7 @@ class Voice:
         self.synthesis.setProperty('voice', voices[0].id)
         newVoiceRate = 120
         self.synthesis.setProperty('rate', newVoiceRate)
+        self.threshold = 0.8
 
     def speech_recognize(self):
         with sr.Microphone() as source:
@@ -32,28 +36,51 @@ class Voice:
         self.synthesis.say(text)
         self.synthesis.runAndWait()
 
+    def compare_strings(self, string1, string2):
+        return SequenceMatcher(None, string1, string2).ratio() >= self.threshold
+
 
 class VocalPages:
     def __init__(self, page: Pages.Page):
         self.page = page
         self.voice = Voice()
 
-    def startPage(self):
-        self.voice.speech_synthesis(config.messageWelcome.replace("desideri","desidéri"))
-        self.voice.speech_synthesis(config.choice1)
-        self.voice.speech_synthesis(config.choice2)
+    def start_page(self):
+        self.voice.speech_synthesis(config.messageWelcome.replace("desideri", "desidéri") + " " + config.choice1 + " " +
+                                    config.choice2)
         choice = self.voice.speech_recognize()
-        if choice.__contains__(config.choice1.lower()):
-            print("L'UTENTE HA SCELTO:",config.choice1)
+        if self.voice.compare_strings(choice,config.choice1.lower()):
+            print("L'UTENTE HA SCELTO:", config.choice1)
             self.page.get_pages()[Pages.StartPage].button1.invoke()
-        elif choice.__contains__(config.choice2):
-            print("L'UTENTE HA SCELTO:",config.choice1)
+            self.enroll_page()
+        elif self.voice.compare_strings(choice,config.choice1.lower()):
+            print("L'UTENTE HA SCELTO:", config.choice1)
             self.page.get_pages()[Pages.StartPage].button2.invoke()
         else:
             print("ERRORE")
 
+    def enroll_page(self):
+        self.voice.speech_synthesis(config.messageCF+"\n Ricorda di fare lo spelling e di dire una parola alla volta")
+        count = 0
+        cf = ""
+        while count < 5:
+            text = self.voice.speech_recognize()
+            words = text.split(" ")
+            for w in words:
+                if w.isdigit():
+                    cf += w
+                    count += len(w)
+                else:
+                    cf += w.upper()[0]
+                    count += 1
+        self.page.get_pages()[Pages.EnrollmentPage].entryCF.delete(0, tk.END)
+        self.page.get_pages()[Pages.EnrollmentPage].entryCF.insert(0, cf)
+
+
 
 if __name__ == '__main__':
-    voice = Voice()
-    voice.speech_recognize()
-    voice.speech_synthesis("Prova?")
+    # voice = Voice()
+    # voice.speech_recognize()
+    # voice.speech_synthesis("Prova?")
+    vp = VocalPages(None)
+    vp.enroll_page()
