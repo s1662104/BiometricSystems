@@ -121,12 +121,12 @@ class RecognitionChoicePage(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text=config.messageRecognition)
         label.pack(pady=10, padx=50)
-        button1 = tk.Button(self, text=config.recognitionChoice1, width=15, height=2, bg='#1E79FA',
+        self.button1 = tk.Button(self, text=config.recognitionChoice1, width=15, height=2, bg='#1E79FA',
                             command=lambda: confirm(0))
-        button2 = tk.Button(self, text=config.recognitionChoice2, width=15, height=2, bg='#1E79FA',
+        self.button2 = tk.Button(self, text=config.recognitionChoice2, width=15, height=2, bg='#1E79FA',
                             command=lambda: confirm(1))
-        button1.pack()
-        button2.pack(pady=1)
+        self.button1.pack()
+        self.button2.pack(pady=1)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: controller.show_frame(StartPage)).place(y=520, x=2)

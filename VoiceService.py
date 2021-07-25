@@ -60,13 +60,13 @@ class VocalPages:
                                     config.choice2)
         choice = self.voice.speech_recognize()
         if self.voice.compare_strings(choice,config.choice1.lower()):
-            print("L'UTENTE HA SCELTO:", config.choice1)
             self.voice.speech_synthesis("Operazione scelta "+config.choice1)
             self.page.get_pages()[Pages.StartPage].button1.invoke()
             self.enroll_page_CF()
         elif self.voice.compare_strings(choice,config.choice2.lower()):
-            print("L'UTENTE HA SCELTO:", config.choice2)
+            self.voice.speech_synthesis("Operazione scelta " + config.choice2)
             self.page.get_pages()[Pages.StartPage].button2.invoke()
+            self.recognition_choice_page()
         else:
             self.voice.speech_synthesis("Scegli tra: "+config.choice1 + " " +config.choice2)
             self.start_page(True)
@@ -134,7 +134,18 @@ class VocalPages:
         self.start_page()
 
     def recognition_choice_page(self):
-        pass
+        self.voice.speech_synthesis(config.messageRecognition+" "+config.recognitionChoice1+" "+
+                                    config.recognitionChoice2)
+        text = self.voice.speech_recognize()
+        if self.voice.compare_strings(text,config.recognitionChoice1.lower()):
+            self.voice.speech_synthesis("Ruolo scelto: "+config.recognitionChoice1)
+            self.page.get_pages()[Pages.RecognitionChoicePage].button1.invoke()
+        elif self.voice.compare_strings(text,config.recognitionChoice2.lower()):
+            self.voice.speech_synthesis("Ruolo scelto: " + config.recognitionChoice2)
+            self.page.get_pages()[Pages.RecognitionChoicePage].button2.invoke()
+        else:
+            self.voice.speech_synthesis("Scegli tra: "+config.choice1 + " " +config.choice2)
+            self.start_page(True)
 
     def check_name(self,text,  repeat= False):
         if not repeat:
