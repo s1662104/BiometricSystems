@@ -25,7 +25,9 @@ class Voice:
         with sr.Microphone() as source:
             self.recognizer_instance.adjust_for_ambient_noise(source)
             if higher_pause:
-                self.recognizer_instance.pause_threshold = 4.0
+                self.recognizer_instance.pause_threshold = 3.0
+            else:
+                self.recognizer_instance.pause_threshold = 2.0
             # TODO: DARE UN FEEDBACK SU QUANDO INIZIARE A PARLARE E QUANDO NON STA PIU' ASCOLTANDO
             print("Sono in ascolto... parla pure!")
             audio = self.recognizer_instance.listen(source)
@@ -78,11 +80,7 @@ class VocalPages:
             text = self.voice.speech_recognize(True)
             cf += self.spelling(text)
         self.voice.speech_synthesis(config.confirmCF)
-        for c in cf:
-            if c.isalpha():
-                self.voice.speech_synthesis(spell[c])
-            else:
-                self.voice.speech_synthesis(c)
+        self.read_cf(cf)
         self.voice.speech_synthesis(config.confirm)
         if self.confirm():
             self.page.get_pages()[Pages.EnrollmentPage].entryCF.delete(0, tk.END)
@@ -113,8 +111,25 @@ class VocalPages:
             self.page.get_pages()[Pages.EnrollmentPage].invio.invoke()
             self.data_enrollment_page()
 
+    # TODO DA SOSTITUIRE
     def data_enrollment_page(self):
-        print("I'm here")
+        self.page.get_pages()[Pages.DataEnrollmentPage].entryNMedicine.delete(0, tk.END)
+        self.page.get_pages()[Pages.DataEnrollmentPage].entryNMedicine.insert(0, 1)
+        self.page.get_pages()[Pages.DataEnrollmentPage].buttonInvia.invoke()
+        self.page.get_pages()[Pages.DataEnrollmentPage].medicineEntry[0].insert(0, "Prefolic 15 mg")
+        count = 0
+        while count < 1000:
+            count += 1
+        self.page.get_pages()[Pages.DataEnrollmentPage].buttonConferma.invoke()
+        self.information_page(config.enrollmentCompleted)
+
+    def information_page(self, info):
+        self.voice.speech_synthesis(info)
+        count = 0
+        while count < 10000000:
+            count += 1
+        self.page.get_pages()[Pages.InformationPage].homeButton.invoke()
+        self.start_page()
 
     def check_name(self,text,  repeat= False):
         if not repeat:
@@ -156,6 +171,12 @@ class VocalPages:
         print(text)
         return self.voice.compare_strings(text, config.yes.lower())
 
+    def read_cf(self, cf):
+        for c in cf:
+            if c.isalpha():
+                self.voice.speech_synthesis(spell[c])
+            else:
+                self.voice.speech_synthesis(c)
 
 if __name__ == '__main__':
     voice = Voice()
