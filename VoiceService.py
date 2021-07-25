@@ -64,8 +64,8 @@ class VocalPages:
             self.voice.speech_synthesis("Operazione scelta "+config.choice1)
             self.page.get_pages()[Pages.StartPage].button1.invoke()
             self.enroll_page_CF()
-        elif self.voice.compare_strings(choice,config.choice1.lower()):
-            print("L'UTENTE HA SCELTO:", config.choice1)
+        elif self.voice.compare_strings(choice,config.choice2.lower()):
+            print("L'UTENTE HA SCELTO:", config.choice2)
             self.page.get_pages()[Pages.StartPage].button2.invoke()
         else:
             self.voice.speech_synthesis("Scegli tra: "+config.choice1 + " " +config.choice2)
@@ -133,6 +133,9 @@ class VocalPages:
         self.page.get_pages()[Pages.InformationPage].homeButton.invoke()
         self.start_page()
 
+    def recognition_choice_page(self):
+        pass
+
     def check_name(self,text,  repeat= False):
         if not repeat:
             self.voice.speech_synthesis(config.errorFirstName + " " + text)
@@ -182,5 +185,6 @@ class VocalPages:
 
 if __name__ == '__main__':
     voice = Voice()
-    voice.speech_recognize()
+    text = voice.speech_recognize()
+
     # voice.speech_synthesis("Prova?")
