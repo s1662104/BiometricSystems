@@ -54,8 +54,9 @@ class VocalPages:
         self.page = page
         self.voice = Voice()
 
-    def start_page(self):
-        self.voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " +
+    def start_page(self, repeat=False):
+        if not repeat:
+            self.voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " +
                                     config.choice2)
         choice = self.voice.speech_recognize()
         if self.voice.compare_strings(choice,config.choice1.lower()):
@@ -67,7 +68,8 @@ class VocalPages:
             print("L'UTENTE HA SCELTO:", config.choice1)
             self.page.get_pages()[Pages.StartPage].button2.invoke()
         else:
-            print("ERRORE")
+            self.voice.speech_synthesis("Scegli tra: "+config.choice1 + " " +config.choice2)
+            self.start_page(True)
 
     def enroll_page_CF(self, first_time=True):
         if first_time:
