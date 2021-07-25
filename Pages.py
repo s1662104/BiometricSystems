@@ -94,17 +94,17 @@ class EnrollmentPage(tk.Frame):
         self.entryName = tk.Entry(self)
         self.entryName.insert(1, config.messageN)
         self.entryName.pack(pady=2)
-        button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+        self.invio = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
                             command=lambda: check_input(controller, self.entryCF.get(), labelError, 0, None,
                                                         self.entryName.get()))
-        button2.pack()
+        self.invio.pack()
 
         labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
-        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, self.entryCF, labelError, self.entryName)).pack(side="left",
-                                                                                                   pady=300)
+        self.back = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                  command=lambda: back(controller, self.entryCF, labelError, self.entryName))
+        self.back.pack(side="left",pady=300)
 
     # reset dei campi della pagina
     def reset(self):
@@ -484,8 +484,8 @@ def check_input(controller, cf, label_error, op, role=None, name=None):
     # l'utente deve passare entrambi i test di anti-spoofing
     if not EyeBlink(None).eyeBlinkStart():
         user = False
-    elif not MicroTexture().microTextureCam():
-        user = False
+    # elif not MicroTexture().microTextureCam():
+    #     user = False
     else:
         user = True
     # Fine parte antispoofing in fase di matching
