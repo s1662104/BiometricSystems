@@ -21,9 +21,11 @@ class Voice:
         self.synthesis.setProperty('rate', newVoiceRate)
         self.threshold = 0.8
 
-    def speech_recognize(self):
+    def speech_recognize(self, higher_pause=False):
         with sr.Microphone() as source:
             self.recognizer_instance.adjust_for_ambient_noise(source)
+            if higher_pause:
+                self.recognizer_instance.pause_threshold = 4.0
             # TODO: DARE UN FEEDBACK SU QUANDO INIZIARE A PARLARE E QUANDO NON STA PIU' ASCOLTANDO
             print("Sono in ascolto... parla pure!")
             audio = self.recognizer_instance.listen(source)
@@ -73,7 +75,7 @@ class VocalPages:
             self.voice.speech_synthesis(config.messageCF)
         cf = ""
         while len(cf) < 16:
-            text = self.voice.speech_recognize()
+            text = self.voice.speech_recognize(True)
             cf += self.spelling(text)
         self.voice.speech_synthesis(config.confirmCF)
         for c in cf:
@@ -123,7 +125,7 @@ class VocalPages:
                 return self.check_name(text,True)
         else:
             self.voice.speech_synthesis(config.errorSpelling)
-            nameSpelled = self.voice.speech_recognize()
+            nameSpelled = self.voice.speech_recognize(True)
             name = self.spelling(nameSpelled, True)
             print(name)
             self.voice.speech_synthesis(name+" "+config.confirm)
