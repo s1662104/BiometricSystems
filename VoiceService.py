@@ -76,7 +76,8 @@ class VocalPages:
         self.page.get_pages()[Pages.EnrollmentPage].entryCF.delete(0, tk.END)
         self.page.get_pages()[Pages.EnrollmentPage].entryCF.insert(0, cf)
 
-
+    def data_enrollment_page(self):
+        self.voice.speech_synthesis(config.numberDelegate)
 
 if __name__ == '__main__':
     # voice = Voice()
