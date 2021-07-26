@@ -48,6 +48,7 @@ class Page(tk.Tk):
         # pagina n, si indicizza a pages.NOME_PAGINA.value - 1 (-1 perche' gli indici partono da 1)
         pages = Enum("pages", pageNames)
 
+        self.current_page = StartPage
         self.show_frame(StartPage)
 
     def show_frame(self, cont):
@@ -94,17 +95,17 @@ class EnrollmentPage(tk.Frame):
         self.entryName = tk.Entry(self)
         self.entryName.insert(1, config.messageN)
         self.entryName.pack(pady=2)
-        button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+        self.invio = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
                             command=lambda: check_input(controller, self.entryCF.get(), labelError, 0, None,
                                                         self.entryName.get()))
-        button2.pack()
+        self.invio.pack()
 
         labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
-        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, self.entryCF, labelError, self.entryName)).pack(side="left",
-                                                                                                   pady=300)
+        self.back = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                  command=lambda: back(controller, self.entryCF, labelError, self.entryName))
+        self.back.pack(side="left",pady=300)
 
     # reset dei campi della pagina
     def reset(self):
@@ -120,12 +121,12 @@ class RecognitionChoicePage(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text=config.messageRecognition)
         label.pack(pady=10, padx=50)
-        button1 = tk.Button(self, text=config.recognitionChoice1, width=15, height=2, bg='#1E79FA',
+        self.button1 = tk.Button(self, text=config.recognitionChoice1, width=15, height=2, bg='#1E79FA',
                             command=lambda: confirm(0))
-        button2 = tk.Button(self, text=config.recognitionChoice2, width=15, height=2, bg='#1E79FA',
+        self.button2 = tk.Button(self, text=config.recognitionChoice2, width=15, height=2, bg='#1E79FA',
                             command=lambda: confirm(1))
-        button1.pack()
-        button2.pack(pady=1)
+        self.button1.pack()
+        self.button2.pack(pady=1)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: controller.show_frame(StartPage)).place(y=520, x=2)
@@ -212,12 +213,13 @@ class DataEnrollmentPage(DataPage):
         self.entryNMedicine = tk.Entry(self)
         self.entryNMedicine.insert(1, "")
         self.entryNMedicine.pack(padx=0, pady=0)
-        button = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+        self.buttonInvia = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
                            command=lambda: self.addMedicines(self.entryNMedicine.get()))
-        button.pack()
+        self.buttonInvia.pack()
 
-        tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
-                  command=lambda: self.confirm(controller)).place(y=520, x=220)
+        self.buttonConferma = tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
+                  command=lambda: self.confirm(controller))
+        self.buttonConferma.place(y=520, x=220)
 
         tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                   command=lambda: self.back(controller)).place(y=520, x=2)
@@ -370,8 +372,9 @@ class InformationPage(tk.Frame):
         self.label = tk.Label(self, text="")
         self.label.pack(pady=200)
 
-        tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
-                  command=lambda: controller.show_frame(StartPage)).place(y=520, x=110)
+        self.homeButton = tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
+                  command=lambda: controller.show_frame(StartPage))
+        self.homeButton.place(y=520, x=110)
 
     def update_data(self, info):
         self.label.config(text=info)
@@ -484,8 +487,8 @@ def check_input(controller, cf, label_error, op, role=None, name=None):
     # l'utente deve passare entrambi i test di anti-spoofing
     if not EyeBlink(None).eyeBlinkStart():
         user = False
-    elif not MicroTexture().microTextureCam():
-        user = False
+    # elif not MicroTexture().microTextureCam():
+    #     user = False
     else:
         user = True
     # Fine parte antispoofing in fase di matching
