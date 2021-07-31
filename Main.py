@@ -2,7 +2,6 @@ from Pages import Page
 from VoiceService import VocalPages
 import threading
 
-
 if __name__ == '__main__':
     app = Page()
     app.geometry('300x550')
