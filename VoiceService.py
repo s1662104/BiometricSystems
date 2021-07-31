@@ -60,7 +60,7 @@ class VocalPages:
     def start_page(self, repeat=False):
         if not repeat:
             self.voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " + config.choice2)
-            time.sleep(18)
+            # time.sleep(18)
         choice = self.voice.speech_recognize()
         if self.voice.compare_strings(choice,config.choice1.lower()):
             self.voice.speech_synthesis("Operazione scelta "+config.choice1)
@@ -74,13 +74,20 @@ class VocalPages:
             self.voice.speech_synthesis("Scegli tra: "+config.choice1 + " " +config.choice2)
             self.start_page(True)
 
-    def enroll_page_CF(self, first_time=True):
+    def enroll_page_CF(self):
+        cf = self.page_CF(False)
+        self.page.get_pages()[Pages.EnrollmentPage].entryCF.delete(0, tk.END)
+        self.page.get_pages()[Pages.EnrollmentPage].entryCF.insert(0, cf)
+        self.enroll_page_name()
+
+    def page_CF(self, first_time=True):
         if first_time:
             self.voice.speech_synthesis(config.messageCF+"\n Ricorda di fare lo spelling e di "
                                                          "dire una parola alla volta")
         else:
             self.voice.speech_synthesis(config.messageCF)
         cf = ""
+        # TODO CONTROLLO SULLA LUNGHEZZA DEL CF
         while len(cf) < 16:
             text = self.voice.speech_recognize(True)
             cf += self.spelling(text)
@@ -88,11 +95,9 @@ class VocalPages:
         self.read_cf(cf)
         self.voice.speech_synthesis(config.confirm)
         if self.confirm():
-            self.page.get_pages()[Pages.EnrollmentPage].entryCF.delete(0, tk.END)
-            self.page.get_pages()[Pages.EnrollmentPage].entryCF.insert(0, cf)
-            self.enroll_page_name()
+            return cf
         else:
-            self.enroll_page_CF(False)
+            return self.page_CF(False)
 
     def enroll_page_name(self):
         # si divide tra nome e cognome per riconoscere correttamente i casi di doppi nomi e cognomi composti
@@ -161,18 +166,42 @@ class VocalPages:
         self.start_page()
 
     def recognition_choice_page(self):
-        self.voice.speech_synthesis(config.messageRecognition+" "+config.recognitionChoice1+" "+
+        self.voice.speech_synthesis("Scegli tra "+" "+config.recognitionChoice1+" "+
                                     config.recognitionChoice2)
         text = self.voice.speech_recognize()
         if self.voice.compare_strings(text,config.recognitionChoice1.lower()):
             self.voice.speech_synthesis("Ruolo scelto: "+config.recognitionChoice1)
             self.page.get_pages()[Pages.RecognitionChoicePage].button1.invoke()
+            self.recognition_page()
         elif self.voice.compare_strings(text,config.recognitionChoice2.lower()):
             self.voice.speech_synthesis("Ruolo scelto: " + config.recognitionChoice2)
             self.page.get_pages()[Pages.RecognitionChoicePage].button2.invoke()
+            self.recognition_page()
         else:
-            self.voice.speech_synthesis("Scegli tra: "+config.choice1 + " " +config.choice2)
-            self.start_page(True)
+            self.recognition_choice_page()
+
+    def recognition_page(self):
+        cf = self.page_CF()
+        self.page.get_pages()[Pages.RecognitionPage].entryCF.delete(0, tk.END)
+        self.page.get_pages()[Pages.RecognitionPage].entryCF.insert(0, cf)
+        self.voice.speech_synthesis(config.messagePhoto)
+        self.page.get_pages()[Pages.RecognitionPage].buttonInvia.invoke()
+        self.data_recognition_page()
+
+    def data_recognition_page(self):
+        cf = self.page.get_pages()[Pages.DataRecognitionPage].cf.cget("text").split("CODICE FISCALE: ")[1]
+        self.voice.speech_synthesis(config.confirmCF)
+        self.read_cf(cf)
+        self.voice.speech_synthesis(config.confirm)
+        if self.confirm():
+            self.page.get_pages()[Pages.DataRecognitionPage].buttonConferma.invoke()
+            self.user_page()
+        else:
+            self.page.get_pages()[Pages.DataRecognitionPage].buttonIndietro.invoke()
+            self.recognition_page()
+
+    def user_page(self):
+        print("LAST PAGE")
 
     def check_name(self,text,  repeat= False):
         if not repeat:

@@ -10,7 +10,7 @@ initialMessage = "Benvenuto \n questo è un sistema per la gestione dei farmaci 
 messageAfterStop = "Da ora in avanti non ti guiderò, ma puoi sempre riattivarmi dicendo Start"
 messageWelcome = "Benvenuto\n Che operazione desideri svolgere?"
 messagePhoto = "Adesso il sistema verificherà se sei un utente reale. \n Quando apparirà un quadrato verde intorno al" \
-               "tuo viso, premi Q per scattare una foto. \n Preparati, te ne chiederemo un po'. "
+               "tuo viso, premi Q per scattare una foto. "
 numberMedicines = "Quanti farmaci assumi?"
 numberDelegate = "A chi vuoi delegare il prelievo di farmaci?"
 enrollmentCompleted = "REGISTRAZIONE COMPLETATA!"

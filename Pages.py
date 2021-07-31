@@ -145,14 +145,15 @@ class RecognitionPage(tk.Frame):
         label = tk.Label(self, text=config.choice2)
         label.pack(pady=10, padx=10)
 
+        # paziente = 0, delegato = 1
         self.role = 0
 
         self.entryCF = tk.Entry(self)
         self.entryCF.insert(1, config.messageCF)
         self.entryCF.pack(padx=0, pady=0)
-        button2 = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+        self.buttonInvia = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
                             command=lambda: check_input(controller, self.entryCF.get(), labelError, 1, self.role))
-        button2.pack()
+        self.buttonInvia.pack()
 
         labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
@@ -318,11 +319,13 @@ class DataRecognitionPage(DataPage):
         self.patient.destroy()
         self.role = 0
 
-        tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
-                  command=lambda: self.confirm(controller)).place(y=520, x=220)
+        self.buttonConferma = tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
+                  command=lambda: self.confirm(controller))
+        self.buttonConferma.place(y=520, x=220)
 
-        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: self.back(controller)).place(y=520, x=2)
+        self.buttonIndietro = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                  command=lambda: self.back(controller))
+        self.buttonIndietro.place(y=520, x=2)
 
     # reset della pagina
     def reset(self):
@@ -662,4 +665,7 @@ def isCF(cf):
     return any(i.isdigit() for i in cf)
 
 
-
+if __name__ == '__main__':
+    app = Page()
+    app.geometry('300x550')
+    app.mainloop()
