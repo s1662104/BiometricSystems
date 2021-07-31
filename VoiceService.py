@@ -60,6 +60,7 @@ class VocalPages:
     def start_page(self, repeat=False):
         if not repeat:
             self.voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " + config.choice2)
+            time.sleep(18)
         choice = self.voice.speech_recognize()
         if self.voice.compare_strings(choice,config.choice1.lower()):
             self.voice.speech_synthesis("Operazione scelta "+config.choice1)
@@ -115,48 +116,40 @@ class VocalPages:
             self.page.get_pages()[Pages.EnrollmentPage].invio.invoke()
             self.data_enrollment_page()
 
-    # TODO DA SOSTITUIRE
     def data_enrollment_page(self):
-        num_medicines = 0
-        #self.page.get_pages()[Pages.DataEnrollmentPage].entryNMedicine.delete(0, tk.END)
-        #self.page.get_pages()[Pages.DataEnrollmentPage].entryNMedicine.insert(0, 1)
         self.voice.speech_synthesis(config.numberMedicines)
         num_string = self.voice.speech_recognize()
 
         if numbers.__contains__(num_string):
             num_medicines = numbers.__getitem__(num_string)
-        try:
-            num_medicines = int(num_string)
-        except Exception as e:
-            self.voice.speech_synthesis(config.messageError)
+        else:
+            try:
+                num_medicines = int(num_string)
+            except Exception as e:
+                self.voice.speech_synthesis(config.messageError)
+                return self.data_enrollment_page()
 
-        actualN = len(self.page.get_pages()[Pages.DataEnrollmentPage].medicineEntry)
-        if num_medicines > actualN:
-            n = num_medicines - actualN
-            for m in range(n):
-                entryMedicine = tk.Entry(self)
-                entryMedicine.insert(1, "")
-                entryMedicine.pack(pady=1, padx=30)
-                self.page.get_pages()[Pages.DataEnrollmentPage].medicineEntry.append(entryMedicine)
-        elif num_medicines < actualN:
-            n = actualN - num_medicines
-            for m in range(n):
-                entryMedicine = self.page.get_pages()[Pages.DataEnrollmentPage].medicineEntry[len(self.page.get_pages()[Pages.DataEnrollmentPage].medicineEntry) - 1]
-                entryMedicine.destroy()
-                self.page.get_pages()[Pages.DataEnrollmentPage].medicineEntry.pop()
+        self.page.get_pages()[Pages.DataEnrollmentPage].entryNMedicine.delete(0, tk.END)
+        self.page.get_pages()[Pages.DataEnrollmentPage].entryNMedicine.insert(0, num_medicines)
+        self.page.get_pages()[Pages.DataEnrollmentPage].buttonInvia.invoke()
+
+        # TODO DIRE NUMMERO FARMACI SCELTO E FORSE CONFERMA
 
         i = 0
         while i < num_medicines:
             self.voice.speech_synthesis(config.messageMedicine)
             entryMedicine = self.voice.speech_recognize()
+
+            # TODO CHIEDERE CONFERMA SUL NOME DEL FARMACO
+
             self.page.get_pages()[Pages.DataEnrollmentPage].medicineEntry[i].insert(0, entryMedicine)
             print(entryMedicine)
             i += 1
-        count = 0
-        while count < 1000:
-            count += 1
-        #self.page.get_pages()[Pages.DataEnrollmentPage].buttonConferma.invoke()
-        #self.information_page(config.enrollmentCompleted)
+
+        # TODO CHIEDERE CONFERMA SUI FARMACI APPENA INSERITI  E MODIFICARE IN CASO QUELLI INDICATI
+
+        self.page.get_pages()[Pages.DataEnrollmentPage].buttonConferma.invoke()
+        self.information_page(config.enrollmentCompleted)
 
 
     def information_page(self, info):
@@ -239,48 +232,3 @@ if __name__ == '__main__':
     #vocal_app = VocalPages(app)
     #task = threading.Thread(target=vocal_app.start_page)
     #task.start()
-    app.get_pages()[Pages.StartPage].button1.invoke()
-    app.get_pages()[Pages.EnrollmentPage].entryCF.delete(0, tk.END)
-    app.get_pages()[Pages.EnrollmentPage].entryCF.insert(0, "WHTCB78P26U522TH")
-    app.get_pages()[Pages.EnrollmentPage].entryName.delete(0, tk.END)
-    app.get_pages()[Pages.EnrollmentPage].entryName.insert(0, "Alessandro Mazzucchelli")
-    app.get_pages()[Pages.EnrollmentPage].invio.invoke()
-
-    num_medicines = 0
-    voice.speech_synthesis(config.numberMedicines)
-    num_string = voice.speech_recognize()
-
-    if numbers.__contains__(num_string):
-        num_medicines = numbers.__getitem__(num_string)
-    try:
-        num_medicines = int(num_string)
-    except Exception as e:
-        voice.speech_synthesis(config.messageError)
-
-    actualN = len(app.get_pages()[Pages.DataEnrollmentPage].medicineEntry)
-    if num_medicines > actualN:
-        n = num_medicines - actualN
-        for m in range(n):
-            entryMedicine = tk.Entry()
-            entryMedicine.insert(1, "")
-            entryMedicine.pack(pady=1, padx=30)
-            app.get_pages()[Pages.DataEnrollmentPage].medicineEntry.append(entryMedicine)
-    elif num_medicines < actualN:
-        n = actualN - num_medicines
-        for m in range(n):
-            entryMedicine = app.get_pages()[Pages.DataEnrollmentPage].medicineEntry[len(app.get_pages()[Pages.DataEnrollmentPage].medicineEntry) - 1]
-            entryMedicine.destroy()
-            app.get_pages()[Pages.DataEnrollmentPage].medicineEntry.pop()
-
-    i = 0
-    while i < num_medicines:
-        voice.speech_synthesis(config.messageMedicine)
-        entryMedicine = voice.speech_recognize()
-        app.get_pages()[Pages.DataEnrollmentPage].medicineEntry[i].insert(0, entryMedicine)
-        print(entryMedicine)
-        i += 1
-    count = 0
-    while count < 1000:
-        count += 1
-    #app.get_pages()[Pages.DataEnrollmentPage].buttonConferma.invoke()
-    app.mainloop()
