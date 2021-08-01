@@ -400,8 +400,9 @@ class UserPage(DataPage):
 
         self.entries = []
 
-        tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
-                  command=lambda: controller.show_frame(StartPage)).place(y=520, x=110)
+        self.homeButton = tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
+                  command=lambda: controller.show_frame(StartPage))
+        self.homeButton.place(y=520, x=110)
 
     # resetta la pagina
     def reset(self):

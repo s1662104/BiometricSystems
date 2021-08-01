@@ -18,8 +18,6 @@ class Voice:
     def __init__(self):
         self.recognizer_instance = sr.Recognizer()  # Crea una istanza del recognizer
         self.synthesis = pyttsx3.init()
-        #voices = self.synthesis.getProperty('voices')
-        #self.synthesis.setProperty('voice', voices[0].id)
         self.synthesis.setProperty('voice', 'com.apple.speech.synthesis.voice.alice')
         newVoiceRate = 140
         self.synthesis.setProperty('rate', newVoiceRate)
@@ -201,7 +199,33 @@ class VocalPages:
             self.recognition_page()
 
     def user_page(self):
-        print("LAST PAGE")
+        page = self.page.get_pages()[Pages.UserPage]
+        self.voice.speech_synthesis(page.name.cget("text"))
+        self.voice.speech_synthesis(page.patient.cget("text"))
+        self.voice.speech_synthesis("Codice fiscale: ")
+        self.read_cf(page.cf.cget("text").split("CODICE FISCALE: ")[1])
+        self.voice.speech_synthesis("Delegati")
+        count = 1
+        for delegateLabel in page.delegatesLabels:
+            if delegateLabel.cget("text") is not "-":
+                self.voice.speech_synthesis("Delegato numero "+count)
+                self.read_cf(delegateLabel.cget("text"))
+                count +=1
+        if count == 1:
+            self.voice.speech_synthesis("Nessuno")
+        self.voice.speech_synthesis("Farmaci ")
+        for medicine in page.entries:
+            if medicine.cget("text").__contains__(" x "):
+                name_medicine = medicine.cget("text").split(" x ")[0]
+                nbox = medicine.cget("text").split(" x ")[1]
+                self.voice.speech_synthesis(name_medicine)
+                self.voice.speech_synthesis("Numero di scatole "+nbox)
+            else:
+                self.voice.speech_synthesis(medicine.cget("text"))
+        while count < 10000000000:
+            count += 1
+        page.homeButton.invoke()
+        self.start_page()
 
     def check_name(self,text,  repeat= False):
         if not repeat:
