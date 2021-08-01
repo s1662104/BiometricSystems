@@ -23,6 +23,8 @@ radius = 1
 neighborhood = 8
 
 
+# --------------- Controller ---------------
+
 class Page(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -48,7 +50,7 @@ class Page(tk.Tk):
         # pagina n, si indicizza a pages.NOME_PAGINA.value - 1 (-1 perche' gli indici partono da 1)
         pages = Enum("pages", pageNames)
 
-        self.current_page = StartPage
+        self.current_page = self.frames[StartPage]
         self.show_frame(StartPage)
 
     def show_frame(self, cont):
@@ -59,6 +61,8 @@ class Page(tk.Tk):
         return self.frames
 
 
+# --------------- Start Page ---------------
+
 # Pagina iniziale dove si presentano le due scelte: registrazione oppure prelievo farmaci
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -66,9 +70,9 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text=config.messageWelcome)
         label.pack(pady=10, padx=50)
         self.button1 = tk.Button(self, text=config.choice1, width=15, height=2, bg='#1E79FA',
-                            command=lambda: goToEnroll())
+                                 command=lambda: goToEnroll())
         self.button2 = tk.Button(self, text=config.choice2, width=15, height=2, bg='#1E79FA',
-                            command=lambda: goToRecognize())
+                                 command=lambda: goToRecognize())
         self.button1.pack()
         self.button2.pack(pady=1)
 
@@ -76,11 +80,15 @@ class StartPage(tk.Frame):
             # resetto la pagina da eventuali dati inseriti da un altro utente. Non lo faccio dopo essere passati
             # da questa alla pagina successiva perche' l'utente potrebbe sempre tornare indietro a correggere i dati
             list(controller.frames.values())[pages.EnrollmentPage.value - 1].reset()
+            controller.current_page = controller.frames[EnrollmentPage]
             controller.show_frame(EnrollmentPage)
 
         def goToRecognize():
+            controller.current_page = controller.frames[RecognitionChoicePage]
             controller.show_frame(RecognitionChoicePage)
 
+
+# --------------- Enrollment Page ---------------
 
 # pagina di registrazione
 class EnrollmentPage(tk.Frame):
@@ -96,16 +104,16 @@ class EnrollmentPage(tk.Frame):
         self.entryName.insert(1, config.messageN)
         self.entryName.pack(pady=2)
         self.invio = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: check_input(controller, self.entryCF.get(), labelError, 0, None,
-                                                        self.entryName.get()))
+                               command=lambda: check_input(controller, self.entryCF.get(), labelError, 0, None,
+                                                           self.entryName.get()))
         self.invio.pack()
 
         labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
         self.back = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, self.entryCF, labelError, self.entryName))
-        self.back.pack(side="left",pady=300)
+                              command=lambda: back(controller, self.entryCF, labelError, self.entryName))
+        self.back.pack(side="left", pady=300)
 
     # reset dei campi della pagina
     def reset(self):
@@ -115,6 +123,8 @@ class EnrollmentPage(tk.Frame):
         self.entryName.insert(0, config.messageN)
 
 
+# --------------- Recognition Choice Page ---------------
+
 # Qui l'utente deve scegliere se essere riconosciuto paziente o come delegato
 class RecognitionChoicePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -122,21 +132,29 @@ class RecognitionChoicePage(tk.Frame):
         label = tk.Label(self, text=config.messageRecognition)
         label.pack(pady=10, padx=50)
         self.button1 = tk.Button(self, text=config.recognitionChoice1, width=15, height=2, bg='#1E79FA',
-                            command=lambda: confirm(0))
+                                 command=lambda: confirm(0))
         self.button2 = tk.Button(self, text=config.recognitionChoice2, width=15, height=2, bg='#1E79FA',
-                            command=lambda: confirm(1))
+                                 command=lambda: confirm(1))
         self.button1.pack()
         self.button2.pack(pady=1)
 
-        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: controller.show_frame(StartPage)).place(y=520, x=2)
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                                    command=lambda: back())
+        self.backButton.place(y=520, x=2)
 
         # resetto la pagina e aggiorno il ruolo dell'utente (paziente o delegato)
         def confirm(role):
             list(controller.frames.values())[pages.RecognitionPage.value - 1].reset()
             list(controller.frames.values())[pages.RecognitionPage.value - 1].update_data(role)
+            controller.current_page = controller.frames[RecognitionPage]
             controller.show_frame(RecognitionPage)
 
+        def back():
+            controller.current_page = controller.frames[StartPage]
+            controller.show_frame(StartPage)
+
+
+# --------------- Recognition Page ---------------
 
 # pagina per il riconoscimento dell'utente
 class RecognitionPage(tk.Frame):
@@ -152,14 +170,16 @@ class RecognitionPage(tk.Frame):
         self.entryCF.insert(1, config.messageCF)
         self.entryCF.pack(padx=0, pady=0)
         self.buttonInvia = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                            command=lambda: check_input(controller, self.entryCF.get(), labelError, 1, self.role))
+                                     command=lambda: check_input(controller, self.entryCF.get(), labelError, 1,
+                                                                 self.role))
         self.buttonInvia.pack()
 
         labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
-        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: back(controller, self.entryCF, labelError)).pack(side="left", pady=385)
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                                    command=lambda: back(controller, self.entryCF, labelError))
+        self.backButton.pack(side="left", pady=385)
 
     # reset della pagina
     def reset(self):
@@ -170,6 +190,8 @@ class RecognitionPage(tk.Frame):
     def update_data(self, role):
         self.role = role
 
+
+# --------------- Data Page ---------------
 
 # La pagina serve per mostrare i dati dell'utente in caso di registrazione o di riconoscimento.
 class DataPage(tk.Frame):
@@ -191,6 +213,8 @@ class DataPage(tk.Frame):
         self.cf = tk.Label(self, text="CF")
         self.cf.pack()
 
+
+# --------------- Data Enrollment Page ---------------
 
 # Dati dell'utente nella fase di registrazione
 class DataEnrollmentPage(DataPage):
@@ -215,15 +239,16 @@ class DataEnrollmentPage(DataPage):
         self.entryNMedicine.insert(1, "")
         self.entryNMedicine.pack(padx=0, pady=0)
         self.buttonInvia = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
-                           command=lambda: self.addMedicines(self.entryNMedicine.get()))
+                                     command=lambda: self.addMedicines(self.entryNMedicine.get()))
         self.buttonInvia.pack()
 
         self.buttonConferma = tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
-                  command=lambda: self.confirm(controller))
+                                        command=lambda: self.confirm(controller))
         self.buttonConferma.place(y=520, x=220)
 
-        tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: self.back(controller)).place(y=520, x=2)
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                                    command=lambda: self.back(controller))
+        self.backButton.place(y=520, x=2)
 
     # resetta la pagina
     def reset(self):
@@ -266,6 +291,7 @@ class DataEnrollmentPage(DataPage):
     # ritorna alla pagina precedente, ma non resetta perche' potrebbe essere che l'utente abbia sbagliato i dati
     # compilati
     def back(self, controller):
+        controller.current_page = controller.frames[EnrollmentPage]
         controller.show_frame(EnrollmentPage)
 
     # conferma le scelte dell'utente
@@ -307,8 +333,11 @@ class DataEnrollmentPage(DataPage):
                 addUser(self.photo, self.cf.cget("text")[16:], self.name.cget("text")[6:], medicines, delegates)
                 list(controller.frames.values())[pages.InformationPage.value - 1].update_data(
                     config.enrollmentCompleted)
+                controller.current_page = controller.frames[InformationPage]
                 controller.show_frame(InformationPage)
 
+
+# --------------- Data Recognition Page ---------------
 
 # Mostra i dati dell'utente prossimo al riconoscimento
 class DataRecognitionPage(DataPage):
@@ -320,12 +349,12 @@ class DataRecognitionPage(DataPage):
         self.role = 0
 
         self.buttonConferma = tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
-                  command=lambda: self.confirm(controller))
+                                        command=lambda: self.confirm(controller))
         self.buttonConferma.place(y=520, x=220)
 
-        self.buttonIndietro = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                  command=lambda: self.back(controller))
-        self.buttonIndietro.place(y=520, x=2)
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                                    command=lambda: self.back(controller))
+        self.backButton.place(y=520, x=2)
 
     # reset della pagina
     def reset(self):
@@ -358,15 +387,20 @@ class DataRecognitionPage(DataPage):
                                                                                    patient["Farmaci"],
                                                                                    patient["Data"],
                                                                                    self.panel.image)
+            controller.current_page = controller.frames[UserPage]
             controller.show_frame(UserPage)
         else:
             list(controller.frames.values())[pages.InformationPage.value - 1].update_data(config.recognitionRejected)
+            controller.current_page = controller.frames[InformationPage]
             controller.show_frame(InformationPage)
 
     # ritorna alla pagina precedente
     def back(self, controller):
+        controller.current_page = controller.frames[RecognitionPage]
         controller.show_frame(RecognitionPage)
 
+
+# --------------- Information Page ---------------
 
 # pagina che mostra delle informazioni,ad esempio se il riconoscimento o il test anti-spoofing non e' andato a buno fine
 class InformationPage(tk.Frame):
@@ -376,12 +410,18 @@ class InformationPage(tk.Frame):
         self.label.pack(pady=200)
 
         self.homeButton = tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
-                  command=lambda: controller.show_frame(StartPage))
+                                    command=lambda: self.home(controller))
         self.homeButton.place(y=520, x=110)
 
     def update_data(self, info):
         self.label.config(text=info)
 
+    def home(self, controller):
+        controller.current_page = controller.frames[StartPage]
+        controller.show_frame(StartPage)
+
+
+# --------------- User Page ---------------
 
 # pagina in cui vengono mostrati i dati del paziente
 class UserPage(DataPage):
@@ -401,8 +441,12 @@ class UserPage(DataPage):
         self.entries = []
 
         self.homeButton = tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
-                  command=lambda: controller.show_frame(StartPage))
+                                    command=lambda: self.home())
         self.homeButton.place(y=520, x=110)
+
+    def home(self, controller):
+        controller.current_page = controller.frames[StartPage]
+        controller.show_frame(StartPage)
 
     # resetta la pagina
     def reset(self):
@@ -474,6 +518,8 @@ class UserPage(DataPage):
                     self.entries.append(label)
 
 
+# --------------- Functions ---------------
+
 # funziona chiamata da EnrollmentPage e RecognitionPage per verificare se l'input fornito e' corretto
 def check_input(controller, cf, label_error, op, role=None, name=None):
     if not isCF(cf) or cf == config.messageCF or (name is not None and name == config.messageN):
@@ -505,14 +551,17 @@ def check_input(controller, cf, label_error, op, role=None, name=None):
             # si passa una solo immagine, come immagine rappresentativa dell'utente
             list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(cropList[0])),
                                                             cropList, name)
+            controller.current_page = controller.frames[DataEnrollmentPage]
             controller.show_frame(DataEnrollmentPage)
         else:
             crop = videoCapture()
             list(controller.frames.values())[n].update_data(cf, ImageTk.PhotoImage(image=Image.fromarray(crop)),
                                                             crop, role)
+            controller.current_page = controller.frames[DataRecognitionPage]
             controller.show_frame(DataRecognitionPage)
     else:
         list(controller.frames.values())[pages.InformationPage.value - 1].update_data(config.spoofingMessage)
+        controller.current_page = controller.frames[DataRecognitionPage]
         controller.show_frame(InformationPage)
 
 
@@ -525,8 +574,10 @@ def back(controller, entryCF, labelError, entryName=None):
         entryName.insert(0, config.messageN)
     labelError.configure(fg="#f0f0f0")
     if entryName is not None:
+        controller.current_page = controller.frames[StartPage]
         controller.show_frame(StartPage)
     else:
+        controller.current_page = controller.frames[RecognitionChoicePage]
         controller.show_frame(RecognitionChoicePage)
 
 

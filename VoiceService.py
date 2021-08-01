@@ -62,11 +62,11 @@ class VocalPages:
         choice = self.voice.speech_recognize()
         if self.voice.compare_strings(choice,config.choice1.lower()):
             self.voice.speech_synthesis("Operazione scelta "+config.choice1)
-            self.page.get_pages()[Pages.StartPage].button1.invoke()
+            self.page.current_page.button1.invoke()
             self.enroll_page_CF()
         elif self.voice.compare_strings(choice,config.choice2.lower()):
             self.voice.speech_synthesis("Operazione scelta " + config.choice2)
-            self.page.get_pages()[Pages.StartPage].button2.invoke()
+            self.page.current_page.button2.invoke()
             self.recognition_choice_page()
         else:
             self.voice.speech_synthesis("Scegli tra: "+config.choice1 + " " +config.choice2)
@@ -74,8 +74,8 @@ class VocalPages:
 
     def enroll_page_CF(self):
         cf = self.page_CF(False)
-        self.page.get_pages()[Pages.EnrollmentPage].entryCF.delete(0, tk.END)
-        self.page.get_pages()[Pages.EnrollmentPage].entryCF.insert(0, cf)
+        self.page.current_page.entryCF.delete(0, tk.END)
+        self.page.current_page.entryCF.insert(0, cf)
         self.enroll_page_name()
 
     def page_CF(self, first_time=True):
@@ -105,18 +105,18 @@ class VocalPages:
         last_name = self.voice.speech_recognize()
         self.voice.speech_synthesis(first_name+" "+last_name +" "+config.confirm)
         if self.confirm():
-            self.page.get_pages()[Pages.EnrollmentPage].entryName.delete(0, tk.END)
-            self.page.get_pages()[Pages.EnrollmentPage].entryName.insert(0, first_name+" "+last_name)
+            self.page.current_page.entryName.delete(0, tk.END)
+            self.page.current_page.entryName.insert(0, first_name+" "+last_name)
             self.voice.speech_synthesis(config.messagePhoto)
-            self.page.get_pages()[Pages.EnrollmentPage].invio.invoke()
+            self.page.current_page.invio.invoke()
             self.data_enrollment_page()
         else:
             first_name = self.check_name(first_name)
             last_name = self.check_name(last_name)
-            self.page.get_pages()[Pages.EnrollmentPage].entryName.delete(0, tk.END)
-            self.page.get_pages()[Pages.EnrollmentPage].entryName.insert(0, first_name+" "+last_name)
+            self.page.current_page.entryName.delete(0, tk.END)
+            self.page.current_page.entryName.insert(0, first_name+" "+last_name)
             self.voice.speech_synthesis(config.messagePhoto)
-            self.page.get_pages()[Pages.EnrollmentPage].invio.invoke()
+            self.page.current_page.invio.invoke()
             self.data_enrollment_page()
 
     def data_enrollment_page(self):
@@ -132,9 +132,9 @@ class VocalPages:
                 self.voice.speech_synthesis(config.messageError)
                 return self.data_enrollment_page()
 
-        self.page.get_pages()[Pages.DataEnrollmentPage].entryNMedicine.delete(0, tk.END)
-        self.page.get_pages()[Pages.DataEnrollmentPage].entryNMedicine.insert(0, num_medicines)
-        self.page.get_pages()[Pages.DataEnrollmentPage].buttonInvia.invoke()
+        self.page.current_page.entryNMedicine.delete(0, tk.END)
+        self.page.current_page.entryNMedicine.insert(0, num_medicines)
+        self.page.current_page.buttonInvia.invoke()
 
         # TODO DIRE NUMMERO FARMACI SCELTO E FORSE CONFERMA
 
@@ -145,13 +145,13 @@ class VocalPages:
 
             # TODO CHIEDERE CONFERMA SUL NOME DEL FARMACO
 
-            self.page.get_pages()[Pages.DataEnrollmentPage].medicineEntry[i].insert(0, entryMedicine)
+            self.page.current_page.medicineEntry[i].insert(0, entryMedicine)
             print(entryMedicine)
             i += 1
 
         # TODO CHIEDERE CONFERMA SUI FARMACI APPENA INSERITI  E MODIFICARE IN CASO QUELLI INDICATI
 
-        self.page.get_pages()[Pages.DataEnrollmentPage].buttonConferma.invoke()
+        self.page.current_page.buttonConferma.invoke()
         self.information_page(config.enrollmentCompleted)
 
 
@@ -160,7 +160,7 @@ class VocalPages:
         count = 0
         while count < 10000000:
             count += 1
-        self.page.get_pages()[Pages.InformationPage].homeButton.invoke()
+        self.page.current_page.homeButton.invoke()
         self.start_page()
 
     def recognition_choice_page(self):
@@ -169,44 +169,43 @@ class VocalPages:
         text = self.voice.speech_recognize()
         if self.voice.compare_strings(text,config.recognitionChoice1.lower()):
             self.voice.speech_synthesis("Ruolo scelto: "+config.recognitionChoice1)
-            self.page.get_pages()[Pages.RecognitionChoicePage].button1.invoke()
+            self.page.current_page.button1.invoke()
             self.recognition_page()
         elif self.voice.compare_strings(text,config.recognitionChoice2.lower()):
             self.voice.speech_synthesis("Ruolo scelto: " + config.recognitionChoice2)
-            self.page.get_pages()[Pages.RecognitionChoicePage].button2.invoke()
+            self.page.current_page.button2.invoke()
             self.recognition_page()
         else:
             self.recognition_choice_page()
 
     def recognition_page(self):
         cf = self.page_CF()
-        self.page.get_pages()[Pages.RecognitionPage].entryCF.delete(0, tk.END)
-        self.page.get_pages()[Pages.RecognitionPage].entryCF.insert(0, cf)
+        self.page.current_page.entryCF.delete(0, tk.END)
+        self.page.current_page.entryCF.insert(0, cf)
         self.voice.speech_synthesis(config.messagePhoto)
-        self.page.get_pages()[Pages.RecognitionPage].buttonInvia.invoke()
+        self.page.current_page.buttonInvia.invoke()
         self.data_recognition_page()
 
     def data_recognition_page(self):
-        cf = self.page.get_pages()[Pages.DataRecognitionPage].cf.cget("text").split("CODICE FISCALE: ")[1]
+        cf = self.page.current_page.cf.cget("text").split("CODICE FISCALE: ")[1]
         self.voice.speech_synthesis(config.confirmCF)
         self.read_cf(cf)
         self.voice.speech_synthesis(config.confirm)
         if self.confirm():
-            self.page.get_pages()[Pages.DataRecognitionPage].buttonConferma.invoke()
+            self.page.current_page.buttonConferma.invoke()
             self.user_page()
         else:
-            self.page.get_pages()[Pages.DataRecognitionPage].buttonIndietro.invoke()
+            self.page.current_page.buttonIndietro.invoke()
             self.recognition_page()
 
     def user_page(self):
-        page = self.page.get_pages()[Pages.UserPage]
-        self.voice.speech_synthesis(page.name.cget("text"))
-        self.voice.speech_synthesis(page.patient.cget("text"))
+        self.voice.speech_synthesis(self.page.current_page.name.cget("text"))
+        self.voice.speech_synthesis(self.page.current_page.patient.cget("text"))
         self.voice.speech_synthesis("Codice fiscale: ")
-        self.read_cf(page.cf.cget("text").split("CODICE FISCALE: ")[1])
+        self.read_cf(self.page.current_page.cf.cget("text").split("CODICE FISCALE: ")[1])
         self.voice.speech_synthesis("Delegati")
         count = 1
-        for delegateLabel in page.delegatesLabels:
+        for delegateLabel in self.page.current_page.delegatesLabels:
             if delegateLabel.cget("text") is not "-":
                 self.voice.speech_synthesis("Delegato numero "+count)
                 self.read_cf(delegateLabel.cget("text"))
@@ -214,7 +213,7 @@ class VocalPages:
         if count == 1:
             self.voice.speech_synthesis("Nessuno")
         self.voice.speech_synthesis("Farmaci ")
-        for medicine in page.entries:
+        for medicine in self.page.current_page.entries:
             if medicine.cget("text").__contains__(" x "):
                 name_medicine = medicine.cget("text").split(" x ")[0]
                 nbox = medicine.cget("text").split(" x ")[1]
@@ -222,9 +221,9 @@ class VocalPages:
                 self.voice.speech_synthesis("Numero di scatole "+nbox)
             else:
                 self.voice.speech_synthesis(medicine.cget("text"))
-        while count < 10000000000:
+        while count < 100000000:
             count += 1
-        page.homeButton.invoke()
+        self.page.current_page.homeButton.invoke()
         self.start_page()
 
     def check_name(self,text,  repeat= False):
