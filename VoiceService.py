@@ -14,6 +14,9 @@ spell = {"A": "Ancona", "B": "Bologna", "C": "Como", "D": "Domodossola", "E": "E
 
 numbers = {"uno": 1, "due": 2}
 
+positions = {"il primo": 0, "il secondo": 1, "il terzo": 2, "il quarto": 3, "il quinto": 4, "il sesto": 5,
+                "il settimo": 6, "l'ottavo": 7, "il nono": 8, "il decimo": 9}
+
 class Voice:
 
     def __init__(self):
@@ -197,9 +200,7 @@ class VocalPages:
         self.voice.speech_synthesis(config.medConfirm)
         #Se c'è quale medicinale errato, chiedo qual è e lo correggo
         if not self.confirm():
-            self.voice.speech_synthesis(config.changeMed)
-            index = self.check_command()
-
+            self.change_medicine()
 
         self.page.current_page.buttonConferma.invoke()
         self.information_page()
@@ -277,6 +278,37 @@ class VocalPages:
         self.start_page()
 
     # -------------- Functions --------------
+
+    def change_medicine(self):
+        while True:
+            # Chiedo quel è il farmaco che deve essere corretto
+            self.voice.speech_synthesis(config.changeMed)
+            index = self.check_command()
+            # Se la posizione è stata capita correttamente, allora ottengo l'indice dell'array dei farmaci
+            if positions.__contains__(index):
+                pos = positions.__getitem__(index)
+                if pos < 0 or pos > len(self.page.current_page.medicineEntry):
+                    self.voice.speech_synthesis(config.errorIndexMedicine)
+                    continue
+                # Chiedo il nome del farmaco
+                self.voice.speech_synthesis(config.messageMedicine)
+                entryMedicine = self.check_command()
+                entryMedicine = self.voice.medicine_autocorrect(entryMedicine)
+                # Chiedo conferma della medicina appena dichiarata
+                self.voice.speech_synthesis(config.medicineConfirm + entryMedicine + "?")
+                # Se il farmaco è corretto, lo sostituisco con quello precedentemente inserito nella posizione indicata
+                if self.confirm():
+                    self.page.current_page.medicineEntry[pos].delete(0, tk.END)
+                    self.page.current_page.medicineEntry[pos].insert(0, entryMedicine)
+                    print(entryMedicine)
+                else:
+                    continue
+                # Chiedo se ci sono altri farmaci da cambiare
+                self.voice.speech_synthesis(config.otherMedToChange)
+                if not self.confirm():
+                    return
+            else:
+                self.voice.speech_synthesis(config.errorSpeechRec)
 
     def check_name(self,text,  repeat= False):
         if not repeat:
@@ -362,12 +394,37 @@ class VocalPages:
 
 if __name__ == '__main__':
     voice = Voice()
+    while True:
+        # Chiedo quel è il farmaco che deve essere corretto
+        voice.speech_synthesis(config.changeMed)
+        index = voice.speech_recognize()
+        # Se la posizione è stata capita correttamente, allora ottengo l'indice dell'array dei farmaci
+        if positions.__contains__(index):
+            pos = positions.__getitem__(index)
+            # Chiedo il nome del farmaco
+            voice.speech_synthesis(config.messageMedicine)
+            entryMedicine = voice.speech_recognize()
+            entryMedicine = voice.medicine_autocorrect(entryMedicine)
+            # Chiedo conferma della medicina appena dichiarata
+            voice.speech_synthesis(config.medicineConfirm + entryMedicine + "?")
+            # Se il farmaco è corretto, lo sostituisco con quello precedentemente inserito nella posizione indicata
+            text = voice.speech_recognize()
+            if voice.compare_strings(text, config.yes.lower()):
+                print(entryMedicine)
+            else:
+                continue
+            # Chiedo se ci sono altri farmaci da cambiare
+            voice.speech_synthesis(config.otherMedToChange)
+            text = voice.speech_recognize()
+            if not voice.compare_strings(text, config.yes.lower()):
+                break
+        else:
+            voice.speech_synthesis(config.errorSpeechRec)
     #voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " + config.choice2)
-    choice = voice.speech_recognize()
+    #choice = voice.speech_recognize()
     #text = config.initialMessage + " " + config.choice1 + " " + config.choice2
-
-    app = Pages.Page()
-    app.geometry('300x550')
+    #app = Pages.Page()
+    #app.geometry('300x550')
     #vocal_app = VocalPages(app)
     #task = threading.Thread(target=vocal_app.start_page)
     #task.start()
