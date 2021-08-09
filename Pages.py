@@ -111,9 +111,9 @@ class EnrollmentPage(tk.Frame):
         labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
-        self.back = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
                               command=lambda: back(controller, self.entryCF, labelError, self.entryName))
-        self.back.pack(side="left", pady=300)
+        self.backButton.pack(side="left", pady=300)
 
     # reset dei campi della pagina
     def reset(self):
