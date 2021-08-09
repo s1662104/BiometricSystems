@@ -4,7 +4,8 @@ import tkinter as tk
 import config
 import Pages
 from difflib import SequenceMatcher
-import time
+import pandas as pd
+import Levenshtein
 
 spell = {"A": "Ancona", "B": "Bologna", "C": "Como", "D": "Domodossola", "E": "Empoli", "F": "Firenze", "G": "Genova",
             "H": "Hotel", "I": "Imola", "J": "Jolly", "K": "Cappa", "L": "Livorno", "M": "Milano", "N": "Napoli",
@@ -49,6 +50,25 @@ class Voice:
 
     def compare_strings(self, string1, string2):
         return SequenceMatcher(None, string1, string2).ratio() >= self.threshold
+
+    def medicine_autocorrect(self, input_word):
+        input_word = input_word.lower()
+        medicines = pd.read_csv('dataset_medicine.csv', index_col=[0])['Nome']
+        medicines = medicines.tolist()
+        for i in range(len(medicines)):
+            medicines[i] = medicines[i].lower()
+        print(medicines)
+        if input_word in medicines:
+            return input_word
+        else:
+            min_dist = 100
+            word = input_word
+            for m in medicines:
+                dist = Levenshtein.distance(m, input_word)
+                if  dist < min_dist:
+                    min_dist = dist
+                    word = m
+            return word
 
 class VocalPages:
     def __init__(self, page: Pages.Page):
@@ -132,24 +152,29 @@ class VocalPages:
                 self.voice.speech_synthesis(config.messageError)
                 return self.data_enrollment_page()
 
+        self.voice.speech_synthesis(config.numberMedicinesConfirm + num_medicines + "?")
+        if not self.confirm():
+            self.data_enrollment_page()
         self.page.current_page.entryNMedicine.delete(0, tk.END)
         self.page.current_page.entryNMedicine.insert(0, num_medicines)
         self.page.current_page.buttonInvia.invoke()
-
-        # TODO DIRE NUMMERO FARMACI SCELTO E FORSE CONFERMA
 
         i = 0
         while i < num_medicines:
             self.voice.speech_synthesis(config.messageMedicine)
             entryMedicine = self.voice.speech_recognize()
+            entryMedicine = self.voice.medicine_autocorrect(entryMedicine)
+            self.voice.speech_synthesis(config.medicineConfirm+entryMedicine+"?")
+            if self.confirm():
+                self.page.current_page.medicineEntry[i].insert(0, entryMedicine)
+                print(entryMedicine)
+                i += 1
 
-            # TODO CHIEDERE CONFERMA SUL NOME DEL FARMACO
-
-            self.page.current_page.medicineEntry[i].insert(0, entryMedicine)
-            print(entryMedicine)
-            i += 1
-
-        # TODO CHIEDERE CONFERMA SUI FARMACI APPENA INSERITI  E MODIFICARE IN CASO QUELLI INDICATI
+        self.voice.speech_synthesis(config.medConfirm)
+        if not self.confirm():
+            self.voice.speech_synthesis(config.changeMed)
+            index = self.voice.speech_recognize()
+            
 
         self.page.current_page.buttonConferma.invoke()
         self.information_page(config.enrollmentCompleted)
@@ -273,14 +298,19 @@ class VocalPages:
             else:
                 self.voice.speech_synthesis(c)
 
+
 if __name__ == '__main__':
     voice = Voice()
     #voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " + config.choice2)
     #choice = voice.speech_recognize()
     #text = config.initialMessage + " " + config.choice1 + " " + config.choice2
-
-    app = Pages.Page()
-    app.geometry('300x550')
+    #app = Pages.Page()
+    #app.geometry('300x550')
     #vocal_app = VocalPages(app)
     #task = threading.Thread(target=vocal_app.start_page)
     #task.start()
+    #voice.speech_synthesis(config.messageMedicine)
+    #medicine = voice.speech_recognize()
+    #correct_word = voice.medicine_autocorrect(medicine)
+    #print("La medicina corretta è", correct_word)
+
