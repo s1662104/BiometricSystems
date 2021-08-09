@@ -182,18 +182,12 @@ class VocalPages:
         self.page.current_page.entryNMedicine.insert(0, num_medicines)
         self.page.current_page.buttonInvia.invoke()
 
-        # TODO DIRE NUMMERO FARMACI SCELTO E FORSE CONFERMA
-
         i = 0
         while i < num_medicines:
             self.voice.speech_synthesis(config.messageMedicine)
             entryMedicine = self.check_command()
             entryMedicine = self.voice.medicine_autocorrect(entryMedicine)
-
-            self.page.current_page.medicineEntry[i].insert(0, entryMedicine)
-            print(entryMedicine)
-            i += 1
-
+            #Chiedo conferma della medicina appena dichiarata
             self.voice.speech_synthesis(config.medicineConfirm+entryMedicine+"?")
             if self.confirm():
                 self.page.current_page.medicineEntry[i].insert(0, entryMedicine)
@@ -201,9 +195,10 @@ class VocalPages:
                 i += 1
 
         self.voice.speech_synthesis(config.medConfirm)
+        #Se c'è quale medicinale errato, chiedo qual è e lo correggo
         if not self.confirm():
             self.voice.speech_synthesis(config.changeMed)
-            index = self.voice.speech_recognize()
+            index = self.check_command()
 
 
         self.page.current_page.buttonConferma.invoke()
