@@ -34,6 +34,8 @@ class Page(tk.Tk):
 
         container.pack(side="top", fill="both", expand=True)
 
+        self.widget_state = "normal"
+
         self.frames = {}
         pageNames = []
 
@@ -55,10 +57,17 @@ class Page(tk.Tk):
 
     def show_frame(self, cont):
         frame = self.frames[cont]
+        frame.update_widget_state(self)
         frame.tkraise()
 
     def get_pages(self):
         return self.frames
+
+    def change_widget_state(self):
+        if self.widget_state == "normal":
+            self.widget_state = "disabled"
+        else:
+            self.widget_state = "normal"
 
 
 # --------------- Start Page ---------------
@@ -70,9 +79,9 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text=config.messageWelcome)
         label.pack(pady=10, padx=50)
         self.button1 = tk.Button(self, text=config.choice1, width=15, height=2, bg='#1E79FA',
-                                 command=lambda: goToEnroll())
+                                 disabledforeground="#2f373c", command=lambda: goToEnroll())
         self.button2 = tk.Button(self, text=config.choice2, width=15, height=2, bg='#1E79FA',
-                                 command=lambda: goToRecognize())
+                                 disabledforeground="#2f373c", command=lambda: goToRecognize())
         self.button1.pack()
         self.button2.pack(pady=1)
 
@@ -86,6 +95,10 @@ class StartPage(tk.Frame):
         def goToRecognize():
             controller.current_page = controller.frames[RecognitionChoicePage]
             controller.show_frame(RecognitionChoicePage)
+
+    def update_widget_state(self, controller):
+        self.button1["state"] = controller.widget_state
+        self.button2["state"] = controller.widget_state
 
 
 # --------------- Enrollment Page ---------------
@@ -103,7 +116,7 @@ class EnrollmentPage(tk.Frame):
         self.entryName = tk.Entry(self)
         self.entryName.insert(1, config.messageN)
         self.entryName.pack(pady=2)
-        self.invio = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+        self.invio = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA', disabledforeground="#2f373c",
                                command=lambda: check_input(controller, self.entryCF.get(), labelError, 0, None,
                                                            self.entryName.get()))
         self.invio.pack()
@@ -111,7 +124,7 @@ class EnrollmentPage(tk.Frame):
         labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
-        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA', disabledforeground="#2f373c",
                               command=lambda: back(controller, self.entryCF, labelError, self.entryName))
         self.backButton.pack(side="left", pady=300)
 
@@ -121,6 +134,12 @@ class EnrollmentPage(tk.Frame):
         self.entryCF.insert(0, config.messageCF)
         self.entryName.delete(0, tk.END)
         self.entryName.insert(0, config.messageN)
+
+    def update_widget_state(self, controller):
+        self.entryCF["state"] = controller.widget_state
+        self.entryName["state"] = controller.widget_state
+        self.invio["state"] = controller.widget_state
+        self.backButton["state"] = controller.widget_state
 
 
 # --------------- Recognition Choice Page ---------------
@@ -132,13 +151,13 @@ class RecognitionChoicePage(tk.Frame):
         label = tk.Label(self, text=config.messageRecognition)
         label.pack(pady=10, padx=50)
         self.button1 = tk.Button(self, text=config.recognitionChoice1, width=15, height=2, bg='#1E79FA',
-                                 command=lambda: confirm(0))
+                                 disabledforeground="#2f373c", command=lambda: confirm(0))
         self.button2 = tk.Button(self, text=config.recognitionChoice2, width=15, height=2, bg='#1E79FA',
-                                 command=lambda: confirm(1))
+                                 disabledforeground="#2f373c", command=lambda: confirm(1))
         self.button1.pack()
         self.button2.pack(pady=1)
 
-        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA', disabledforeground="#2f373c",
                                     command=lambda: back())
         self.backButton.place(y=520, x=2)
 
@@ -152,6 +171,11 @@ class RecognitionChoicePage(tk.Frame):
         def back():
             controller.current_page = controller.frames[StartPage]
             controller.show_frame(StartPage)
+
+    def update_widget_state(self, controller):
+        self.button1["state"] = controller.widget_state
+        self.button2["state"] = controller.widget_state
+        self.backButton["state"] = controller.widget_state
 
 
 # --------------- Recognition Page ---------------
@@ -169,7 +193,7 @@ class RecognitionPage(tk.Frame):
         self.entryCF = tk.Entry(self)
         self.entryCF.insert(1, config.messageCF)
         self.entryCF.pack(padx=0, pady=0)
-        self.buttonInvia = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+        self.buttonInvia = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA', disabledforeground="#2f373c",
                                      command=lambda: check_input(controller, self.entryCF.get(), labelError, 1,
                                                                  self.role))
         self.buttonInvia.pack()
@@ -177,7 +201,7 @@ class RecognitionPage(tk.Frame):
         labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
         labelError.pack(pady=10, padx=10)
 
-        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA', disabledforeground="#2f373c",
                                     command=lambda: back(controller, self.entryCF, labelError))
         self.backButton.pack(side="left", pady=385)
 
@@ -189,6 +213,11 @@ class RecognitionPage(tk.Frame):
     # aggiornamento della pagina
     def update_data(self, role):
         self.role = role
+
+    def update_widget_state(self, controller):
+        self.entryCF["state"] = controller.widget_state
+        self.buttonInvia["state"] = controller.widget_state
+        self.backButton["state"] = controller.widget_state
 
 
 # --------------- Data Page ---------------
@@ -238,17 +267,27 @@ class DataEnrollmentPage(DataPage):
         self.entryNMedicine = tk.Entry(self)
         self.entryNMedicine.insert(1, "")
         self.entryNMedicine.pack(padx=0, pady=0)
-        self.buttonInvia = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA',
+        self.buttonInvia = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA', disabledforeground="#2f373c",
                                      command=lambda: self.addMedicines(self.entryNMedicine.get()))
         self.buttonInvia.pack()
 
         self.buttonConferma = tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
-                                        command=lambda: self.confirm(controller))
+                                        disabledforeground="#2f373c", command=lambda: self.confirm(controller))
         self.buttonConferma.place(y=520, x=220)
 
         self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                                    command=lambda: self.back(controller))
+                                    disabledforeground="#2f373c", command=lambda: self.back(controller))
         self.backButton.place(y=520, x=2)
+
+    def update_widget_state(self, controller):
+        for entry in self.delegateEntry:
+            entry["state"] = controller.widget_state
+        for entry in self.medicineEntry:
+            entry["state"] = controller.widget_state
+        self.entryNMedicine["state"] = controller.widget_state
+        self.buttonConferma["state"] = controller.widget_state
+        self.buttonInvia["state"] = controller.widget_state
+        self.backButton["state"] = controller.widget_state
 
     # resetta la pagina
     def reset(self):
@@ -349,12 +388,16 @@ class DataRecognitionPage(DataPage):
         self.role = 0
 
         self.buttonConferma = tk.Button(self, text="Conferma", width=8, height=1, bg='#1E79FA',
-                                        command=lambda: self.confirm(controller))
+                                        disabledforeground="#2f373c", command=lambda: self.confirm(controller))
         self.buttonConferma.place(y=520, x=220)
 
         self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
-                                    command=lambda: self.back(controller))
+                                    disabledforeground="#2f373c", command=lambda: self.back(controller))
         self.backButton.place(y=520, x=2)
+
+    def update_widget_state(self, controller):
+        self.buttonConferma["state"] = controller.widget_state
+        self.backButton["state"] = controller.widget_state
 
     # reset della pagina
     def reset(self):
@@ -409,9 +452,12 @@ class InformationPage(tk.Frame):
         self.label = tk.Label(self, text="")
         self.label.pack(pady=200)
 
-        self.homeButton = tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
+        self.homeButton = tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA', disabledforeground="#2f373c",
                                     command=lambda: self.home(controller))
         self.homeButton.place(y=520, x=110)
+
+    def update_widget_state(self, controller):
+        self.homeButton["state"] = controller.widget_state
 
     def update_data(self, info):
         self.label.config(text=info)
@@ -440,9 +486,12 @@ class UserPage(DataPage):
 
         self.entries = []
 
-        self.homeButton = tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA',
+        self.homeButton = tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA', disabledforeground="#2f373c",
                                     command=lambda: self.home())
         self.homeButton.place(y=520, x=110)
+
+    def update_widget_state(self, controller):
+        self.homeButton["state"] = controller.widget_state
 
     def home(self, controller):
         controller.current_page = controller.frames[StartPage]
