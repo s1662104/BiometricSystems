@@ -28,6 +28,8 @@ class Voice:
         newVoiceRate = 140
         self.synthesis.setProperty('rate', newVoiceRate)
         self.threshold = 0.8
+        # state = 0 -> interact with the user; = 1 -> listening silently the user
+        self.state = 0
 
     def speech_recognize(self, higher_pause=False):
         with sr.Microphone() as source:
@@ -45,7 +47,8 @@ class Voice:
                 text = self.recognizer_instance.recognize_google(audio, language="it-IT")
                 print("Google ha capito: \n", text)
             except Exception as e:
-                self.speech_synthesis(config.errorSpeechRec)
+                if self.state == 0:
+                    self.speech_synthesis(config.errorSpeechRec)
                 return self.speech_recognize()
             return text
 
@@ -82,7 +85,6 @@ class VocalPages:
         self.voice = Voice()
         self.page.change_widget_state()
         # state = 0 significa che il sistema di interfaccia vocale e' attivo; = 1 viceversa
-        self.state = 0
 
     # -------------- Pages --------------
 
@@ -376,7 +378,7 @@ class VocalPages:
 
     def check_command(self, higher_pause=False):
         text = self.voice.speech_recognize(higher_pause)
-        if self.state == 0 and self.voice.compare_strings(text, "Indietro"):
+        if self.voice.state == 0 and self.voice.compare_strings(text, "Indietro"):
             no_back_pages = [self.page.get_pages()[Pages.StartPage], self.page.get_pages()[Pages.InformationPage],
                              self.page.get_pages()[Pages.UserPage]]
             if self.page.current_page in no_back_pages:
@@ -386,17 +388,17 @@ class VocalPages:
                 self.page.current_page.backButton["state"] = "normal"
                 self.page.current_page.backButton.invoke()
                 self.go_to_current_page_function()
-        elif self.state == 0 and self.voice.compare_strings(text, "stop"):
+        elif self.voice.state == 0 and self.voice.compare_strings(text, "stop"):
             self.voice.speech_synthesis(config.messageAfterStop)
             self.page.change_widget_state()
             self.page.current_page.update_widget_state(self.page)
-            self.state = 1
+            self.voice.state = 1
             while True:
                 self.check_command()
-        elif self.state == 1 and self.voice.compare_strings(text, "start"):
+        elif self.voice.state == 1 and self.voice.compare_strings(text, "start"):
             self.page.change_widget_state()
             self.page.current_page.update_widget_state(self.page)
-            self.state = 0
+            self.voice.state = 0
             self.go_to_current_page_function()
         else:
             return text
