@@ -96,13 +96,11 @@ class VocalPages:
         choice = self.check_command()
         if self.voice.compare_strings(choice, config.choice1.lower()):
             self.voice.speech_synthesis("Operazione scelta " + config.choice1)
-            self.page.current_page.button1["state"] = "normal"
-            self.page.current_page.button1.invoke()
+            self.invoke_button(self.page.current_page.button1)
             self.enroll_page_CF()
         elif self.voice.compare_strings(choice, config.choice2.lower()):
             self.voice.speech_synthesis("Operazione scelta " + config.choice2)
-            self.page.current_page.button2["state"] = "normal"
-            self.page.current_page.button2.invoke()
+            self.invoke_button(self.page.current_page.button2)
             self.recognition_choice_page()
         else:
             self.voice.speech_synthesis("Scegli tra: " + config.choice1 + " " + config.choice2)
@@ -110,13 +108,14 @@ class VocalPages:
 
     def enroll_page_CF(self):
         cf = self.page_CF()
-        self.page.current_page.entryCF.delete(0, tk.END)
-        self.page.current_page.entryCF.insert(0, cf)
+        self.set_text_entry(self.page.current_page.entryCF, cf)
         self.enroll_page_name()
 
     def page_CF(self, first_time=True):
         # se l'entry e' gia' modificata, significa che l'utente ha proceduto con l'operazione e poi e' tornato indietro
         # quindi il sistema gli chiedera' conferma sul codice fiscale
+        print(self.page.current_page.entryCF.get(),
+              self.page.current_page.entryCF.get() == config.messageCF)
         if self.page.current_page.entryCF.get() == config.messageCF:
             if first_time:
                 self.voice.speech_synthesis(config.messageCF + "\n Ricorda di fare lo spelling e di "
@@ -124,20 +123,21 @@ class VocalPages:
             else:
                 self.voice.speech_synthesis(config.messageCF)
             cf = ""
-            # TODO CONTROLLO SULLA LUNGHEZZA DEL CF
             while len(cf) < 16:
                 text = self.check_command(True)
                 cf += self.spelling(text)
         else:
             cf = self.page.current_page.entryCF.get()
+        if len(cf)!=16:
+            self.set_text_entry(self.page.current_page.entryCF, config.messageCF)
+            return self.page_CF(False)
         self.voice.speech_synthesis(config.confirmCF)
         self.read_cf(cf)
         self.voice.speech_synthesis(config.confirm)
         if self.confirm():
             return cf
         else:
-            self.page.current_page.entryCF.delete(0, tk.END)
-            self.page.current_page.entryCF.insert(0, config.messageCF)
+            self.set_text_entry(self.page.current_page.entryCF,config.messageCF)
             return self.page_CF(False)
 
     def enroll_page_name(self):
@@ -149,31 +149,25 @@ class VocalPages:
             last_name = self.check_command()
             self.voice.speech_synthesis(first_name + " " + last_name + " " + config.confirm)
             if self.confirm():
-                self.page.current_page.entryName.delete(0, tk.END)
-                self.page.current_page.entryName.insert(0, first_name + " " + last_name)
+                self.set_text_entry(self.page.current_page.entryName,first_name + " " + last_name)
                 self.voice.speech_synthesis(config.messagePhoto)
-                self.page.current_page.invio["state"] = "normal"
-                self.page.current_page.invio.invoke()
+                self.invoke_button(self.page.current_page.invio)
                 self.data_enrollment_page()
             else:
                 first_name = self.check_name(first_name)
                 last_name = self.check_name(last_name)
-                self.page.current_page.entryName.delete(0, tk.END)
-                self.page.current_page.entryName.insert(0, first_name + " " + last_name)
+                self.set_text_entry(self.page.current_page.entryName,first_name + " " + last_name)
                 self.voice.speech_synthesis(config.messagePhoto)
-                self.page.current_page.invio["state"] = "normal"
-                self.page.current_page.invio.invoke()
+                self.invoke_button(self.page.current_page.invio)
                 self.data_enrollment_page()
         else:
             self.voice.speech_synthesis(self.page.current_page.entryName.get() + " " + config.confirm)
             if self.confirm():
                 self.voice.speech_synthesis(config.messagePhoto)
-                self.page.current_page.invio["state"] = "normal"
-                self.page.current_page.invio.invoke()
+                self.invoke_button(self.page.current_page.invio)
                 self.data_enrollment_page()
             else:
-                self.page.current_page.entryName.delete(0, tk.END)
-                self.page.current_page.entryName.insert(0, config.messageN)
+                self.set_text_entry(self.page.current_page.entryName,config.messageN)
                 self.enroll_page_name()
 
     def data_enrollment_page(self):
@@ -195,10 +189,8 @@ class VocalPages:
         self.voice.speech_synthesis(config.numberMedicinesConfirm + num_medicines + "?")
         if not self.confirm():
             self.data_enrollment_page()
-        self.page.current_page.entryNMedicine.delete(0, tk.END)
-        self.page.current_page.entryNMedicine.insert(0, num_medicines)
-        self.page.current_page.buttonInvia["state"] = "normal"
-        self.page.current_page.buttonInvia.invoke()
+        self.set_text_entry(self.page.current_page.entryNMedicine,num_medicines)
+        self.invoke_button(self.page.current_page.buttonInvia)
 
         i = 0
         while i < num_medicines:
@@ -208,7 +200,7 @@ class VocalPages:
             # Chiedo conferma della medicina appena dichiarata
             self.voice.speech_synthesis(config.medicineConfirm + entryMedicine + "?")
             if self.confirm():
-                self.page.current_page.medicineEntry[i].insert(0, entryMedicine)
+                self.set_text_entry(self.page.current_page.medicineEntry[i],entryMedicine)
                 print(entryMedicine)
                 i += 1
 
@@ -217,16 +209,13 @@ class VocalPages:
         if not self.confirm():
             self.change_medicine()
 
-        self.page.current_page.buttonConferma["state"] = "normal"
-        self.page.current_page.buttonConferma.invoke()
+        self.invoke_button(self.page.current_page.buttonConferma)
         self.information_page()
 
     def information_page(self):
         self.voice.speech_synthesis(self.page.current_page.label.cget("tex"))
-        count = 0
         time.sleep(5)
-        self.page.current_page.homeButton["state"] = "normal"
-        self.page.current_page.homeButton.invoke()
+        self.invoke_button(self.page.current_page.homeButton)
         self.start_page()
 
     def recognition_choice_page(self):
@@ -235,24 +224,20 @@ class VocalPages:
         text = self.check_command()
         if self.voice.compare_strings(text, config.recognitionChoice1.lower()):
             self.voice.speech_synthesis("Ruolo scelto: " + config.recognitionChoice1)
-            self.page.current_page.button1["state"] = "normal"
-            self.page.current_page.button1.invoke()
+            self.invoke_button(self.page.current_page.button1)
             self.recognition_page()
         elif self.voice.compare_strings(text, config.recognitionChoice2.lower()):
             self.voice.speech_synthesis("Ruolo scelto: " + config.recognitionChoice2)
-            self.page.current_page.button2["state"] = "normal"
-            self.page.current_page.button2.invoke()
+            self.invoke_button(self.page.current_page.button2)
             self.recognition_page()
         else:
             self.recognition_choice_page()
 
     def recognition_page(self, indietro=False):
         cf = self.page_CF(indietro)
-        self.page.current_page.entryCF.delete(0, tk.END)
-        self.page.current_page.entryCF.insert(0, cf)
+        self.set_text_entry(self.page.current_page.entryCF, cf)
         self.voice.speech_synthesis(config.messagePhoto)
-        self.page.current_page.buttonInvia["state"] = "normal"
-        self.page.current_page.buttonInvia.invoke()
+        self.invoke_button(self.page.current_page.buttonInvia)
         self.data_recognition_page()
 
     def data_recognition_page(self):
@@ -261,12 +246,10 @@ class VocalPages:
         self.read_cf(cf)
         self.voice.speech_synthesis(config.confirm)
         if self.confirm():
-            self.page.current_page.buttonConferma["state"] = "normal"
-            self.page.current_page.buttonConferma.invoke()
+            self.invoke_button(self.page.current_page.buttonConferma)
             self.user_page()
         else:
-            self.page.current_page.backButton["state"] = "normal"
-            self.page.current_page.backButton.invoke()
+            self.invoke_button(self.page.current_page.backButton)
             self.recognition_page()
 
     def user_page(self):
@@ -293,8 +276,7 @@ class VocalPages:
             else:
                 self.voice.speech_synthesis(medicine.cget("text"))
         time.sleep(10)
-        self.page.current_page.homeButton["state"] = "normal"
-        self.page.current_page.homeButton.invoke()
+        self.invoke_button(self.page.current_page.homeButton)
         self.start_page()
 
     # -------------- Functions --------------
@@ -318,8 +300,7 @@ class VocalPages:
                 self.voice.speech_synthesis(config.medicineConfirm + entryMedicine + "?")
                 # Se il farmaco è corretto, lo sostituisco con quello precedentemente inserito nella posizione indicata
                 if self.confirm():
-                    self.page.current_page.medicineEntry[pos].delete(0, tk.END)
-                    self.page.current_page.medicineEntry[pos].insert(0, entryMedicine)
+                    self.set_text_entry(self.page.current_page.medicineEntry[pos],entryMedicine)
                     print(entryMedicine)
                 else:
                     continue
@@ -385,8 +366,7 @@ class VocalPages:
                 self.voice.speech_synthesis(config.messageError)
                 return self.check_command(higher_pause)
             else:
-                self.page.current_page.backButton["state"] = "normal"
-                self.page.current_page.backButton.invoke()
+                self.invoke_button(self.page.current_page.backButton)
                 self.go_to_current_page_function()
         elif self.voice.state == 0 and self.voice.compare_strings(text, "stop"):
             self.voice.speech_synthesis(config.messageAfterStop)
@@ -419,6 +399,16 @@ class VocalPages:
         elif self.page.current_page.__class__ is Pages.UserPage:
             self.user_page()
 
+    def set_text_entry(self,entry, text):
+        entry["state"] = "normal"
+        entry.delete(0, tk.END)
+        entry.insert(0, text)
+        entry["state"] = "disabled"
+
+    def invoke_button(self, button):
+        button["state"] = "normal"
+        button.invoke()
+        button["state"] = "disabled"
 
 if __name__ == '__main__':
     voice = Voice()
