@@ -163,33 +163,47 @@ class VocalPages:
                 self.enroll_page_name()
 
     def data_enrollment_page(self):
-        # TODO GESTIRE IL CASO IN CUI L'UTENTE ABBIA ATTIVATO IL VOICE SERVICE SU QUESTA PAGINA
-        # e quindi gestire il caso in cui la pagina sia gia' stata compilata e bisogna chiedere conferma dei dati
-        # inseriti
-        self.voice.speech_synthesis(config.numberMedicines)
-        num_string = self.check_command()
 
-        if numbers.__contains__(num_string):
-            num_medicines = numbers.__getitem__(num_string)
+        print(self.page.current_page.entryNMedicine.get())
+
+        # se l'entry non e' modificata, significa che l'utente non ha inserito il numero dei farmaci
+        if self.page.current_page.entryNMedicine.get() == "":
+            self.voice.speech_synthesis(config.numberMedicines)
+            num_string = self.check_command()
+
+            if numbers.__contains__(num_string):
+                num_medicines = numbers.__getitem__(num_string)
+            else:
+                try:
+                    num_medicines = int(num_string)
+                except Exception as e:
+                    self.voice.speech_synthesis(config.messageError)
+                    return self.data_enrollment_page()
+        # se l'entry e' modificata, l'utente aveva gia' inserito il numero dei farmaci e poi era tornato indietro
         else:
-            try:
-                num_medicines = int(num_string)
-            except Exception as e:
-                self.voice.speech_synthesis(config.messageError)
-                return self.data_enrollment_page()
+            num_medicines = self.page.current_page.entryNMedicine.get()
 
+        # chiedo conferma del numero dei farmaci
         self.voice.speech_synthesis(config.numberMedicinesConfirm + num_medicines + "?")
         if not self.confirm():
-            self.data_enrollment_page()
+            self.data_enrollment_page()     # se la risposta è negativa, allora chiedo nuvamente il numero
+        # altrimenti vado avanti ed aggiungo un numero di entry pari al numero appena inserito
         self.page.current_page.entryNMedicine.delete(0, tk.END)
         self.page.current_page.entryNMedicine.insert(0, num_medicines)
         self.page.current_page.buttonInvia.invoke()
 
         i = 0
+
+        # ogni entry deve essere controllato per vedere se è stato modificato o meno
         while i < num_medicines:
-            self.voice.speech_synthesis(config.messageMedicine)
-            entryMedicine = self.check_command()
-            entryMedicine = self.voice.medicine_autocorrect(entryMedicine)
+
+            # se non è presente nessun nome di un farmaco, allora viene richiesto all'untente di aggiungerlo
+            if self.page.current_page.medicineEntry[i].get() == "":
+                self.voice.speech_synthesis(config.messageMedicine)
+                entryMedicine = self.check_command()
+                entryMedicine = self.voice.medicine_autocorrect(entryMedicine)
+            else:
+                entryMedicine = self.page.current_page.medicineEntry[i].get()
             #Chiedo conferma della medicina appena dichiarata
             self.voice.speech_synthesis(config.medicineConfirm+entryMedicine+"?")
             if self.confirm():
