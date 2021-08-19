@@ -186,7 +186,7 @@ class VocalPages:
                 self.voice.speech_synthesis(config.messageError)
                 return self.data_enrollment_page()
 
-        self.voice.speech_synthesis(config.numberMedicinesConfirm + num_medicines + "?")
+        self.voice.speech_synthesis(config.numberMedicinesConfirm + str(num_medicines) + "?")
         if not self.confirm():
             self.data_enrollment_page()
         self.set_text_entry(self.page.current_page.entryNMedicine,num_medicines)
@@ -253,6 +253,7 @@ class VocalPages:
             self.recognition_page()
 
     def user_page(self):
+        print(self.page.current_page)
         self.voice.speech_synthesis(self.page.current_page.name.cget("text"))
         self.voice.speech_synthesis(self.page.current_page.patient.cget("text"))
         self.voice.speech_synthesis("Codice fiscale: ")

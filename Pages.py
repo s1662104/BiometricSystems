@@ -487,7 +487,7 @@ class UserPage(DataPage):
         self.entries = []
 
         self.homeButton = tk.Button(self, text="Home", width=8, height=1, bg='#1E79FA', disabledforeground="#2f373c",
-                                    command=lambda: self.home())
+                                    command=lambda: self.home(controller))
         self.homeButton.place(y=520, x=110)
 
     def update_widget_state(self, controller):
@@ -584,13 +584,12 @@ def check_input(controller, cf, label_error, op, role=None, name=None):
     list(controller.frames.values())[n].reset()
     # Inizio parte antispoofing in fase di matching
     # l'utente deve passare entrambi i test di anti-spoofing
-    user = True
-    # if not EyeBlink(None).eyeBlinkStart():
-    #     user = False
+    if not EyeBlink(None).eyeBlinkStart():
+         user = False
     # elif not MicroTexture().microTextureCam():
     #     user = False
-    # else:
-    #     user = True
+    else:
+         user = True
     # Fine parte antispoofing in fase di matching
     # registrazione
     if user:
