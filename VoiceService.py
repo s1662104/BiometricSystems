@@ -184,7 +184,7 @@ class VocalPages:
             num_medicines = self.page.current_page.entryNMedicine.get()
 
         # chiedo conferma del numero dei farmaci
-        self.voice.speech_synthesis(config.numberMedicinesConfirm + num_medicines + "?")
+        self.voice.speech_synthesis(config.numberMedicinesConfirm + str(num_medicines) + "?")
         if not self.confirm():
             self.data_enrollment_page()     # se la risposta è negativa, allora chiedo nuvamente il numero
         # altrimenti vado avanti ed aggiungo un numero di entry pari al numero appena inserito
@@ -204,12 +204,30 @@ class VocalPages:
                 entryMedicine = self.voice.medicine_autocorrect(entryMedicine)
             else:
                 entryMedicine = self.page.current_page.medicineEntry[i].get()
-            #Chiedo conferma della medicina appena dichiarata
+
+            # chiedo conferma della medicina appena dichiarata
             self.voice.speech_synthesis(config.medicineConfirm+entryMedicine+"?")
-            if self.confirm():
-                self.page.current_page.medicineEntry[i].insert(0, entryMedicine)
-                print(entryMedicine)
-                i += 1
+            # se il farmaco è errato, viene chiesto nuovamente di inserirlo
+            if not self.confirm():
+                # se era gi stato inserito un farmco, ma era errato, viene cancellato
+                if not self.page.current_page.medicineEntry[i].get() == "":
+                    self.page.current_page.medicineEntry[i].delete(0, tk.END)
+                    self.page.current_page.medicineEntry[i].insert(0, "")
+                continue
+
+            dosaggioCorretto = False
+            while not dosaggioCorretto:
+                # chiedo il dosaggio per il farmaco
+                self.voice.speech_synthesis(config.dosageMedicine)
+                dosaggio = self.check_command()
+
+                # chiedo conferma del dosaggio
+                self.voice.speech_synthesis("Confermi che"+dosaggio+"sia il dosaggio corretto?")
+                if self.confirm():
+                    self.page.current_page.medicineEntry[i].insert(0, entryMedicine+" "+dosaggio)
+                    print(entryMedicine)
+                    i += 1
+                    dosaggioCorretto = True
 
         self.voice.speech_synthesis(config.medConfirm)
         #Se c'è quale medicinale errato, chiedo qual è e lo correggo
@@ -408,32 +426,6 @@ class VocalPages:
 
 if __name__ == '__main__':
     voice = Voice()
-    while True:
-        # Chiedo quel è il farmaco che deve essere corretto
-        voice.speech_synthesis(config.changeMed)
-        index = voice.speech_recognize()
-        # Se la posizione è stata capita correttamente, allora ottengo l'indice dell'array dei farmaci
-        if positions.__contains__(index):
-            pos = positions.__getitem__(index)
-            # Chiedo il nome del farmaco
-            voice.speech_synthesis(config.messageMedicine)
-            entryMedicine = voice.speech_recognize()
-            entryMedicine = voice.medicine_autocorrect(entryMedicine)
-            # Chiedo conferma della medicina appena dichiarata
-            voice.speech_synthesis(config.medicineConfirm + entryMedicine + "?")
-            # Se il farmaco è corretto, lo sostituisco con quello precedentemente inserito nella posizione indicata
-            text = voice.speech_recognize()
-            if voice.compare_strings(text, config.yes.lower()):
-                print(entryMedicine)
-            else:
-                continue
-            # Chiedo se ci sono altri farmaci da cambiare
-            voice.speech_synthesis(config.otherMedToChange)
-            text = voice.speech_recognize()
-            if not voice.compare_strings(text, config.yes.lower()):
-                break
-        else:
-            voice.speech_synthesis(config.errorSpeechRec)
     #voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " + config.choice2)
     #choice = voice.speech_recognize()
     #text = config.initialMessage + " " + config.choice1 + " " + config.choice2
