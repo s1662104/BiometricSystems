@@ -170,8 +170,11 @@ class VocalPages:
                 self.enroll_page_name()
 
     def data_enrollment_page(self):
-
-        print(self.page.current_page.entryNMedicine.get())
+        # chiedo se si vogliono aggiungere dei delegati
+        self.voice.speech_synthesis(config.messageDelegate)
+        if self.confirm():
+            # aggiungo i delegati
+            self.addDelegates()
 
         # se l'entry non e' modificata, significa che l'utente non ha inserito il numero dei farmaci
         if self.page.current_page.entryNMedicine.get() == "":
@@ -237,6 +240,42 @@ class VocalPages:
 
         self.invoke_button(self.page.current_page.buttonConferma)
         self.information_page()
+
+    def addDelegates(self):
+        nDelegates = 0
+        while True:
+            # chiedo di fare lo spelling del codice fiscale
+            self.voice.speech_synthesis(config.numberDelegate)
+            cf = ""
+            while len(cf) < 16:
+                text = self.check_command(True)
+                cf += self.spelling(text)
+
+            # se la stringa del cf non ha la lunghezza corretta, si ripete da capo lo spelling
+            if len(cf) != 16:
+                self.voice.speech_synthesis(config.cfDeleateError)
+                continue
+
+            # chiedo conferma del codice fiscale del delegato
+            self.voice.speech_synthesis(config.confirmCFDelegate+cf+"?")
+            self.read_cf(cf)
+
+            # se il codice fiscale è giusto
+            if self.confirm():
+                # inserisco il cf nell'entry
+                self.set_text_entry(self.page.current_page.delegateEntry[nDelegates], cf)
+                nDelegates += 1
+                # se si è raggiunto il numero massimo di delegati,allora termino
+                if nDelegates == 2:
+                    self.voice.speech_synthesis(config.numberMaxDelegate)
+                    break
+                # se possono esserne inseriti altri, chiedo se ce ne sono da aggiungere
+                self.voice.speech_synthesis(config.continueToAddDelegate)
+                # se non ci sono altri delegati da inserire, allora termino
+                if not self.confirm():
+                    break
+
+        return
 
     def information_page(self):
         self.voice.speech_synthesis(self.page.current_page.label.cget("tex"))
