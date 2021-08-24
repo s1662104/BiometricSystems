@@ -195,29 +195,29 @@ class VocalPages:
                     if self.confirm():
                         self.addDelegates(nDelegates=i)
                     break
+        while True:
+            # se l'entry non e' modificata, significa che l'utente non ha inserito il numero dei farmaci
+            if self.page.current_page.entryNMedicine.get() == "":
+                self.voice.speech_synthesis(config.numberMedicines)
+                num_string = self.check_command()
 
-        # se l'entry non e' modificata, significa che l'utente non ha inserito il numero dei farmaci
-        if self.page.current_page.entryNMedicine.get() == "":
-            self.voice.speech_synthesis(config.numberMedicines)
-            num_string = self.check_command()
-
-            if numbers.__contains__(num_string):
-                num_medicines = numbers.__getitem__(num_string)
+                if numbers.__contains__(num_string):
+                    num_medicines = numbers.__getitem__(num_string)
+                else:
+                    try:
+                        num_medicines = int(num_string)
+                    except Exception as e:
+                        self.voice.speech_synthesis(config.messageError)
+            # se l'entry e' modificata, l'utente aveva gia' inserito il numero dei farmaci e poi era tornato indietro
             else:
-                try:
-                    num_medicines = int(num_string)
-                except Exception as e:
-                    self.voice.speech_synthesis(config.messageError)
-                    return self.data_enrollment_page()
-        # se l'entry e' modificata, l'utente aveva gia' inserito il numero dei farmaci e poi era tornato indietro
-        else:
-            num_medicines = self.page.current_page.entryNMedicine.get()
+                num_medicines = self.page.current_page.entryNMedicine.get()
 
-        # chiedo conferma del numero dei farmaci
-        self.voice.speech_synthesis(config.numberMedicinesConfirm + str(num_medicines) + "?")
-        if not self.confirm():
-            self.data_enrollment_page()     # se la risposta è negativa, allora chiedo nuvamente il numero
-        # altrimenti vado avanti ed aggiungo un numero di entry pari al numero appena inserito
+            # chiedo conferma del numero dei farmaci
+            self.voice.speech_synthesis(config.numberMedicinesConfirm + str(num_medicines) + "?")
+            if self.confirm():
+                break     # se la risposta è positiva, vado avanti
+
+        # aggiungo un numero di entry pari al numero appena inserito
         self.set_text_entry(self.page.current_page.entryNMedicine,num_medicines)
         self.invoke_button(self.page.current_page.buttonInvia)
 
