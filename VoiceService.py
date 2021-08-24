@@ -169,12 +169,32 @@ class VocalPages:
                 self.set_text_entry(self.page.current_page.entryName,config.messageN)
                 self.enroll_page_name()
 
-    def data_enrollment_page(self):
-        # chiedo se si vogliono aggiungere dei delegati
-        self.voice.speech_synthesis(config.messageDelegate)
-        if self.confirm():
-            # aggiungo i delegati
-            self.addDelegates()
+    def data_enrollment_page(self, first_time=True):
+        # se la prima entry della lista dei delegati è vuota
+        if first_time:
+            # chiedo se si vogliono aggiungere dei delegati
+            self.voice.speech_synthesis(config.messageDelegate)
+            if self.confirm():
+                # aggiungo i delegati
+                self.addDelegates()
+        # altrimenti, dato che era gia' stata compilata
+        else:
+            # chiedo conferma dei codici fiscali inseriti appartenenti ai delegati
+            for i in range(3):
+                # se l'entry è stata compliata, chiedo conferma
+                if self.page.current_page.delegateEntry[i].get() != "":
+                    cf = self.page.current_page.delegateEntry[i].get()
+                    self.voice.speech_synthesis(config.confirmCFDelegate + cf + "?")
+                    self.read_cf(cf)
+                    # se è errato, allora viene modificato
+                    if not self.confirm():
+                        self.change_delegate(i)
+                else:
+                    # se l'entry è vuota, chiedo se si vogliono aggiungere altri delegati
+                    self.voice.speech_synthesis(config.continueToAddDelegate)
+                    if self.confirm():
+                        self.addDelegates(nDelegates=i)
+                    break
 
         # se l'entry non e' modificata, significa che l'utente non ha inserito il numero dei farmaci
         if self.page.current_page.entryNMedicine.get() == "":
@@ -240,42 +260,6 @@ class VocalPages:
 
         self.invoke_button(self.page.current_page.buttonConferma)
         self.information_page()
-
-    def addDelegates(self):
-        nDelegates = 0
-        while True:
-            # chiedo di fare lo spelling del codice fiscale
-            self.voice.speech_synthesis(config.numberDelegate)
-            cf = ""
-            while len(cf) < 16:
-                text = self.check_command(True)
-                cf += self.spelling(text)
-
-            # se la stringa del cf non ha la lunghezza corretta, si ripete da capo lo spelling
-            if len(cf) != 16:
-                self.voice.speech_synthesis(config.cfDeleateError)
-                continue
-
-            # chiedo conferma del codice fiscale del delegato
-            self.voice.speech_synthesis(config.confirmCFDelegate+cf+"?")
-            self.read_cf(cf)
-
-            # se il codice fiscale è giusto
-            if self.confirm():
-                # inserisco il cf nell'entry
-                self.set_text_entry(self.page.current_page.delegateEntry[nDelegates], cf)
-                nDelegates += 1
-                # se si è raggiunto il numero massimo di delegati,allora termino
-                if nDelegates == 2:
-                    self.voice.speech_synthesis(config.numberMaxDelegate)
-                    break
-                # se possono esserne inseriti altri, chiedo se ce ne sono da aggiungere
-                self.voice.speech_synthesis(config.continueToAddDelegate)
-                # se non ci sono altri delegati da inserire, allora termino
-                if not self.confirm():
-                    break
-
-        return
 
     def information_page(self):
         self.voice.speech_synthesis(self.page.current_page.label.cget("tex"))
@@ -346,6 +330,47 @@ class VocalPages:
         self.start_page()
 
     # -------------- Functions --------------
+    def addDelegates(self, nDelegates=0):
+        while True:
+            # chiedo di fare lo spelling del codice fiscale
+            self.voice.speech_synthesis(config.numberDelegate)
+            cf = ""
+            while len(cf) < 16:
+                text = self.check_command(True)
+                cf += self.spelling(text)
+
+            print("Lunghezza codice fiscale:",len(cf))
+
+            # se la stringa del cf non ha la lunghezza corretta, si ripete da capo lo spelling
+            if len(cf) != 16:
+                self.voice.speech_synthesis(config.cfDeleateError)
+                continue
+
+            # chiedo conferma del codice fiscale del delegato
+            self.voice.speech_synthesis(config.confirmCFDelegate+cf+"?")
+            self.read_cf(cf)
+
+            # se il codice fiscale è giusto
+            if self.confirm():
+                # inserisco il cf nell'entry
+                self.set_text_entry(self.page.current_page.delegateEntry[nDelegates], cf)
+                nDelegates += 1
+                # se si è raggiunto il numero massimo di delegati,allora termino
+                if nDelegates == 2:
+                    self.voice.speech_synthesis(config.numberMaxDelegate)
+                    break
+                # se possono esserne inseriti altri, chiedo se ce ne sono da aggiungere
+                self.voice.speech_synthesis(config.continueToAddDelegate)
+                # se non ci sono altri delegati da inserire, allora termino
+                if not self.confirm():
+                    break
+        return
+
+    def change_delegate(self, index):
+
+
+
+        return
 
     def change_medicine(self):
         while True:
@@ -459,7 +484,7 @@ class VocalPages:
         elif self.page.current_page.__class__ is Pages.RecognitionPage:
             self.recognition_page()
         elif self.page.current_page.__class__ is Pages.DataEnrollmentPage:
-            self.data_enrollment_page()
+            self.data_enrollment_page(first_time=False)
         elif self.page.current_page.__class__ is Pages.DataRecognitionPage:
             self.data_recognition_page()
         elif self.page.current_page.__class__ is Pages.UserPage:
