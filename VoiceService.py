@@ -417,11 +417,15 @@ class VocalPages:
         return self.voice.compare_strings(text, config.yes.lower())
 
     def read_cf(self, cf):
+        voice.synthesis.setProperty('rate', 100)
+        spelling = ""
         for c in cf:
             if c.isalpha():
-                self.voice.speech_synthesis(spell[c])
+                spelling += spell[c] + " "
             else:
-                self.voice.speech_synthesis(c)
+                spelling += c + " "
+        voice.speech_synthesis(spelling)
+        voice.synthesis.setProperty('rate', 140)
 
     def check_command(self, higher_pause=False):
         text = self.voice.speech_recognize(higher_pause)
@@ -478,6 +482,11 @@ class VocalPages:
 
 if __name__ == '__main__':
     voice = Voice()
+    # for c in "SMRLPG34R92H784R":
+    #     if c.isalpha():
+    #         voice.speech_synthesis(spell[c])
+    #     else:
+    #         voice.speech_synthesis(c)
     #voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " + config.choice2)
     #choice = voice.speech_recognize()
     #text = config.initialMessage + " " + config.choice1 + " " + config.choice2
