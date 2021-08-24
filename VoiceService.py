@@ -278,7 +278,7 @@ class VocalPages:
         return
 
     def information_page(self):
-        self.voice.speech_synthesis(self.page.current_page.label.cget("tex"))
+        self.voice.speech_synthesis(self.page.current_page.label.cget("text"))
         time.sleep(5)
         self.invoke_button(self.page.current_page.homeButton)
         self.start_page()
@@ -417,15 +417,15 @@ class VocalPages:
         return self.voice.compare_strings(text, config.yes.lower())
 
     def read_cf(self, cf):
-        voice.synthesis.setProperty('rate', 100)
+        self.voice.synthesis.setProperty('rate', 100)
         spelling = ""
         for c in cf:
             if c.isalpha():
                 spelling += spell[c] + " "
             else:
                 spelling += c + " "
-        voice.speech_synthesis(spelling)
-        voice.synthesis.setProperty('rate', 140)
+        self.voice.speech_synthesis(spelling)
+        self.voice.synthesis.setProperty('rate', 140)
 
     def check_command(self, higher_pause=False):
         text = self.voice.speech_recognize(higher_pause)
