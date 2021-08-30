@@ -39,7 +39,7 @@ class Page(tk.Tk):
         self.frames = {}
         pageNames = []
 
-        for F in (StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage,
+        for F in (ModePage, StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage,
                   InformationPage, UserPage, RecognitionChoicePage):
             frame = F(container, self)
 
@@ -52,8 +52,8 @@ class Page(tk.Tk):
         # pagina n, si indicizza a pages.NOME_PAGINA.value - 1 (-1 perche' gli indici partono da 1)
         pages = Enum("pages", pageNames)
 
-        self.current_page = self.frames[StartPage]
-        self.show_frame(StartPage)
+        self.current_page = self.frames[ModePage]
+        self.show_frame(ModePage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -69,6 +69,64 @@ class Page(tk.Tk):
         else:
             self.widget_state = "normal"
 
+# --------------- Mode Page ---------------
+class ModePage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text=config.choiceMode)
+        label.pack(pady=10, padx=50)
+        self.controller = controller
+        self.button1 = tk.Button(self, text=config.mode1, width=15, height=2, bg='#1E79FA',
+                                 disabledforeground="#2f373c", command=lambda: goToStart(1))
+        self.button2 = tk.Button(self, text=config.mode2, width=15, height=2, bg='#1E79FA',
+                                 disabledforeground="#2f373c", command=lambda: goToStart(2))
+        self.button3 = tk.Button(self, text=config.mode3, width=15, height=2, bg='#1E79FA',
+                                 disabledforeground="#2f373c", command=lambda: goToStart(3))
+
+        self.button1.pack()
+        self.button2.pack(pady=1)
+        self.button3.pack()
+
+        self.var1 = tk.IntVar
+        self.var2 = tk.IntVar
+
+        self.c1 = tk.Checkbutton(self, text=config.checkbox1, variable=self.var1, onvalue=1, offvalue=0, command=lambda: setFeedback(1))
+        self.c1.pack(pady=20)
+        self.c2 = tk.Checkbutton(self, text=config.checkbox2, variable=self.var2, onvalue=1, offvalue=0, command=lambda: setFeedback(2))
+        self.c2.pack()
+
+        def goToStart(mode):
+            controller.current_page = controller.frames[StartPage]
+            if mode == 1:
+                print("Modalità manuale")
+            elif mode == 2:
+                controller.current_page.widget_state = "disabled"
+                print("Modalità comandi vocali")
+            else:
+                print("Modalità mista")
+            controller.show_frame(StartPage)
+
+        def setFeedback(feedback):
+            if feedback == 1:
+                self.c1.select()
+                self.c2.deselect()
+            elif feedback == 2:
+                self.c1.deselect()
+                self.c2.select()
+            else:
+                print("FEEDBACK NON VALIDO")
+
+
+    def update_widget_state(self, controller):
+        # self.button1["state"] = tk.NORMAL
+        # self.button2["state"] = tk.NORMAL
+        # self.button3["state"] = tk.NORMAL
+        self.button1["state"] = controller.widget_state
+        self.button2["state"] = controller.widget_state
+        self.button3["state"] = controller.widget_state
+        self.c1.select()
+        self.c2.deselect()
+
 
 # --------------- Start Page ---------------
 
@@ -78,6 +136,7 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text=config.messageWelcome)
         label.pack(pady=10, padx=50)
+        self.controller = controller
         self.button1 = tk.Button(self, text=config.choice1, width=15, height=2, bg='#1E79FA',
                                  disabledforeground="#2f373c", command=lambda: goToEnroll())
         self.button2 = tk.Button(self, text=config.choice2, width=15, height=2, bg='#1E79FA',

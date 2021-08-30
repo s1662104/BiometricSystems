@@ -87,11 +87,39 @@ class VocalPages:
 
     # -------------- Pages --------------
 
+    def mode_page(self, repeat=False):
+        self.page.current_page.update_widget_state(self.page)
+        # self.page.current_page.button1.bind('<Button-1>', func=lambda *args: self.button_press())
+        # self.page.current_page.button2.bind('<Button-1>', func=lambda *args: self.start_page())
+        # self.page.current_page.button3.bind('<Button-1>', func=lambda *args: self.start_page())
+        if not repeat:
+            self.voice.speech_synthesis(config.welcomeMessage + " " + config.mode1 + " \n " + config.mode2 + " \n " + config.mode3)
+        mode = self.check_command()
+        # if self.voice.compare_strings(mode, config.mode1):
+        #     self.voice.speech_synthesis(config.confirmMode1)
+        #     if self.confirm():
+        #         self.invoke_button(self.page.current_page.button1)
+        #         self.start_page()
+        # elif self.voice.compare_strings(mode, config.mode2):
+        #     self.voice.speech_synthesis(config.confirmMode2)
+        #     if self.confirm():
+        #         self.invoke_button(self.page.current_page.button2)
+        #         self.start_page()
+        # elif self.voice.compare_strings(mode, config.mode3):
+        #     self.voice.speech_synthesis(config.confirmMode3)
+        #     if self.confirm():
+        #         self.invoke_button(self.page.current_page.button3)
+        #         self.start_page()
+        # self.voice.speech_synthesis("quale modalità preferisci utilizzare?" + " " + config.mode1 + " " + config.mode2 + " " + config.mode3)
+        # self.mode_page(True)
+
+    def button_press(self):
+        print("BOTTONE PREMUTO VOICE SERVICE")
+
     def start_page(self, repeat=False):
         self.page.current_page.update_widget_state(self.page)
         if not repeat:
             self.voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " + config.choice2)
-            # time.sleep(18)
         choice = self.check_command()
         if self.voice.compare_strings(choice, config.choice1.lower()):
             self.voice.speech_synthesis("Operazione scelta " + config.choice1)
@@ -232,31 +260,46 @@ class VocalPages:
                 entryMedicine = self.voice.medicine_autocorrect(entryMedicine)
             else:
                 entryMedicine = self.page.current_page.medicineEntry[i].get()
-            # Chiedo conferma della medicina appena dichiarata
-            self.voice.speech_synthesis(config.medicineConfirm + entryMedicine + "?")
-            # se il farmaco è errato, viene chiesto nuovamente di inserirlo
-            if not self.confirm():
-                # se era gi stato inserito un farmco, ma era errato, viene cancellato
-                if not self.page.current_page.medicineEntry[i].get() == "":
-                    self.page.current_page.medicineEntry[i].delete(0, tk.END)
-                    self.page.current_page.medicineEntry[i].insert(0, "")
-                continue
-            dosaggioCorretto = False
-            while not dosaggioCorretto:
-                # chiedo il dosaggio per il farmaco
-                self.voice.speech_synthesis(config.dosageMedicine)
-                dosaggio = self.check_command()
-                # chiedo conferma del dosaggio
-                self.voice.speech_synthesis("Confermi che" + dosaggio + "sia il dosaggio corretto?")
-                if self.confirm():
-                    self.page.current_page.medicineEntry[i].insert(0, entryMedicine + " " + dosaggio)
-                    i += 1
-                    dosaggioCorretto = True
 
-        self.voice.speech_synthesis(config.medConfirm)
+            # chiedo il dosaggio per il farmaco
+            self.voice.speech_synthesis(config.dosageMedicine)
+            dosaggio = self.check_command()
+            dosMilligrammi = dosaggio[:-2] + config.mg
+
+            # chiedo conferma del farmaco e del dosaggio
+            self.voice.speech_synthesis(config.medicineConfirm + entryMedicine + "mentre il dosaggio è" + dosMilligrammi + "?")
+            if self.confirm():
+                self.page.current_page.medicineEntry[i].insert(0, entryMedicine + " " + dosaggio)
+                i += 1
+
+            # # Chiedo conferma della medicina appena dichiarata
+            # self.voice.speech_synthesis(config.medicineConfirm + entryMedicine + "?")
+            #
+            # # se il farmaco è errato, viene chiesto nuovamente di inserirlo
+            # if not self.confirm():
+            #     # se era gi stato inserito un farmco, ma era errato, viene cancellato
+            #     if not self.page.current_page.medicineEntry[i].get() == "":
+            #         self.page.current_page.medicineEntry[i].delete(0, tk.END)
+            #         self.page.current_page.medicineEntry[i].insert(0, "")
+            #     continue
+
+            # dosaggioCorretto = False
+            # while not dosaggioCorretto:
+            #     # chiedo il dosaggio per il farmaco
+            #     self.voice.speech_synthesis(config.dosageMedicine)
+            #     dosaggio = self.check_command()
+            #     dosMilligrammi = dosaggio[:-2] + config.mg
+            #     # chiedo conferma del dosaggio
+            #     self.voice.speech_synthesis("Confermi che" + dosMilligrammi + "sia il dosaggio corretto?")
+            #     if self.confirm():
+            #         self.page.current_page.medicineEntry[i].insert(0, entryMedicine + " " + dosaggio)
+            #         i += 1
+            #         dosaggioCorretto = True
+
+        # self.voice.speech_synthesis(config.medConfirm)
         # Se c'è quale medicinale errato, chiedo qual è e lo correggo
-        if not self.confirm():
-            self.change_medicine()
+        # if not self.confirm():
+        #     self.change_medicine()
 
         self.invoke_button(self.page.current_page.buttonConferma)
         self.information_page()
@@ -479,7 +522,9 @@ class VocalPages:
             return text
 
     def go_to_current_page_function(self):
-        if self.page.current_page.__class__ is Pages.StartPage:
+        if self.page.current_page.__class__ is Pages.ModePage:
+            self.mode_page()
+        elif self.page.current_page.__class__ is Pages.StartPage:
             self.start_page()
         elif self.page.current_page.__class__ is Pages.EnrollmentPage:
             self.enroll_page_CF()
@@ -507,20 +552,3 @@ class VocalPages:
 
 if __name__ == '__main__':
     voice = Voice()
-    # for c in "SMRLPG34R92H784R":
-    #     if c.isalpha():
-    #         voice.speech_synthesis(spell[c])
-    #     else:
-    #         voice.speech_synthesis(c)
-    #voice.speech_synthesis(config.initialMessage + " " + config.choice1 + " " + config.choice2)
-    #choice = voice.speech_recognize()
-    #text = config.initialMessage + " " + config.choice1 + " " + config.choice2
-    #app = Pages.Page()
-    #app.geometry('300x550')
-    #vocal_app = VocalPages(app)
-    #task = threading.Thread(target=vocal_app.start_page)
-    #task.start()
-    #voice.speech_synthesis(config.messageMedicine)
-    #medicine = voice.speech_recognize()
-    #correct_word = voice.medicine_autocorrect(medicine)
-    #print("La medicina corretta è", correct_word)
