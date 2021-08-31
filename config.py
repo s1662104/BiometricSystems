@@ -13,7 +13,11 @@ choiceMode = "Benvenuto \n quale modalità preferisci utilizzare?"
 confirmMode1 = "Vuoi proseguire inserendo i dati manualmente?"
 confirmMode2 = "Vuoi proseguire utilizzando i comandi vocali?"
 confirmMode3 = "Vuoi proseguire inserendo i dati sia manualmente sia attraverso comandi vocali?"
-welcomeMessage = "Benvenuto \n questo è un sistema per la gestione dei fàrmaci \n scegli la modalità con cui preferisci interagire \n"
+welcomeMessage = "Benvenuto \n questo è un sistema per la gestione dei farmaci \n Parla solo dopo il bip o dopo che " \
+                 "la pagina avrà cambiato colore, in base alla tua scelta" \
+                 "\n scegli la modalità con cui preferisci interagire. \n"
+explainFBModMessage = "Ricorda di parlare solo dopo il bip o dopo che \n la pagina avrà cambiato colore, \n" \
+                      "in base alla tua scelta "
 initialMessage = "Puoi scegliere di disattivarmi quando vuoi, basta dire Stop."
 messageAfterStop = "Da ora in avanti non ti guiderò, ma puoi sempre riattivarmi dicendo Start"
 messageWelcome = "Che operazione desideri svolgere?"

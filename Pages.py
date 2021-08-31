@@ -115,6 +115,9 @@ class ModePage(tk.Frame):
                                  command=lambda: setFeedback(2))
         self.c2.pack()
 
+        self.labelExplainFBMod = tk.Label(self, text=config.explainFBModMessage)
+        self.labelExplainFBMod.pack()
+
         def goToStart(mode):
             controller.current_page = controller.frames[StartPage]
             if mode == 1:
@@ -151,6 +154,7 @@ class ModePage(tk.Frame):
         self.label.configure(bg=color)
         self.c1.configure(bg=color)
         self.c2.configure(bg=color)
+        self.labelExplainFBMod.configure(bg=color)
 
 
 # --------------- Start Page ---------------
