@@ -128,7 +128,7 @@ class VocalPages:
                 if self.confirm():
                     self.invoke_button(self.page.current_page.button2)
                     self.start_page()
-            elif self.voice.compare_strings(mode, config.mode3):
+            elif self.voice.compare_strings(mode, config.mode3.replace("\n","")):
                 self.voice.speech_synthesis(config.confirmMode3)
                 if self.confirm():
                     self.invoke_button(self.page.current_page.button3)
@@ -283,14 +283,21 @@ class VocalPages:
                 self.voice.speech_synthesis(config.messageMedicine)
                 entryMedicine = self.check_command()
                 entryMedicine = self.voice.medicine_autocorrect(entryMedicine)
+
+                # chiedo il dosaggio per il farmaco
+                self.voice.speech_synthesis(config.dosageMedicine)
+                dosaggio = self.check_command()
+
             else:
-                entryMedicine = self.page.current_page.medicineEntry[i].get()
-
-            # chiedo il dosaggio per il farmaco
-            self.voice.speech_synthesis(config.dosageMedicine)
-            dosaggio = self.check_command()
+                entry = self.page.current_page.medicineEntry[i].get()
+                medicineDosaggio = entry.split(" ", 4)
+                dosaggio = medicineDosaggio[len(medicineDosaggio)-2] + medicineDosaggio[len(medicineDosaggio)-1]
+                x = 0
+                entryMedicine = ""
+                while x < len(medicineDosaggio)-2:
+                    entryMedicine = entryMedicine + medicineDosaggio[x]
+                    x += 1
             dosMilligrammi = dosaggio[:-2] + config.mg
-
             # chiedo conferma del farmaco e del dosaggio
             self.voice.speech_synthesis(
                 config.medicineConfirm + entryMedicine + "mentre il dosaggio è" + dosMilligrammi + "?")
@@ -321,11 +328,6 @@ class VocalPages:
             #         self.page.current_page.medicineEntry[i].insert(0, entryMedicine + " " + dosaggio)
             #         i += 1
             #         dosaggioCorretto = True
-
-        # self.voice.speech_synthesis(config.medConfirm)
-        # Se c'è quale medicinale errato, chiedo qual è e lo correggo
-        # if not self.confirm():
-        #     self.change_medicine()
 
         self.invoke_button(self.page.current_page.buttonConferma)
         self.information_page()
@@ -577,4 +579,7 @@ class VocalPages:
         button["state"] = "disabled"
 
 if __name__ == '__main__':
-    voice = Voice()
+    # voice = Voice()
+    medicine = "SENSIPAR 30mg"
+    medicineDosaggio = medicine.split(" ", 2)
+    print(medicineDosaggio)
