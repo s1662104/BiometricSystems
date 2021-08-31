@@ -89,11 +89,11 @@ class VocalPages:
 
     def mode_page(self, repeat=False):
         self.page.current_page.update_widget_state(self.page)
-        # self.page.current_page.button1.bind('<Button-1>', func=lambda *args: self.button_press())
+        self.page.current_page.button1.bind('<Button-1>', func=lambda *args: self.button_press())
         # self.page.current_page.button2.bind('<Button-1>', func=lambda *args: self.start_page())
         # self.page.current_page.button3.bind('<Button-1>', func=lambda *args: self.start_page())
         if not repeat:
-            self.voice.speech_synthesis(config.welcomeMessage + " " + config.mode1 + " \n " + config.mode2 + " \n " + config.mode3)
+            self.voice.speech_synthesis(config.welcomeMessage + " " + config.mode1 + " \n " + config.mode2 + " \n " + config.mode3.replace("\n", ""))
         mode = self.check_command()
         # if self.voice.compare_strings(mode, config.mode1):
         #     self.voice.speech_synthesis(config.confirmMode1)
@@ -115,6 +115,7 @@ class VocalPages:
 
     def button_press(self):
         print("BOTTONE PREMUTO VOICE SERVICE")
+        self.voice.synthesis.stop()
 
     def start_page(self, repeat=False):
         self.page.current_page.update_widget_state(self.page)
