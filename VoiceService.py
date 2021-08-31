@@ -409,8 +409,6 @@ class VocalPages:
                 text = self.check_command(True)
                 cf += self.spelling(text)
 
-            print("Lunghezza codice fiscale:", len(cf))
-
             # se la stringa del cf non ha la lunghezza corretta, si ripete da capo lo spelling
             if len(cf) != 16:
                 self.voice.speech_synthesis(config.cfDeleateError)
@@ -437,6 +435,25 @@ class VocalPages:
         return
 
     def change_delegate(self, index):
+
+        while True:
+            # chiedo di fare lo spelling del codice fiscale
+            self.voice.speech_synthesis(config.changeDelegate)
+            cf = ""
+            while len(cf) < 16:
+                text = self.check_command(True)
+                cf += self.spelling(text)
+
+            # chiedo conferma del codice fiscale del delegato
+            self.voice.speech_synthesis(config.confirmCFDelegate + cf + "?")
+            self.read_cf(cf)
+
+            if self.confirm():
+                # cancello il codice fiscale scritto precedentemente
+                self.page.current_page.delegateEntry[index].delete(0, tk.END)
+                # inserisco nella entry il codie fiscale corretto
+                self.set_text_entry(self.page.current_page.delegateEntry[index], cf)
+                break
 
         return
 

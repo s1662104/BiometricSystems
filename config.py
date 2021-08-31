@@ -21,6 +21,7 @@ messagePhoto = "Adesso il sistema verificherà se sei un utente reale. \n Quando
                "tuo viso, premi Q per scattare una foto. "
 numberMedicines = "Quanti fàrmaci assumi?"
 numberDelegate = "A chi vuoi delegare il prelievo di fàrmaci?"
+changeDelegate = "Inserisci codice fiscale corretto"
 enrollmentCompleted = "REGISTRAZIONE COMPLETATA!"
 recognitionRejected = "UTENTE NON RICONOSCIUTO"
 messageRecognition = "Chi sei?"
