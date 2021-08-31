@@ -395,7 +395,7 @@ class VocalPages:
                 self.voice.speech_synthesis(medicine.cget("text"))
         time.sleep(10)
         self.invoke_button(self.page.current_page.homeButton)
-        self.mode_page()
+        self.start_page()
 
     # -------------- Functions --------------
     def addDelegates(self, nDelegates=0):

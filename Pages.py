@@ -635,8 +635,8 @@ class UserPage(DataPage):
             entry.configure(bg=color)
 
     def home(self, controller):
-        controller.current_page = controller.frames[ModePage]
-        controller.show_frame(ModePage)
+        controller.current_page = controller.frames[StartPage]
+        controller.show_frame(StartPage)
 
     # resetta la pagina
     def reset(self):
