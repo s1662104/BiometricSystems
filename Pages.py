@@ -22,6 +22,21 @@ pages = Enum("pages", [])
 radius = 1
 neighborhood = 8
 
+# --------------- Feedback modality ---------------
+
+
+class Feedback(Enum):
+    COLOR = 0
+    SOUND = 1
+
+
+# --------------- Modality enum ---------------
+
+class Modality(Enum):
+    MANUALE = 0
+    COMANDI_VOCALI = 1
+    MIX = 2
+
 
 # --------------- Controller ---------------
 
@@ -53,6 +68,8 @@ class Page(tk.Tk):
         pages = Enum("pages", pageNames)
 
         self.current_page = self.frames[ModePage]
+        self.modality = None
+        self.feedback_modality = Feedback.COLOR
         self.show_frame(ModePage)
 
     def show_frame(self, cont):
@@ -69,12 +86,13 @@ class Page(tk.Tk):
         else:
             self.widget_state = "normal"
 
+
 # --------------- Mode Page ---------------
 class ModePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text=config.choiceMode)
-        label.pack(pady=10, padx=50)
+        self.label = tk.Label(self, text=config.choiceMode)
+        self.label.pack(pady=10, padx=50)
         self.controller = controller
         self.button1 = tk.Button(self, text=config.mode1, width=15, height=2, bg='#1E79FA',
                                  disabledforeground="#2f373c", command=lambda: goToStart(1))
@@ -90,42 +108,49 @@ class ModePage(tk.Frame):
         self.var1 = tk.IntVar
         self.var2 = tk.IntVar
 
-        self.c1 = tk.Checkbutton(self, text=config.checkbox1, variable=self.var1, onvalue=1, offvalue=0, command=lambda: setFeedback(1))
+        self.c1 = tk.Checkbutton(self, text=config.checkbox1, variable=self.var1, onvalue=1, offvalue=0,
+                                 command=lambda: setFeedback(1))
         self.c1.pack(pady=20)
-        self.c2 = tk.Checkbutton(self, text=config.checkbox2, variable=self.var2, onvalue=1, offvalue=0, command=lambda: setFeedback(2))
+        self.c2 = tk.Checkbutton(self, text=config.checkbox2, variable=self.var2, onvalue=1, offvalue=0,
+                                 command=lambda: setFeedback(2))
         self.c2.pack()
 
         def goToStart(mode):
             controller.current_page = controller.frames[StartPage]
             if mode == 1:
-                print("Modalità manuale")
+                controller.modality = Modality.MANUALE
+                self.controller.widget_state = "normal"
             elif mode == 2:
                 controller.current_page.widget_state = "disabled"
-                print("Modalità comandi vocali")
+                controller.modality = Modality.COMANDI_VOCALI
             else:
-                print("Modalità mista")
+                controller.modality = Modality.MIX
             controller.show_frame(StartPage)
 
         def setFeedback(feedback):
             if feedback == 1:
                 self.c1.select()
                 self.c2.deselect()
+                controller.feedback_modality = Feedback.COLOR
             elif feedback == 2:
                 self.c1.deselect()
                 self.c2.select()
+                controller.feedback_modality = Feedback.SOUND
             else:
                 print("FEEDBACK NON VALIDO")
 
-
     def update_widget_state(self, controller):
-        # self.button1["state"] = tk.NORMAL
-        # self.button2["state"] = tk.NORMAL
-        # self.button3["state"] = tk.NORMAL
-        self.button1["state"] = controller.widget_state
-        self.button2["state"] = controller.widget_state
-        self.button3["state"] = controller.widget_state
+        self.button1["state"] = tk.NORMAL
+        self.button2["state"] = tk.NORMAL
+        self.button3["state"] = tk.NORMAL
         self.c1.select()
         self.c2.deselect()
+
+    def update_bg_state(self, controller, color):
+        controller.current_page.configure(background=color)
+        self.label.configure(bg=color)
+        self.c1.configure(bg=color)
+        self.c2.configure(bg=color)
 
 
 # --------------- Start Page ---------------
@@ -134,8 +159,8 @@ class ModePage(tk.Frame):
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text=config.messageWelcome)
-        label.pack(pady=10, padx=50)
+        self.label = tk.Label(self, text=config.messageWelcome)
+        self.label.pack(pady=10, padx=50)
         self.controller = controller
         self.button1 = tk.Button(self, text=config.choice1, width=15, height=2, bg='#1E79FA',
                                  disabledforeground="#2f373c", command=lambda: goToEnroll())
@@ -159,6 +184,10 @@ class StartPage(tk.Frame):
         self.button1["state"] = controller.widget_state
         self.button2["state"] = controller.widget_state
 
+    def update_bg_state(self, controller, color):
+        controller.current_page.configure(background=color)
+        self.label.configure(bg=color)
+
 
 # --------------- Enrollment Page ---------------
 
@@ -166,8 +195,8 @@ class StartPage(tk.Frame):
 class EnrollmentPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text=config.choice1)
-        label.pack(pady=10, padx=10)
+        self.label = tk.Label(self, text=config.choice1)
+        self.label.pack(pady=10, padx=10)
 
         self.entryCF = tk.Entry(self)
         self.entryCF.insert(1, config.messageCF)
@@ -176,15 +205,16 @@ class EnrollmentPage(tk.Frame):
         self.entryName.insert(1, config.messageN)
         self.entryName.pack(pady=2)
         self.invio = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA', disabledforeground="#2f373c",
-                               command=lambda: check_input(controller, self.entryCF.get(), labelError, 0, None,
+                               command=lambda: check_input(controller, self.entryCF.get(), self.labelError, 0, None,
                                                            self.entryName.get()))
         self.invio.pack()
 
-        labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
-        labelError.pack(pady=10, padx=10)
+        self.labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
+        self.labelError.pack(pady=10, padx=10)
 
-        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA', disabledforeground="#2f373c",
-                              command=lambda: back(controller, self.entryCF, labelError, self.entryName))
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                                    disabledforeground="#2f373c",
+                                    command=lambda: back(controller, self.entryCF, self.labelError, self.entryName))
         self.backButton.pack(side="left", pady=300)
 
     # reset dei campi della pagina
@@ -200,6 +230,14 @@ class EnrollmentPage(tk.Frame):
         self.invio["state"] = controller.widget_state
         self.backButton["state"] = controller.widget_state
 
+    def update_bg_state(self, controller, color):
+        controller.current_page.configure(background=color)
+        self.label.configure(bg=color)
+        self.entryCF.configure(disabledbackground=color)
+        self.entryName.configure(disabledbackground=color)
+        self.labelError.configure(bg=color)
+        self.labelError.configure(fg=color)
+
 
 # --------------- Recognition Choice Page ---------------
 
@@ -207,8 +245,8 @@ class EnrollmentPage(tk.Frame):
 class RecognitionChoicePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text=config.messageRecognition)
-        label.pack(pady=10, padx=50)
+        self.label = tk.Label(self, text=config.messageRecognition)
+        self.label.pack(pady=10, padx=50)
         self.button1 = tk.Button(self, text=config.recognitionChoice1, width=15, height=2, bg='#1E79FA',
                                  disabledforeground="#2f373c", command=lambda: confirm(0))
         self.button2 = tk.Button(self, text=config.recognitionChoice2, width=15, height=2, bg='#1E79FA',
@@ -216,7 +254,8 @@ class RecognitionChoicePage(tk.Frame):
         self.button1.pack()
         self.button2.pack(pady=1)
 
-        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA', disabledforeground="#2f373c",
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                                    disabledforeground="#2f373c",
                                     command=lambda: back())
         self.backButton.place(y=520, x=2)
 
@@ -236,6 +275,10 @@ class RecognitionChoicePage(tk.Frame):
         self.button2["state"] = controller.widget_state
         self.backButton["state"] = controller.widget_state
 
+    def update_bg_state(self, controller, color):
+        controller.current_page.configure(background=color)
+        self.label.configure(bg=color)
+
 
 # --------------- Recognition Page ---------------
 
@@ -243,8 +286,8 @@ class RecognitionChoicePage(tk.Frame):
 class RecognitionPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text=config.choice2)
-        label.pack(pady=10, padx=10)
+        self.label = tk.Label(self, text=config.choice2)
+        self.label.pack(pady=10, padx=10)
 
         # paziente = 0, delegato = 1
         self.role = 0
@@ -253,15 +296,16 @@ class RecognitionPage(tk.Frame):
         self.entryCF.insert(1, config.messageCF)
         self.entryCF.pack(padx=0, pady=0)
         self.buttonInvia = tk.Button(self, text="Invia", width=10, height=1, bg='#1E79FA', disabledforeground="#2f373c",
-                                     command=lambda: check_input(controller, self.entryCF.get(), labelError, 1,
+                                     command=lambda: check_input(controller, self.entryCF.get(), self.labelError, 1,
                                                                  self.role))
         self.buttonInvia.pack()
 
-        labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
-        labelError.pack(pady=10, padx=10)
+        self.labelError = tk.Label(self, text=config.messageError, fg="#f0f0f0")
+        self.labelError.pack(pady=10, padx=10)
 
-        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA', disabledforeground="#2f373c",
-                                    command=lambda: back(controller, self.entryCF, labelError))
+        self.backButton = tk.Button(self, text="Indietro", width=8, height=1, bg='#1E79FA',
+                                    disabledforeground="#2f373c",
+                                    command=lambda: back(controller, self.entryCF, self.labelError))
         self.backButton.pack(side="left", pady=385)
 
     # reset della pagina
@@ -278,6 +322,12 @@ class RecognitionPage(tk.Frame):
         self.buttonInvia["state"] = controller.widget_state
         self.backButton["state"] = controller.widget_state
 
+    def update_bg_state(self, controller, color):
+        controller.current_page.configure(background=color)
+        self.label.configure(bg=color)
+        self.entryCF.configure(disabledbackground=color)
+        self.labelError.configure(bg=color)
+        self.labelError.configure(fg=color)
 
 # --------------- Data Page ---------------
 
@@ -311,8 +361,8 @@ class DataEnrollmentPage(DataPage):
 
         self.patient.destroy()
 
-        labelDelegate = tk.Label(self, text=config.numberDelegate)
-        labelDelegate.pack()
+        self.labelDelegate = tk.Label(self, text=config.numberDelegate)
+        self.labelDelegate.pack()
         self.delegateEntry = []
         for n in range(number_maximum_delegate):
             entryDelegate = tk.Entry(self)
@@ -321,8 +371,8 @@ class DataEnrollmentPage(DataPage):
             self.delegateEntry.append(entryDelegate)
 
         self.medicineEntry = []
-        labelNMedicine = tk.Label(self, text=config.numberMedicines)
-        labelNMedicine.pack()
+        self.labelNMedicine = tk.Label(self, text=config.numberMedicines)
+        self.labelNMedicine.pack()
         self.entryNMedicine = tk.Entry(self)
         self.entryNMedicine.insert(1, "")
         self.entryNMedicine.pack(padx=0, pady=0)
@@ -347,6 +397,18 @@ class DataEnrollmentPage(DataPage):
         self.buttonConferma["state"] = controller.widget_state
         self.buttonInvia["state"] = controller.widget_state
         self.backButton["state"] = controller.widget_state
+
+    def update_bg_state(self, controller, color):
+        controller.current_page.configure(background=color)
+        self.name.configure(bg=color)
+        self.cf.configure(bg=color)
+        self.labelDelegate.configure(bg=color)
+        self.labelNMedicine.configure(bg=color)
+        for entry in self.delegateEntry:
+            entry.configure(disabledbackground=color)
+        for entry in self.medicineEntry:
+            entry.configure(disabledbackground=color)
+        self.entryNMedicine.configure(disabledbackground=color)
 
     # resetta la pagina
     def reset(self):
@@ -458,6 +520,10 @@ class DataRecognitionPage(DataPage):
         self.buttonConferma["state"] = controller.widget_state
         self.backButton["state"] = controller.widget_state
 
+    def update_bg_state(self, controller, color):
+        controller.current_page.configure(background=color)
+        self.cf.configure(bg=color)
+
     # reset della pagina
     def reset(self):
         pass
@@ -518,6 +584,10 @@ class InformationPage(tk.Frame):
     def update_widget_state(self, controller):
         self.homeButton["state"] = controller.widget_state
 
+    def update_bg_state(self, controller, color):
+        controller.current_page.configure(background=color)
+        self.label.configure(bg=color)
+
     def update_data(self, info):
         self.label.config(text=info)
 
@@ -533,15 +603,15 @@ class UserPage(DataPage):
     def __init__(self, parent, controller):
         DataPage.__init__(self, parent, controller)
 
-        delegates = tk.Label(self, text="DELEGATI:")
-        delegates.pack()
+        self.delegates = tk.Label(self, text="DELEGATI:")
+        self.delegates.pack()
         self.delegatesLabels = []
         for i in range(3):
             delegate = tk.Label(self, text="Delegato")
             delegate.pack()
             self.delegatesLabels.append(delegate)
-        medicineLabel = tk.Label(self, text="FARMACI:")
-        medicineLabel.pack()
+        self.medicineLabel = tk.Label(self, text="FARMACI:")
+        self.medicineLabel.pack()
 
         self.entries = []
 
@@ -551,6 +621,18 @@ class UserPage(DataPage):
 
     def update_widget_state(self, controller):
         self.homeButton["state"] = controller.widget_state
+
+    def update_bg_state(self, controller, color):
+        controller.current_page.configure(background=color)
+        self.name.configure(bg=color)
+        self.patient.configure(bg=color)
+        self.cf.configure(bg=color)
+        self.delegates.configure(bg=color)
+        for i, label in enumerate(self.delegatesLabels):
+            self.delegatesLabels[i].config(bg=color)
+        self.medicineLabel.configure(bg=color)
+        for entry in self.entries:
+            entry.configure(bg=color)
 
     def home(self, controller):
         controller.current_page = controller.frames[StartPage]
@@ -644,11 +726,11 @@ def check_input(controller, cf, label_error, op, role=None, name=None):
     # Inizio parte antispoofing in fase di matching
     # l'utente deve passare entrambi i test di anti-spoofing
     if not EyeBlink(None).eyeBlinkStart():
-         user = False
+        user = False
     # elif not MicroTexture().microTextureCam():
     #     user = False
     else:
-         user = True
+        user = True
     # Fine parte antispoofing in fase di matching
     # registrazione
     if user:
