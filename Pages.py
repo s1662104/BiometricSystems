@@ -69,7 +69,8 @@ class Page(tk.Tk):
 
         self.current_page = self.frames[ModePage]
         self.modality = None
-        self.feedback_modality = Feedback.COLOR
+        # self.feedback_modality = Feedback.COLOR
+        self.feedback_modality = Feedback.SOUND
         self.show_frame(ModePage)
 
     def show_frame(self, cont):
@@ -134,11 +135,11 @@ class ModePage(tk.Frame):
             if feedback == 1:
                 self.c1.select()
                 self.c2.deselect()
-                controller.feedback_modality = Feedback.COLOR
+                controller.feedback_modality = Feedback.SOUND
             elif feedback == 2:
                 self.c1.deselect()
                 self.c2.select()
-                controller.feedback_modality = Feedback.SOUND
+                controller.feedback_modality = Feedback.COLOR
             else:
                 print("FEEDBACK NON VALIDO")
 
