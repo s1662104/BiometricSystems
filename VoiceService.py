@@ -375,12 +375,9 @@ class VocalPages:
     def page_CF(self, first_time=True):
         # se l'entry e' gia' modificata, significa che l'utente ha proceduto con l'operazione e poi e' tornato indietro
         # quindi il sistema gli chiedera' conferma sul codice fiscale
-        print(self.page.current_page.entryCF.get(),
-              self.page.current_page.entryCF.get() == config.messageCF)
         if self.page.current_page.entryCF.get() == config.messageCF:
             if first_time:
-                self.voice.speech_synthesis(config.messageCF + "\n Ricorda di fare lo spelling e di "
-                                                               "dire una parola alla volta")
+                self.voice.speech_synthesis(config.messageCF + "\n" + config.spellingAdvice)
             else:
                 self.voice.speech_synthesis(config.messageCF)
             cf = ""
@@ -546,7 +543,7 @@ class VocalPages:
                                  self.page.get_pages()[Pages.UserPage], self.page.get_pages()[Pages.ModePage]]
                 if self.page.current_page in no_back_pages:
                     self.voice.speech_synthesis(config.messageError)
-                    return self.check_command(higher_pause)
+                    return self.check_command(higher_pause,modality_check)
                 else:
                     self.invoke_button(self.page.current_page.backButton)
                     self.go_to_current_page_function()
