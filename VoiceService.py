@@ -133,7 +133,8 @@ class VocalPages:
                 if self.confirm():
                     self.invoke_button(self.page.current_page.button3)
                     self.start_page()
-            self.voice.speech_synthesis("quale modalità preferisci utilizzare?" + " " + config.mode1 + " " + config.mode2 + " " + config.mode3)
+            self.voice.speech_synthesis("quale modalità preferisci utilizzare?" + " " + config.mode1 + " " +
+                                        config.mode2 + " " + config.mode3)
             self.mode_page(True)
         else:
             if self.page.modality != self.page.modality.MANUALE:
@@ -162,35 +163,6 @@ class VocalPages:
         cf = self.page_CF()
         self.set_text_entry(self.page.current_page.entryCF, cf)
         self.enroll_page_name()
-
-    def page_CF(self, first_time=True):
-        # se l'entry e' gia' modificata, significa che l'utente ha proceduto con l'operazione e poi e' tornato indietro
-        # quindi il sistema gli chiedera' conferma sul codice fiscale
-        print(self.page.current_page.entryCF.get(),
-              self.page.current_page.entryCF.get() == config.messageCF)
-        if self.page.current_page.entryCF.get() == config.messageCF:
-            if first_time:
-                self.voice.speech_synthesis(config.messageCF + "\n Ricorda di fare lo spelling e di "
-                                                               "dire una parola alla volta")
-            else:
-                self.voice.speech_synthesis(config.messageCF)
-            cf = ""
-            while len(cf) < 16:
-                text = self.check_command(True)
-                cf += self.spelling(text)
-        else:
-            cf = self.page.current_page.entryCF.get()
-        if len(cf) != 16:
-            self.set_text_entry(self.page.current_page.entryCF, config.messageCF)
-            return self.page_CF(False)
-        self.voice.speech_synthesis(config.confirmCF)
-        self.read_cf(cf)
-        self.voice.speech_synthesis(config.confirm)
-        if self.confirm():
-            return cf
-        else:
-            self.set_text_entry(self.page.current_page.entryCF, config.messageCF)
-            return self.page_CF(False)
 
     def enroll_page_name(self):
         # si divide tra nome e cognome per riconoscere correttamente i casi di doppi nomi e cognomi composti
@@ -400,6 +372,35 @@ class VocalPages:
         self.start_page()
 
     # -------------- Functions --------------
+    def page_CF(self, first_time=True):
+        # se l'entry e' gia' modificata, significa che l'utente ha proceduto con l'operazione e poi e' tornato indietro
+        # quindi il sistema gli chiedera' conferma sul codice fiscale
+        print(self.page.current_page.entryCF.get(),
+              self.page.current_page.entryCF.get() == config.messageCF)
+        if self.page.current_page.entryCF.get() == config.messageCF:
+            if first_time:
+                self.voice.speech_synthesis(config.messageCF + "\n Ricorda di fare lo spelling e di "
+                                                               "dire una parola alla volta")
+            else:
+                self.voice.speech_synthesis(config.messageCF)
+            cf = ""
+            while len(cf) < 16:
+                text = self.check_command(True)
+                cf += self.spelling(text)
+        else:
+            cf = self.page.current_page.entryCF.get()
+        if len(cf) != 16:
+            self.set_text_entry(self.page.current_page.entryCF, config.messageCF)
+            return self.page_CF(False)
+        self.voice.speech_synthesis(config.confirmCF)
+        self.read_cf(cf)
+        self.voice.speech_synthesis(config.confirm)
+        if self.confirm():
+            return cf
+        else:
+            self.set_text_entry(self.page.current_page.entryCF, config.messageCF)
+            return self.page_CF(False)
+
     def addDelegates(self, nDelegates=0):
         while True:
             # chiedo di fare lo spelling del codice fiscale
@@ -542,7 +543,7 @@ class VocalPages:
         if text is not None:
             if self.voice.state == 0 and self.voice.compare_strings(text, config.backCommand):
                 no_back_pages = [self.page.get_pages()[Pages.StartPage], self.page.get_pages()[Pages.InformationPage],
-                                 self.page.get_pages()[Pages.UserPage]]
+                                 self.page.get_pages()[Pages.UserPage], self.page.get_pages()[Pages.ModePage]]
                 if self.page.current_page in no_back_pages:
                     self.voice.speech_synthesis(config.messageError)
                     return self.check_command(higher_pause)
