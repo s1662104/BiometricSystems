@@ -691,7 +691,9 @@ class UserPage(DataPage):
         days = (today - last_date).days
         medicine_dataset = pd.read_csv("dataset_medicine.csv")
         for row in medicine_dataset.iterrows():
+            print(row)
             for medicine in medicines:
+                print(medicine)
                 # poiche' le medicine sono nel formato "Prefolic 15 mg", si divide il nome dal dosaggio
                 s = medicine.split(" ")
                 # gli ultimi due elementi sono il dosaggio ("15 mg")
@@ -701,7 +703,7 @@ class UserPage(DataPage):
                 # si prendono gli ultimi due elementi
                 dose = s[len(s) - 2] + " " + s[len(s) - 1]
                 # se il nome e il dosaggio combaciano
-                if row[1]["Nome"] == name and row[1]["Dosaggio"] == dose:
+                if row[1]["Nome"].lower() == name and row[1]["Dosaggio"].lower() == dose:
                     # estraggo i dati
                     n = row[1]["Numero Pasticche"]
                     dose_x_day = row[1]["Dose x giorno"]

@@ -112,7 +112,7 @@ class VocalPages:
 
     def mode_page(self, repeat=False):
         self.page.current_page.update_widget_state(self.page)
-
+        time.sleep(5)
         if not repeat:
             self.voice.speech_synthesis(
                 config.welcomeMessage + " " + config.mode1 + " \n " + config.mode2 + " \n " + config.mode3.replace("\n",""))
