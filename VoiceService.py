@@ -198,7 +198,7 @@ class VocalPages:
         # se la prima entry della lista dei delegati è vuota
         if first_time:
             # chiedo se si vogliono aggiungere dei delegati
-            self.voice.speech_synthesis(config.messageDelegate)
+            self.voice.speech_synthesis(config.messageDelegate.replace("farmaco","fàrmaco"))
             if self.confirm():
                 # aggiungo i delegati
                 self.addDelegates()
@@ -223,7 +223,7 @@ class VocalPages:
         while True:
             # se l'entry non e' modificata, significa che l'utente non ha inserito il numero dei farmaci
             if self.page.current_page.entryNMedicine.get() == "":
-                self.voice.speech_synthesis(config.numberMedicines)
+                self.voice.speech_synthesis(config.numberMedicines.replace("farmaci","fàrmaci"))
                 num_string = self.check_command()
 
                 if numbers.__contains__(num_string):
@@ -245,7 +245,7 @@ class VocalPages:
         # aggiungo un numero di entry pari al numero appena inserito
         self.set_text_entry(self.page.current_page.entryNMedicine, num_medicines)
         self.invoke_button(self.page.current_page.buttonInvia)
-
+        self.page.current_page.update_widget_state(self.page)
         i = 0
 
         # ogni entry deve essere controllato per vedere se è stato modificato o meno
@@ -257,7 +257,7 @@ class VocalPages:
                 entryMedicine = self.voice.medicine_autocorrect(entryMedicine)
 
                 # chiedo il dosaggio per il farmaco
-                self.voice.speech_synthesis(config.dosageMedicine)
+                self.voice.speech_synthesis(config.dosageMedicine.replace("farmaco","fàrmaco"))
                 dosaggio = self.check_command()
 
             else:
@@ -274,7 +274,7 @@ class VocalPages:
             self.voice.speech_synthesis(
                 config.medicineConfirm + entryMedicine + "mentre il dosaggio è" + dosMilligrammi + "?")
             if self.confirm():
-                self.page.current_page.medicineEntry[i].insert(0, entryMedicine + " " + dosaggio)
+                self.set_text_entry(self.page.current_page.medicineEntry[i], entryMedicine + " " + dosaggio)
                 i += 1
 
             # # Chiedo conferma della medicina appena dichiarata
@@ -401,7 +401,7 @@ class VocalPages:
     def addDelegates(self, nDelegates=0):
         while True:
             # chiedo di fare lo spelling del codice fiscale
-            self.voice.speech_synthesis(config.numberDelegate)
+            self.voice.speech_synthesis(config.numberDelegate.replace("farmaci","fàrmaci"))
             cf = ""
             while len(cf) < 16:
                 text = self.check_command(True)
