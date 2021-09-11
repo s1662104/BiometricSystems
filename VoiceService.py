@@ -110,7 +110,7 @@ class VocalPages:
 
     # -------------- Pages --------------
 
-    def mode_page(self, repeat=False):
+    def modality_page(self, repeat=False):
         self.page.current_page.update_widget_state(self.page)
         time.sleep(5)
         if not repeat:
@@ -135,7 +135,7 @@ class VocalPages:
                     self.start_page()
             self.voice.speech_synthesis("quale modalità preferisci utilizzare?" + " " + config.mode1 + " " +
                                         config.mode2 + " " + config.mode3)
-            self.mode_page(True)
+            self.modality_page(True)
         else:
             if self.page.modality != self.page.modality.MANUALE:
                 self.start_page()
@@ -540,7 +540,7 @@ class VocalPages:
         if text is not None:
             if self.voice.state == 0 and self.voice.compare_strings(text, config.backCommand):
                 no_back_pages = [self.page.get_pages()[Pages.StartPage], self.page.get_pages()[Pages.InformationPage],
-                                 self.page.get_pages()[Pages.UserPage], self.page.get_pages()[Pages.ModePage]]
+                                 self.page.get_pages()[Pages.UserPage], self.page.get_pages()[Pages.ModalityPage]]
                 if self.page.current_page in no_back_pages:
                     self.voice.speech_synthesis(config.messageError)
                     return self.check_command(higher_pause,modality_check)
@@ -565,8 +565,8 @@ class VocalPages:
                 return text
 
     def go_to_current_page_function(self):
-        if self.page.current_page.__class__ is Pages.ModePage:
-            self.mode_page()
+        if self.page.current_page.__class__ is Pages.ModalityPage:
+            self.modality_page()
         elif self.page.current_page.__class__ is Pages.StartPage:
             self.start_page()
         elif self.page.current_page.__class__ is Pages.EnrollmentPage:

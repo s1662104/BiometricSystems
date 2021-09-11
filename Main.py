@@ -6,5 +6,5 @@ if __name__ == '__main__':
     app = Page()
     app.geometry('300x550')
     vocal_app = VocalPages(app)
-    threading.Thread(target=vocal_app.mode_page).start()
+    threading.Thread(target=vocal_app.modality_page).start()
     threading.Thread(target=app.mainloop())

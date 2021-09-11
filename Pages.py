@@ -54,7 +54,7 @@ class Page(tk.Tk):
         self.frames = {}
         pageNames = []
 
-        for F in (ModePage, StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage,
+        for F in (ModalityPage, StartPage, EnrollmentPage, RecognitionPage, DataEnrollmentPage, DataRecognitionPage,
                   InformationPage, UserPage, RecognitionChoicePage):
             frame = F(container, self)
 
@@ -67,11 +67,11 @@ class Page(tk.Tk):
         # pagina n, si indicizza a pages.NOME_PAGINA.value - 1 (-1 perche' gli indici partono da 1)
         pages = Enum("pages", pageNames)
 
-        self.current_page = self.frames[ModePage]
+        self.current_page = self.frames[ModalityPage]
         self.modality = None
         # self.feedback_modality = Feedback.COLOR
         self.feedback_modality = Feedback.SOUND
-        self.show_frame(ModePage)
+        self.show_frame(ModalityPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -89,7 +89,7 @@ class Page(tk.Tk):
 
 
 # --------------- Mode Page ---------------
-class ModePage(tk.Frame):
+class ModalityPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text=config.choiceMode)
